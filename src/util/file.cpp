@@ -24,11 +24,14 @@ std::vector<char> readFile(std::string path) {
   return std::vector<char>(data, data + size);
 }
 
-bool FileInputStream::open(std::string path) {
-  if (filehandle) {
-    PHYSFS_close(filehandle);
-  }
+FileInputStream::FileInputStream() : sf::FileInputStream(), filehandle(nullptr) {}
 
+FileInputStream::~FileInputStream() {
+  close();
+}
+
+bool FileInputStream::open(const std::string& path) {
+  close();
   filehandle = PHYSFS_openRead(path.c_str());
   return filehandle != nullptr;
 }
@@ -49,7 +52,7 @@ sf::Int64 FileInputStream::getSize() {
   return PHYSFS_fileLength(filehandle);
 }
 
-FileInputStream::~FileInputStream() {
-  PHYSFS_close(filehandle);
+int FileInputStream::close() {
+  return PHYSFS_close(filehandle);
 }
 }
