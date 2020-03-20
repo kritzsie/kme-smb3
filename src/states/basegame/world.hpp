@@ -15,7 +15,7 @@ public:
   Tilemap& getTiles();
 
 private:
-  Entities entities;
+  Components entities;
   Tilemap tiles;
 };
 
@@ -48,7 +48,6 @@ public:
 private:
   UInt32 counter;
 
-  SubworldTable subworld_original;
   SubworldTable subworld;
 };
 }

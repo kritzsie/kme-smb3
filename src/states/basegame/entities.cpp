@@ -1,25 +1,25 @@
 #include "entities.hpp"
 
 namespace kme {
-Entity::Entity(Entities& entities, UInt32 index) : entities(entities), index(index) {}
+Entity::Entity(Components& components, UInt32 index): components(components), index(index) {}
 
-const UInt32& Entity::getId() const {
-  return entities.id.at(index);
+const EntityID& Entity::getId() const {
+  return components.id.at(index);
 }
 
 const EntityType& Entity::getType() const {
-  return entities.type.at(index);
+  return components.type.at(index);
 }
 
 const Vec2f& Entity::getPos() const {
-  return entities.pos.at(index);
+  return components.pos.at(index);
 }
 
 const Vec2f& Entity::getVel() const {
-  return entities.vel.at(index);
+  return components.vel.at(index);
 }
 
-UInt32& Entity::getId() {
+EntityID& Entity::getId() {
   return const_cast<UInt32&>(static_cast<const Entity*>(this)->getId());
 }
 

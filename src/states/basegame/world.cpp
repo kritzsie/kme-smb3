@@ -25,7 +25,6 @@ UInt32 Level::createSubworld(UInt32 index_hint) {
     if (counter == index_hint) {
       ++counter;
     }
-    subworld_original.emplace(index_hint, Subworld());
     subworld.emplace(index_hint, Subworld());
     return index_hint;
   }
@@ -33,7 +32,6 @@ UInt32 Level::createSubworld(UInt32 index_hint) {
   while (subworld.find(counter) != subworld.end()) {
     ++counter;
   }
-  subworld_original.emplace(counter, Subworld());
   subworld.emplace(counter, Subworld());
   return counter;
 }
@@ -44,7 +42,6 @@ bool Level::subworldExists(UInt32 index) {
 
 bool Level::deleteSubworld(UInt32 index) {
   if (subworldExists(index)) {
-    subworld_original.erase(index);
     subworld.erase(index);
     return true;
   }

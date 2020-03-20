@@ -9,6 +9,8 @@
 
 #include <SFML/Graphics.hpp>
 
+#include <string>
+
 namespace kme {
 class Gameplay : public BaseState {
 public:
@@ -30,15 +32,24 @@ public:
   void draw() final;
 
 private:
+  BaseGame* getBaseGame();
+
+  void drawBackground(sf::Color color);
+  void drawBackground(std::string texture);
   void drawTiles(Rect<Int32> region);
+
+  Vec2f fromScreen(Vec2f pos);
+  Vec2f toScreen(Vec2f pos);
+
+  Vec2f fromTile(Vec2i pos);
+  Vec2i toTile(Vec2f pos);
 
   float ticktime;
   float rendertime;
 
-  BaseGame* base_game;
   sf::RenderTexture* framebuffer;
 
-  UInt32 subworld_current;
   Level level;
+  UInt32 current_subworld;
 };
 }

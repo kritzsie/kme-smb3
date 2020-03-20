@@ -7,14 +7,17 @@
 #include <vector>
 
 namespace kme {
+using EntityID = UInt32;
 using EntityType = std::string;
 
-struct Entities {
+struct Components {
 public:
-  std::vector<UInt32> id;
+  std::vector<EntityID> id;
   std::vector<EntityType> type;
   std::vector<Vec2f> pos;
   std::vector<Vec2f> vel;
+
+  void createEntity();
 
 private:
   UInt32 counter;
@@ -22,21 +25,21 @@ private:
 
 class Entity {
 public:
-  Entity(Entities& entities, UInt32 index);
+  Entity(Components& components, UInt32 index);
 
-  const UInt32& getId() const;
+  const EntityID& getId() const;
   const EntityType& getType() const;
   const Vec2f& getPos() const;
   const Vec2f& getVel() const;
 
   // mutable accessors
-  UInt32& getId();
+  EntityID& getId();
   EntityType& getType();
   Vec2f& getPos();
   Vec2f& getVel();
 
 private:
-  Entities& entities;
+  Components& components;
   UInt32 index;
 };
 }
