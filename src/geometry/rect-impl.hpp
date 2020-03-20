@@ -1,0 +1,155 @@
+#pragma once
+
+namespace kme {
+template<typename T>
+Rect<T> Rect<T>::operator+() const {
+  return Rect<T>(+x, +y, +width, +height);
+}
+
+template<typename T>
+Rect<T> Rect<T>::operator-() const {
+  return Rect<T>(-x, -y, -width, -height);
+}
+
+// Rect addition defined as the Minkowski sum of two rectangles
+template<typename T>
+Rect<T> Rect<T>::operator+(const Rect<T>& rhs) const {
+  return Rect<T>(x + rhs.x, y + rhs.y, width + rhs.width, height + rhs.height);
+}
+
+// Likewise, subtraction defined as the Minkowski difference of two rectangles
+template<typename T>
+Rect<T> Rect<T>::operator-(const Rect<T>& rhs) const {
+  return Rect<T>(x - rhs.x, y - rhs.y, width - rhs.width, height - rhs.height);
+}
+
+template<typename T>
+Rect<T> Rect<T>::operator*(T rhs) const {
+  return Rect<T>(x * rhs, y * rhs, width * rhs, height * rhs);
+}
+
+template<typename T>
+Rect<T> operator*(T lhs, const Rect<T>& rhs) {
+  return Rect<T>(lhs * rhs.x, lhs * rhs.y, lhs * rhs.width, lhs * rhs.height);
+}
+
+template<typename T>
+Rect<T> Rect<T>::operator/(T rhs) const {
+  return Rect<T>(x / rhs, y / rhs, width / rhs, height / rhs);
+}
+
+template<typename T>
+Rect<T> operator/(T lhs, const Rect<T>& rhs) {
+  return Rect<T>(lhs / rhs.x, lhs / rhs.y, lhs / rhs.width, lhs / rhs.height);
+}
+
+template<typename T>
+bool Rect<T>::operator==(const Rect<T>& rhs) const {
+  return (x == rhs.x) and
+         (y == rhs.y) and
+         (width == rhs.width) and
+         (height == rhs.height);
+}
+
+template<typename T>
+bool Rect<T>::operator!=(const Rect<T>& rhs) const {
+  return (this->pos != rhs.pos) and (this->size != rhs.size);
+}
+
+template<typename T>
+Rect<T>& Rect<T>::operator=(const Rect<T>& rhs) {
+  x = rhs.x;
+  y = rhs.y;
+  width = rhs.width;
+  height = rhs.height;
+  return *this;
+}
+
+template<typename T>
+Rect<T>& Rect<T>::operator+=(const Rect<T>& rhs) {
+  x += rhs.x;
+  y += rhs.y;
+  width += rhs.width;
+  height += rhs.height;
+  return *this;
+}
+
+template<typename T>
+Rect<T>& Rect<T>::operator-=(const Rect<T>& rhs) {
+  x -= rhs.x;
+  y -= rhs.y;
+  width -= rhs.width;
+  height -= rhs.height;
+  return *this;
+}
+
+template<typename T>
+Rect<T>& Rect<T>::operator*=(T rhs) {
+  x *= rhs;
+  y *= rhs;
+  width *= rhs;
+  height *= rhs;
+  return *this;
+}
+
+template<typename T>
+Rect<T>& Rect<T>::operator/=(T rhs) {
+  x /= rhs;
+  y /= rhs;
+  width /= rhs;
+  height /= rhs;
+  return *this;
+}
+
+template<typename T>
+Rect<T>::operator sf::Rect<T>() const {
+  return sf::Rect<T>(x, y, width, height);
+}
+
+template<typename T>
+Vec2<T> Rect<T>::midpoint() const {
+  return Vec2<T>(x + width / 2, y + height / 2);
+}
+
+template<typename T>
+bool Rect<T>::intersects(const Rect<T>& rhs) const {
+  if (x < rhs.x + rhs.width
+  and x + width > rhs.x
+  and y < rhs.y + rhs.height
+  and y + height > rhs.y) {
+    return true;
+  }
+  return false;
+}
+
+template<typename T>
+Rect<T> Rect<T>::intersection(const Rect<T>& rhs) const {
+  return Rect<T>(
+    std::max(x, rhs.x),
+    std::max(y, rhs.y),
+    (x < rhs.x) ? (x + width - rhs.x) : (rhs.x + rhs.width - x),
+    (y < rhs.y) ? (y + height - rhs.y) : (rhs.y + rhs.height - y)
+  );
+}
+
+template<typename T>
+Rect<T>::Rect() : x(), y(), width(), height() {}
+
+template<typename T>
+Rect<T>::Rect(T all) : x(all), y(all), width(all), height(all) {}
+
+template<typename T>
+Rect<T>::Rect(T x, T y, T width, T height) :
+  x(x), y(y), width(width), height(height)
+{}
+
+template<typename T>
+Rect<T>::Rect(const Rect<T>& rect) :
+  x(rect.x), y(rect.y), width(rect.width), height(rect.height)
+{}
+
+template<typename T>
+Rect<T>::Rect(const Vec2<T>& pos, const Vec2<T>& size) :
+  x(pos.x), y(pos.y), width(size.x), height(size.y)
+{}
+}
