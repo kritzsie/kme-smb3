@@ -54,19 +54,18 @@ public:
   void registerTileDef(TileID tileid, TileDef tiledef);
   const TileDef& getTileDef(TileID tileid) const;
 
-  const const_iterator begin() const;
-  const const_iterator end() const;
-  const const_reverse_iterator rbegin() const;
-  const const_reverse_iterator rend() const;
   const const_iterator cbegin() const;
   const const_iterator cend() const;
+  const const_iterator begin() const;
+  iterator begin();
+  const const_iterator end() const;
+  iterator end();
+
   const const_reverse_iterator crbegin() const;
   const const_reverse_iterator crend() const;
-
-  // mutable accessors
-  iterator begin();
-  iterator end();
+  const const_reverse_iterator rbegin() const;
   reverse_iterator rbegin();
+  const const_reverse_iterator rend() const;
   reverse_iterator rend();
 
 private:

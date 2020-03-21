@@ -1,6 +1,59 @@
 #include "world.hpp"
 
 namespace kme {
+Entity::Entity(EntityComponents& entity_components,
+               EntityComponents& entity_components_next,
+               std::size_t index) :
+entity_components(entity_components),
+entity_components_next(entity_components_next),
+index(index) {}
+
+const EntityID& Entity::getID() const {
+  return entity_components.id.at(index);
+}
+
+const EntityType& Entity::getType() const {
+  return entity_components.type.at(index);
+}
+
+const Vec2f& Entity::getPos() const {
+  return entity_components.pos.at(index);
+}
+
+void Entity::setPos(Vec2f pos) {
+  entity_components_next.pos.at(index) = pos;
+}
+
+const Vec2f& Entity::getVel() const {
+  return entity_components.vel.at(index);
+}
+
+void Entity::setVel(Vec2f vel) {
+  entity_components_next.vel.at(index) = vel;
+}
+
+Entity Subworld::spawnEntity(EntityType type) {
+  std::size_t index;
+  for (index = 0; index < entity_components_next.valid.size(); ++index) {
+    std::vector<bool>::reference valid = entity_components_next.valid.at(index);
+    if (not valid) {
+      valid = true;
+      entity_components_next.id.at(index) = spawn_counter++;
+      entity_components_next.type.at(index) = type;
+      return Entity(entity_components, entity_components_next, index);
+    }
+  }
+  expandEntityComponents();
+  entity_components_next.valid.at(index) = true;
+  entity_components_next.id.at(index) = spawn_counter++;
+  entity_components_next.type.at(index) = type;
+  return Entity(entity_components, entity_components_next, index);
+}
+
+const EntityComponents& Subworld::getEntityComponents() const {
+  return entity_components;
+}
+
 const Tilemap& Subworld::getTiles() const {
   return tiles;
 }
@@ -9,7 +62,34 @@ Tilemap& Subworld::getTiles() {
   return const_cast<Tilemap&>(static_cast<const Subworld*>(this)->getTiles());
 }
 
-Level::Level() : counter(0) {
+void Subworld::update() {
+  entity_components = entity_components_next;
+}
+
+void Subworld::expandEntityComponents() {
+  std::size_t size = entity_components_next.valid.size();
+  std::size_t new_size = 2 * entity_components_next.valid.size();
+  try {
+    entity_components.valid.resize(new_size);
+    entity_components.id.resize(new_size);
+    entity_components.type.resize(new_size);
+    entity_components.pos.resize(new_size);
+    entity_components.vel.resize(new_size);
+  }
+  catch (const std::bad_alloc& ex) {
+    entity_components.valid.resize(size);
+    entity_components.id.resize(size);
+    entity_components.type.resize(size);
+    entity_components.pos.resize(size);
+    entity_components.vel.resize(size);
+    throw ex;
+  }
+}
+
+// TODO: implement this for garbage collection
+//void Subworld::shrinkEntityComponents() {}
+
+Level::Level() {
   createSubworld();
 }
 
@@ -23,6 +103,7 @@ UInt32 Level::createSubworld(UInt32 index_hint) {
     if (counter == index_hint) {
       ++counter;
     }
+
     subworld.emplace(index_hint, Subworld());
     return index_hint;
   }
@@ -30,6 +111,7 @@ UInt32 Level::createSubworld(UInt32 index_hint) {
   while (subworld.find(counter) != subworld.end()) {
     ++counter;
   }
+
   subworld.emplace(counter, Subworld());
   return counter;
 }
@@ -43,6 +125,7 @@ bool Level::deleteSubworld(UInt32 index) {
     subworld.erase(index);
     return true;
   }
+
   return false;
 }
 

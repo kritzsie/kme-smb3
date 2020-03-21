@@ -7,23 +7,55 @@
 #include <unordered_map>
 
 namespace kme {
-class Subworld {
+class Entity {
 public:
-  const Tilemap& getTiles() const;
+  Entity(EntityComponents& entity_components,
+         EntityComponents& entity_components_next,
+         std::size_t index);
 
-  // mutable accessors
-  Tilemap& getTiles();
+  const EntityID& getID() const;
+  const EntityType& getType() const;
+  const Vec2f& getPos() const;
+  void setPos(Vec2f pos);
+  const Vec2f& getVel() const;
+  void setVel(Vec2f vel);
 
 private:
-  EntityComponents entities;
+  EntityComponents& entity_components;
+  EntityComponents& entity_components_next;
+
+  std::size_t index;
+};
+
+class Subworld {
+public:
+  Entity spawnEntity(EntityType type);
+
+  const EntityComponents& getEntityComponents() const;
+
+  const Tilemap& getTiles() const;
+  Tilemap& getTiles();
+
+  void update();
+
+private:
+  void expandEntityComponents();
+  void shrinkEntityComponents();
+
+  EntityID spawn_counter = 0;
+
+  EntityComponents entity_components;
+  EntityComponents entity_components_next;
+
   Tilemap tiles;
 };
 
 class Level {
 public:
-  using SubworldTable = std::unordered_map<UInt32, Subworld>;
-  using const_iterator = SubworldTable::const_iterator;
-  using iterator = SubworldTable::iterator;
+  using Map = std::unordered_map<UInt32, Subworld>;
+
+  using const_iterator = Map::const_iterator;
+  using iterator = Map::iterator;
 
   Level();
 
@@ -33,21 +65,18 @@ public:
   bool deleteSubworld(UInt32 index);
 
   const Subworld& getSubworld(UInt32 index) const;
-
-  const const_iterator begin() const;
-  const const_iterator end() const;
-  const const_iterator cbegin() const;
-  const const_iterator cend() const;
-
-  // mutable accessors
   Subworld& getSubworld(UInt32 index);
 
+  const const_iterator cbegin() const;
+  const const_iterator cend() const;
+  const const_iterator begin() const;
   iterator begin();
+  const const_iterator end() const;
   iterator end();
 
 private:
-  UInt32 counter;
+  UInt32 counter = 0;
 
-  SubworldTable subworld;
+  Map subworld;
 };
 }

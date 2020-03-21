@@ -57,12 +57,14 @@ bool Gameplay::handleInput(sf::Event::EventType type, const sf::Event& event) {
   default:
     break;
   }
-
   return true;
 }
 
 void Gameplay::enter() {
-  Tilemap& tiles = level.getSubworld(current_subworld).getTiles();
+  Subworld& subworld = level.getSubworld(current_subworld);
+
+  // tiles
+  Tilemap& tiles = subworld.getTiles();
 
   tiles[0][0] = TileID("wood_floor_0");
   for (int x = 1; x < 23; ++x) {
@@ -70,12 +72,16 @@ void Gameplay::enter() {
   }
   tiles[23][0] = TileID("wood_floor_2");
 
-  tiles[10][5] = TileID("brick_block");
-  for (int x = 11; x < 15; ++x) {
+  tiles[13][5] = TileID("brick_block");
+  for (int x = 14; x < 18; ++x) {
     Tile prev = tiles[x - 1][5];
     if      (prev == TileID("brick_block")) tiles[x][5] = TileID("item_block");
     else if (prev == TileID("item_block"))  tiles[x][5] = TileID("brick_block");
   }
+
+  // entities
+  Entity mario = subworld.spawnEntity("player_mario");
+  mario.setPos(Vec2f(2.f, 1.f));
 }
 
 void Gameplay::exit() {}
@@ -90,6 +96,8 @@ void Gameplay::update() {
   if (pressedUp or pressedDown or pressedLeft or pressedRight) {
     camera_pos += Vec2f(pressedRight - pressedLeft, pressedUp - pressedDown) * 16.f * delta;
   }
+
+  level.getSubworld(current_subworld).update();
 
   ticktime += delta;
 }
@@ -116,17 +124,21 @@ static Vec2f getCameraRadius() {
 
 void Gameplay::draw() {
   Window* window = engine->getWindow();
+
   if (window != nullptr) {
     drawBackground(sf::Color(0x6898F8FF));
     drawBackground("overworldblockstop");
     drawBackground("cloudlayer");
 
     sf::View view = framebuffer->getView();
-    view.setCenter(toScreen(camera_pos));
+    Vec2f screen_coords = toScreen(camera_pos);
+    view.setCenter(Vec2f(std::round(screen_coords.x), std::round(screen_coords.y)));
     framebuffer->setView(view);
 
     Rect<float> camera_region = regionFromRect(rectFromBox(camera_pos, getCameraRadius()));
     drawTiles(viewportFromRegion(camera_region));
+
+    drawEntities();
 
     framebuffer->display();
 
@@ -155,6 +167,24 @@ void Gameplay::drawTiles(Rect<Int32> region) {
         Vec2<Int32> pos = tile.getPos();
         sf::Sprite sprite(gfx.getTile(texture), tiledef.getFrame(frame).cliprect);
         sprite.setPosition(sf::Vector2f(pos.x * 16.f, -(pos.y * 16.f + 16.f)));
+        framebuffer->draw(sprite);
+      }
+    }
+  }
+}
+
+void Gameplay::drawEntities() {
+  const EntityComponents& entity_components = level.getSubworld(current_subworld).getEntityComponents();
+  std::size_t size = entity_components.valid.size();
+
+  for (std::size_t i = 0; i < size; ++i) {
+    if (entity_components.valid.at(i)) {
+      const RenderFrame& frame = getBaseGame()->entity_data.getRenderStates(entity_components.type.at(i))->getFrame();
+      std::string texture = frame.texture;
+      if (texture != "") {
+        sf::Sprite sprite(gfx.getSprite(texture), frame.cliprect);
+        Vec2f offset = frame.offset + Vec2f(0.f, frame.cliprect.height);
+        sprite.setPosition(toScreen(entity_components.pos.at(i)) - offset);
         framebuffer->draw(sprite);
       }
     }

@@ -22,7 +22,7 @@ std::size_t TileDef::getFrameCount() const {
   return frames.size();
 }
 
-// NOTE: this function has potential for optimization.
+// NOTE: this function has potential for optimization
 std::size_t TileDef::getFrameOffset(float time) const {
   float time_max = 0.f;
 

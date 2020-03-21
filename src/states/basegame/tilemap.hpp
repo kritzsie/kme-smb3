@@ -43,13 +43,11 @@ public:
   Vec2<Int16> getChunkPos() const;
 
   const Chunk& getChunk() const;
+  Chunk& getChunk();
 
   operator TileID() const;
 
   operator bool() const;
-
-  // mutable accessors
-  Chunk& getChunk();
 
 private:
   ChunkMap& chunks;
@@ -73,8 +71,6 @@ public:
 
   Proxy operator [](Int32 x);
   Tile operator [](Vec2<Int32> pos);
-
-  // TODO: implement iterator functions
 
 private:
   ChunkMap chunks;

@@ -40,6 +40,7 @@ private:
   void drawBackground(sf::Color color);
   void drawBackground(std::string texture);
   void drawTiles(Rect<Int32> region);
+  void drawEntities();
 
   Vec2f fromScreen(Vec2f pos);
   Vec2f toScreen(Vec2f pos);
@@ -59,7 +60,7 @@ private:
 
   Vec2f camera_pos;
 
-  Level level;
   UInt32 current_subworld;
+  Level level;
 };
 }
