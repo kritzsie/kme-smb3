@@ -1,5 +1,7 @@
 #pragma once
 
+#include <SFML/Window/Event.hpp>
+
 #include <functional>
 
 namespace kme {
@@ -14,6 +16,8 @@ protected:
 
 public:
   virtual ~BaseState() = default;
+
+  virtual bool handleInput(sf::Event::EventType event_type, const sf::Event& event);
 
   virtual void enter() = 0;
   virtual void exit() = 0;

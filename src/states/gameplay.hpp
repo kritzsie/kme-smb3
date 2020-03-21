@@ -7,6 +7,7 @@
 #include "../geometry.hpp"
 #include "../types.hpp"
 
+#include <SFML/Window/Event.hpp>
 #include <SFML/Graphics.hpp>
 
 #include <string>
@@ -21,6 +22,8 @@ private:
 
 public:
   ~Gameplay() final;
+
+  bool handleInput(sf::Event::EventType type, const sf::Event& event) final;
 
   void enter() final;
   void exit() final;

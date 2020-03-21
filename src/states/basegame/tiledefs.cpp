@@ -72,7 +72,6 @@ void TileDefs::registerTileDef(TileID tileid, TileDef tiledef) {
     ss << "attempted to redefine tile with id \"" << tileid << "\"";
     throw TileRedefinitionError(ss.str());
   }
-
   tiledefs[tileid] = std::move(tiledef);
 }
 

@@ -5,7 +5,7 @@
 #include "../util/math.hpp"
 
 #include <ctgmath>
-
+                              #include <iostream>
 namespace kme {
 Gameplay::Factory Gameplay::create() {
   return [=](BaseState* parent, Engine* engine) -> BaseState* {
@@ -29,6 +29,11 @@ Gameplay::~Gameplay() {
 
 BaseGame* Gameplay::getBaseGame() {
   return dynamic_cast<BaseGame*>(parent);
+}
+
+bool Gameplay::handleInput(sf::Event::EventType type, const sf::Event& event) {
+  std::cerr << "Testing\n";
+  return true;
 }
 
 void Gameplay::enter() {

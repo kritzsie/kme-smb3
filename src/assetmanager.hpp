@@ -20,13 +20,14 @@ private:
   AssetManager(const AssetManager&) = delete;
   AssetManager& operator =(const AssetManager&) = delete;
 
+public:
+  virtual ~AssetManager() = default;
+
 protected:
   bool load(std::string folder, std::string name);
   virtual bool onLoad(util::FileInputStream& ifs, std::string folder, std::string name) = 0;
 
 public:
-  virtual ~AssetManager() = default;
-
   const StringList extensions;
 };
 

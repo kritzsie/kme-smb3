@@ -164,6 +164,7 @@ bool Engine::main() {
   return true;
 }
 
+// TODO: move event processing to update function
 void Engine::update() {
   if (window != nullptr) {
     sf::Event event;
@@ -171,9 +172,14 @@ void Engine::update() {
       switch (event.type) {
       default:
         break;
-      case sf::Event::KeyPressed:
-        break;
+      case sf::Event::MouseMoved:
+      case sf::Event::MouseWheelScrolled:
       case sf::Event::KeyReleased:
+      case sf::Event::KeyPressed:
+      case sf::Event::JoystickMoved:
+        for (auto iter = states.rbegin(); iter != states.rend(); ++iter) {
+          (*iter)->handleInput(event.type, event);
+        }
         break;
       case sf::Event::Resized:
         window->resize(event.size.width, event.size.height);
