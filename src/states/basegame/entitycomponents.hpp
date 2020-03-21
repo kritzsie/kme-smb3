@@ -10,7 +10,7 @@ namespace kme {
 using EntityID = UInt32;
 using EntityType = std::string;
 
-struct Components {
+struct EntityComponents {
 public:
   std::vector<EntityID> id;
   std::vector<EntityType> type;
@@ -25,7 +25,7 @@ private:
 
 class Entity {
 public:
-  Entity(Components& components, UInt32 index);
+  Entity(EntityComponents& components, UInt32 index);
 
   const EntityID& getId() const;
   const EntityType& getType() const;
@@ -39,7 +39,7 @@ public:
   Vec2f& getVel();
 
 private:
-  Components& components;
+  EntityComponents& components;
   UInt32 index;
 };
 }

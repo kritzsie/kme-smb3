@@ -1,6 +1,6 @@
 #pragma once
 
-#include "entities.hpp"
+#include "entitycomponents.hpp"
 #include "tilemap.hpp"
 
 #include <cstdlib>
@@ -15,7 +15,7 @@ public:
   Tilemap& getTiles();
 
 private:
-  Components entities;
+  EntityComponents entities;
   Tilemap tiles;
 };
 

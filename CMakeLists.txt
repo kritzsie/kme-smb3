@@ -14,7 +14,8 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/json/include)
 add_executable(
   kme-smb3
   src/states/basestate.cpp
-  src/states/basegame/entities.cpp
+  src/states/basegame/entitycomponents.cpp
+  src/states/basegame/entitydata.cpp
   src/states/basegame/tiledefs.cpp
   src/states/basegame/tilemap.cpp
   src/states/basegame/world.cpp

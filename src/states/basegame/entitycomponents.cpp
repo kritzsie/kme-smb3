@@ -1,7 +1,7 @@
-#include "entities.hpp"
+#include "entitycomponents.hpp"
 
 namespace kme {
-Entity::Entity(Components& components, UInt32 index): components(components), index(index) {}
+Entity::Entity(EntityComponents& components, UInt32 index): components(components), index(index) {}
 
 const EntityID& Entity::getId() const {
   return components.id.at(index);
