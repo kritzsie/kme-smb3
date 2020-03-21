@@ -1,7 +1,5 @@
 #include "world.hpp"
 
-          #include <iostream>
-
 namespace kme {
 const Tilemap& Subworld::getTiles() const {
   return tiles;

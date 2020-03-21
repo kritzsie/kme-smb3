@@ -41,10 +41,12 @@ public:
 
 class TileDefs {
 public:
-  using const_iterator = std::map<TileID, TileDef>::const_iterator;
-  using const_reverse_iterator = std::map<TileID, TileDef>::const_reverse_iterator;
-  using iterator = std::map<TileID, TileDef>::iterator;
-  using reverse_iterator = std::map<TileID, TileDef>::reverse_iterator;
+  using Map = std::map<TileID, TileDef>;
+
+  using const_iterator = Map::const_iterator;
+  using const_reverse_iterator = Map::const_reverse_iterator;
+  using iterator = Map::iterator;
+  using reverse_iterator = Map::reverse_iterator;
 
   TileDefs();
   TileDefs(TileDef default_tile);
@@ -68,6 +70,6 @@ public:
   reverse_iterator rend();
 
 private:
-  std::map<TileID, TileDef> tiledefs;
+  Map tiledefs;
 };
 }
