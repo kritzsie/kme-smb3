@@ -42,7 +42,7 @@ public:
   Window(UInt32 width, UInt32 height, const char* title);
   ~Window();
 
-  void update();
+  void drawWindow();
   void resize(UInt32 width, UInt32 height);
 
   sf::RenderTexture* getFramebuffer();
@@ -60,7 +60,7 @@ public:
 
   using StateEvent = std::pair<StateEventType, BaseState::Factory>;
 
-  Engine(int, char**);
+  Engine(int argc, char** argv);
   Engine(std::vector<std::string>&& args);
   ~Engine();
 
@@ -73,7 +73,7 @@ public:
   TimeInfo getTickTime() const;
   TimeInfo getRenderTime() const;
 
-  void pushState(BaseState::Factory);
+  void pushState(BaseState::Factory factory);
   BaseState* popState();
 
 protected:

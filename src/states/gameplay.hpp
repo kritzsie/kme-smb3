@@ -7,8 +7,8 @@
 #include "../geometry.hpp"
 #include "../types.hpp"
 
-#include <SFML/Window/Event.hpp>
 #include <SFML/Graphics.hpp>
+#include <SFML/Window/Event.hpp>
 
 #include <string>
 
@@ -51,6 +51,13 @@ private:
   float rendertime;
 
   sf::RenderTexture* framebuffer;
+
+  bool pressedUp = false;
+  bool pressedDown = false;
+  bool pressedLeft = false;
+  bool pressedRight = false;
+
+  Vec2f camera_pos;
 
   Level level;
   UInt32 current_subworld;

@@ -27,6 +27,8 @@ Window::Window(UInt32 width, UInt32 height, const char* title)
   framebuffer = new sf::RenderTexture();
   framebuffer->create(480, 270);
 
+  setKeyRepeatEnabled(false);
+
   sf::VideoMode videomode = sf::VideoMode::getDesktopMode();
   setPosition(sf::Vector2i(
     (videomode.width - width) / 2,
@@ -42,7 +44,7 @@ sf::RenderTexture* Window::getFramebuffer() {
   return framebuffer;
 }
 
-void Window::update() {
+void Window::drawWindow() {
   clear();
 
   framebuffer->display();
@@ -170,15 +172,19 @@ void Engine::update() {
     sf::Event event;
     while (window->pollEvent(event)) {
       switch (event.type) {
-      default:
-        break;
-      case sf::Event::MouseMoved:
-      case sf::Event::MouseWheelScrolled:
-      case sf::Event::KeyReleased:
       case sf::Event::KeyPressed:
+      case sf::Event::KeyReleased:
       case sf::Event::JoystickMoved:
+      case sf::Event::JoystickButtonPressed:
+      case sf::Event::JoystickButtonReleased:
+      case sf::Event::MouseMoved:
+      case sf::Event::MouseButtonPressed:
+      case sf::Event::MouseButtonReleased:
+      case sf::Event::MouseWheelScrolled:
         for (auto iter = states.rbegin(); iter != states.rend(); ++iter) {
-          (*iter)->handleInput(event.type, event);
+          if ((*iter)->handleInput(event.type, event)) {
+            break;
+          }
         }
         break;
       case sf::Event::Resized:
@@ -186,6 +192,8 @@ void Engine::update() {
         break;
       case sf::Event::Closed:
         quit();
+        break;
+      default:
         break;
       }
     }
@@ -223,7 +231,7 @@ void Engine::draw() {
   }
 
   if (window != nullptr) {
-    window->update();
+    window->drawWindow();
   }
 }
 

@@ -5,7 +5,7 @@
 #include "../util/math.hpp"
 
 #include <ctgmath>
-                              #include <iostream>
+
 namespace kme {
 Gameplay::Factory Gameplay::create() {
   return [=](BaseState* parent, Engine* engine) -> BaseState* {
@@ -17,6 +17,8 @@ Gameplay::Gameplay(BaseState* parent, Engine* engine)
 : BaseState(parent, engine) {
   framebuffer = new sf::RenderTexture;
   framebuffer->create(480, 270);
+
+  camera_pos = Vec2f(15.f, 8.4375f);
 
   current_subworld = 0;
 }
@@ -32,7 +34,30 @@ BaseGame* Gameplay::getBaseGame() {
 }
 
 bool Gameplay::handleInput(sf::Event::EventType type, const sf::Event& event) {
-  std::cerr << "Testing\n";
+  switch (type) {
+  case sf::Event::KeyPressed:
+  case sf::Event::KeyReleased:
+    switch (event.key.code) {
+    case sf::Keyboard::Key::Up:
+      pressedUp = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Up);
+      break;
+    case sf::Keyboard::Key::Down:
+      pressedDown = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Down);
+      break;
+    case sf::Keyboard::Key::Left:
+      pressedLeft = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left);
+      break;
+    case sf::Keyboard::Key::Right:
+      pressedRight = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right);
+      break;
+    default:
+      break;
+    }
+    break;
+  default:
+    break;
+  }
+
   return true;
 }
 
@@ -60,7 +85,13 @@ void Gameplay::pause() {}
 void Gameplay::resume() {}
 
 void Gameplay::update() {
-  ticktime += engine->getTickTime().delta;
+  float delta = engine->getTickTime().delta;
+
+  if (pressedUp or pressedDown or pressedLeft or pressedRight) {
+    camera_pos += Vec2f(pressedRight - pressedLeft, pressedUp - pressedDown) * 16.f * delta;
+  }
+
+  ticktime += delta;
 }
 
 static Rect<float> rectFromBox(Vec2f pos, Vec2f radius) {
@@ -79,6 +110,10 @@ static Rect<Int32> viewportFromRegion(Rect<float> region) {
   );
 }
 
+static Vec2f getCameraRadius() {
+  return Vec2f(15.f, 8.4375f);
+}
+
 void Gameplay::draw() {
   Window* window = engine->getWindow();
   if (window != nullptr) {
@@ -86,14 +121,11 @@ void Gameplay::draw() {
     drawBackground("overworldblockstop");
     drawBackground("cloudlayer");
 
-    Vec2f camera_pos = Vec2f(15.f, 8.4375f);
-    Vec2f camera_radius = Vec2f(15.f, 8.4375f);
-
     sf::View view = framebuffer->getView();
     view.setCenter(toScreen(camera_pos));
     framebuffer->setView(view);
 
-    Rect<float> camera_region = regionFromRect(rectFromBox(camera_pos, camera_radius));
+    Rect<float> camera_region = regionFromRect(rectFromBox(camera_pos, getCameraRadius()));
     drawTiles(viewportFromRegion(camera_region));
 
     framebuffer->display();
