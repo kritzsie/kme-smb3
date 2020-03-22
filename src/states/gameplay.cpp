@@ -90,16 +90,14 @@ void Gameplay::pause() {}
 
 void Gameplay::resume() {}
 
-void Gameplay::update() {
-  float delta = engine->getTickTime().delta;
-
+void Gameplay::update(float delta_time) {
   if (pressedUp or pressedDown or pressedLeft or pressedRight) {
-    camera_pos += Vec2f(pressedRight - pressedLeft, pressedUp - pressedDown) * 16.f * delta;
+    camera_pos += Vec2f(pressedRight - pressedLeft, pressedUp - pressedDown) * 16.f * delta_time;
   }
 
-  level.getSubworld(current_subworld).update();
+  level.getSubworld(current_subworld).update(delta_time);
 
-  ticktime += delta;
+  ticktime += delta_time;
 }
 
 static Rect<float> rectFromBox(Vec2f pos, Vec2f radius) {
@@ -122,7 +120,7 @@ static Vec2f getCameraRadius() {
   return Vec2f(15.f, 8.4375f);
 }
 
-void Gameplay::draw() {
+void Gameplay::draw(float delta_time) {
   Window* window = engine->getWindow();
 
   if (window != nullptr) {
@@ -131,8 +129,7 @@ void Gameplay::draw() {
     drawBackground("cloudlayer");
 
     sf::View view = framebuffer->getView();
-    Vec2f screen_coords = toScreen(camera_pos);
-    view.setCenter(Vec2f(std::round(screen_coords.x), std::round(screen_coords.y)));
+    view.setCenter(toScreen(camera_pos).map(std::roundf));
     framebuffer->setView(view);
 
     Rect<float> camera_region = regionFromRect(rectFromBox(camera_pos, getCameraRadius()));
@@ -145,7 +142,7 @@ void Gameplay::draw() {
     window->getFramebuffer()->draw(sf::Sprite(framebuffer->getTexture()));
   }
 
-  rendertime += engine->getRenderTime().delta;
+  rendertime += delta_time;
 }
 
 void Gameplay::drawBackground(sf::Color color) {

@@ -27,7 +27,7 @@ struct PhysFSInfo {
   std::string prefdir;
 };
 
-class TimeInfo {
+struct TimeInfo {
 public:
   TimeInfo(float rate);
 
@@ -78,15 +78,17 @@ public:
 
 protected:
   bool main();
-  void update();
-  void draw();
+  void update(float delta_time);
+  void draw(float delta_time);
   void quit();
-
-  std::vector<std::string> args;
 
 private:
   bool setupPhysFS();
 
+protected:
+  std::vector<std::string> args;
+
+private:
   static std::size_t instance_count;
 
   bool running;

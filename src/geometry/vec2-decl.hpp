@@ -4,42 +4,46 @@
 
 #include <SFML/System/Vector2.hpp>
 
+#include <functional>
+
 namespace kme {
 template<typename T>
 class Vec2 {
 public:
   T x, y;
 
+  Vec2();
+  Vec2(T x, T y);
+  Vec2(const Vec2<T>& vec2);
+  Vec2(const sf::Vector2<T>& vec2);
+
+  Vec2<T>& operator=(const Vec2<T>& rhs);
+
   Vec2<T> operator+() const;
   Vec2<T> operator-() const;
-  Vec2<T> operator+(const Vec2<T>&) const;
-  Vec2<T> operator-(const Vec2<T>&) const;
-  Vec2<T> operator*(T) const;
-  Vec2<T> operator/(T) const;
+  Vec2<T> operator+(const Vec2<T>& rhs) const;
+  Vec2<T> operator-(const Vec2<T>& rhs) const;
+  Vec2<T> operator*(T rhs) const;
+  Vec2<T> operator/(T rhs) const;
 
-  bool operator==(const Vec2<T>&) const;
-  bool operator!=(const Vec2<T>&) const;
+  bool operator==(const Vec2<T>& rhs) const;
+  bool operator!=(const Vec2<T>& rhs) const;
 
-  Vec2<T>& operator=(const Vec2<T>&);
-  Vec2<T>& operator+=(const Vec2<T>&);
-  Vec2<T>& operator-=(const Vec2<T>&);
-  Vec2<T>& operator*=(T);
-  Vec2<T>& operator/=(T);
+  Vec2<T>& operator+=(const Vec2<T>& rhs);
+  Vec2<T>& operator-=(const Vec2<T>& rhs);
+  Vec2<T>& operator*=(T rhs);
+  Vec2<T>& operator/=(T rhs);
 
-  T dot(const Vec2<T>&) const;
+  T dot(const Vec2<T>& other) const;
   T length() const;
   Vec2 normalized() const;
 
-  Vec2 map(T (&)(T));
-  Vec2 map(T (&)(T, T), T);
+  Vec2 map(std::function<T (T)> f);
+
+  template<typename U>
+  explicit operator Vec2<U>() const;
 
   operator sf::Vector2<T>() const;
-
-  Vec2();
-  Vec2(T);
-  Vec2(T, T);
-  Vec2(const Vec2<T>&);
-  Vec2(const sf::Vector2<T>&);
 };
 
 using Vec2i = Vec2<Int32>;

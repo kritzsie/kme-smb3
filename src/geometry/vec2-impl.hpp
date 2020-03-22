@@ -1,6 +1,27 @@
 #pragma once
 
+#include "vec2-decl.hpp"
+
 namespace kme {
+template<typename T>
+Vec2<T>::Vec2() : x(), y() {}
+
+template<typename T>
+Vec2<T>::Vec2(T x, T y) : x(x), y(y) {}
+
+template<typename T>
+Vec2<T>::Vec2(const Vec2<T>& vec2) : x(vec2.x), y(vec2.y) {}
+
+template<typename T>
+Vec2<T>::Vec2(const sf::Vector2<T>& vec2) : Vec2<T>(vec2.x, vec2.y) {}
+
+template<typename T>
+Vec2<T>& Vec2<T>::operator=(const Vec2<T>& rhs) {
+  x = rhs.x;
+  y = rhs.y;
+  return *this;
+}
+
 template<typename T>
 Vec2<T> Vec2<T>::operator+() const {
   return Vec2<T>(+x, +y);
@@ -52,13 +73,6 @@ bool Vec2<T>::operator!=(const Vec2<T>& rhs) const {
 }
 
 template<typename T>
-Vec2<T>& Vec2<T>::operator=(const Vec2<T>& rhs) {
-  x = rhs.x;
-  y = rhs.y;
-  return *this;
-}
-
-template<typename T>
 Vec2<T>& Vec2<T>::operator+=(const Vec2<T>& rhs) {
   x += rhs.x;
   y += rhs.y;
@@ -87,8 +101,8 @@ Vec2<T>& Vec2<T>::operator/=(T rhs) {
 }
 
 template<typename T>
-T Vec2<T>::dot(const Vec2<T>& rhs) const {
-  return acos(x * rhs.x + y * rhs.y);
+T Vec2<T>::dot(const Vec2<T>& other) const {
+  return acos(x * other.x + y * other.y);
 }
 
 template<typename T>
@@ -102,13 +116,8 @@ Vec2<T> Vec2<T>::normalized() const {
 }
 
 template<typename T>
-Vec2<T> Vec2<T>::map(T (&f)(T)) {
+Vec2<T> Vec2<T>::map(std::function<T (T)> f) {
   return Vec2<T>(f(x), f(y));
-}
-
-template<typename T>
-Vec2<T> Vec2<T>::map(T (&f)(T, T), T rhs) {
-  return Vec2<T>(f(x, rhs), f(y, rhs));
 }
 
 template<typename T>
@@ -116,18 +125,8 @@ Vec2<T>::operator sf::Vector2<T>() const {
   return sf::Vector2<T>(x, y);
 }
 
-template<typename T>
-Vec2<T>::Vec2() : x(), y() {}
-
-template<typename T>
-Vec2<T>::Vec2(T both) : x(both), y(both) {}
-
-template<typename T>
-Vec2<T>::Vec2(T x, T y) : x(x), y(y) {}
-
-template<typename T>
-Vec2<T>::Vec2(const Vec2<T>& vec2) : x(vec2.x), y(vec2.y) {}
-
-template<typename T>
-Vec2<T>::Vec2(const sf::Vector2<T>& vec2) : Vec2<T>(vec2.x, vec2.y) {}
+template<typename T> template<typename U>
+Vec2<T>::operator Vec2<U>() const {
+  return Vec2<U>(x, y);
+}
 }

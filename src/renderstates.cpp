@@ -21,8 +21,9 @@ void RenderStates::pushFrame(std::string state_arg, std::string texture,
   );
 }
 
-void RenderStates::pushFrame(std::string state_arg, std::string texture, Vec2i origin, Vec2f offset_arg, float duration) {
-  pushFrame(state_arg, texture, Rect<int>(origin, Vec2i(16)), offset_arg, duration);
+void RenderStates::pushFrame(std::string state_arg, std::string texture,
+                             Vec2i origin, Vec2f offset_arg, float duration) {
+  pushFrame(state_arg, texture, Rect<int>(origin, Vec2i(16, 16)), offset_arg, duration);
 }
 
 StringList RenderStates::getStateList() const {

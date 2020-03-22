@@ -4,6 +4,8 @@
 
 #include <SFML/Graphics/Rect.hpp>
 
+#include <functional>
+
 namespace kme {
 template<typename T>
 class Rect {
@@ -11,35 +13,43 @@ public:
   T x, y;
   T width, height;
 
-  Rect<T> operator+() const;
-  Rect<T> operator-() const;
-  Rect<T> operator+(const Rect<T>&) const;
-  Rect<T> operator-(const Rect<T>&) const;
-  Rect<T> operator*(T) const;
-  Rect<T> operator/(T) const;
-
-  Rect<T> operator+(const Vec2<T>&) const;
-  Rect<T> operator-(const Vec2<T>&) const;
-
-  bool operator==(const Rect<T>&) const;
-  bool operator!=(const Rect<T>&) const;
+  Rect();
+  Rect(T x, T y, T width, T height);
+  Rect(const Rect<T>& rect);
+  Rect(const Vec2<T>& pos, const Vec2<T>& size);
+  Rect(const sf::Rect<T>& rect);
 
   Rect<T>& operator=(const Rect<T>&);
-  Rect<T>& operator+=(const Rect<T>&);
-  Rect<T>& operator-=(const Rect<T>&);
-  Rect<T>& operator*=(T);
-  Rect<T>& operator/=(T);
 
-  operator sf::Rect<T>() const;
+  Rect<T> operator+() const;
+  Rect<T> operator-() const;
+  Rect<T> operator+(const Rect<T>& rhs) const;
+  Rect<T> operator-(const Rect<T>& rhs) const;
+  Rect<T> operator*(T rhs) const;
+  Rect<T> operator/(T rhs) const;
+
+  Rect<T> operator+(const Vec2<T>& rhs) const;
+  Rect<T> operator-(const Vec2<T>& rhs) const;
+
+  bool operator==(const Rect<T>& rhs) const;
+  bool operator!=(const Rect<T>& rhs) const;
+
+  Rect<T>& operator+=(const Rect<T>& rhs);
+  Rect<T>& operator-=(const Rect<T>& rhs);
+  Rect<T>& operator*=(T rhs);
+  Rect<T>& operator/=(T rhs);
+
+  bool intersects(const Rect<T>& other) const;
+  Rect<T> intersection(const Rect<T>& other) const;
 
   Vec2<T> midpoint() const;
-  bool intersects(const Rect<T>&) const;
-  Rect<T> intersection(const Rect<T>&) const;
+  Vec2<T> radius() const;
 
-  Rect();
-  Rect(T);
-  Rect(T, T, T, T);
-  Rect(const Rect<T>&);
-  Rect(const Vec2<T>&, const Vec2<T>&);
+  Rect<T> map(std::function<T (T)> f);
+
+  template<typename U>
+  explicit operator Rect<U>() const;
+
+  operator sf::Rect<T>() const;
 };
 }

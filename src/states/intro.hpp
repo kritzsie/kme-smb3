@@ -19,8 +19,8 @@ public:
   void pause() final;
   void resume() final;
 
-  void update() final;
-  void draw() final;
+  void update(float delta_time) final;
+  void draw(float delta_time) final;
 
 private:
   bool paused = false;

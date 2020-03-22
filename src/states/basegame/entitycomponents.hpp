@@ -15,6 +15,9 @@ struct EntityComponents {
 
   EntityComponents();
 
+  const std::size_t getSize() const;
+  const std::size_t getCapacity() const;
+
   std::vector<bool> valid;
   std::vector<EntityID> id;
   std::vector<EntityType> type;

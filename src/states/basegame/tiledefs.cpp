@@ -15,7 +15,7 @@ void TileDef::setCollisionType(CollisionType new_collision_type) {
 }
 
 void TileDef::pushFrame(std::string texture, Vec2i origin, float duration) {
-  frames.push_back(RenderFrame(texture, Rect<int>(origin, Vec2i(16)), Vec2f(0.f, 0.f), duration));
+  frames.push_back(RenderFrame(texture, Rect<int>(origin, Vec2i(16, 16)), Vec2f(0.f, 0.f), duration));
 }
 
 std::size_t TileDef::getFrameCount() const {

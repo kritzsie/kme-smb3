@@ -22,14 +22,14 @@ void Intro::resume() {
   paused = false;
 }
 
-void Intro::update() {
+void Intro::update(float delta_time) {
   if (not paused) {
     engine->pushState(BaseGame::create());
     pause();
   }
 }
 
-void Intro::draw() {}
+void Intro::draw(float delta_time) {}
 
 Intro::Intro(Engine* engine) : BaseState(nullptr, engine) {}
 }

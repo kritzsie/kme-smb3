@@ -143,12 +143,12 @@ bool Engine::main() {
 
   while (running) {
     if (nexttick < curtime) {
-      update();
+      update(ticktime.delta);
       nexttick += tickdelta;
     }
 
     if (nextrender < curtime) {
-      draw();
+      draw(rendertime.delta);
       nextrender += renderdelta;
     }
 
@@ -167,7 +167,7 @@ bool Engine::main() {
 }
 
 // TODO: move event processing to update function
-void Engine::update() {
+void Engine::update(float delta_time) {
   if (window != nullptr) {
     sf::Event event;
     while (window->pollEvent(event)) {
@@ -221,13 +221,13 @@ void Engine::update() {
   }
 
   for (BaseState* state : states) {
-    state->update();
+    state->update(delta_time);
   }
 }
 
-void Engine::draw() {
+void Engine::draw(float delta_time) {
   for (BaseState* state : states) {
-    state->draw();
+    state->draw(delta_time);
   }
 
   if (window != nullptr) {

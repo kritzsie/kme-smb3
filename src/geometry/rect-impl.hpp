@@ -1,6 +1,28 @@
 #pragma once
 
+#include "rect-decl.hpp"
+
+#include <algorithm>
+
 namespace kme {
+template<typename T>
+Rect<T>::Rect() : x(), y(), width(), height() {}
+
+template<typename T>
+Rect<T>::Rect(T x, T y, T width, T height) :
+  x(x), y(y), width(width), height(height)
+{}
+
+template<typename T>
+Rect<T>::Rect(const Rect<T>& rect) :
+  x(rect.x), y(rect.y), width(rect.width), height(rect.height)
+{}
+
+template<typename T>
+Rect<T>::Rect(const Vec2<T>& pos, const Vec2<T>& size) :
+  x(pos.x), y(pos.y), width(size.x), height(size.y)
+{}
+
 template<typename T>
 Rect<T> Rect<T>::operator+() const {
   return Rect<T>(+x, +y, +width, +height);
@@ -102,16 +124,6 @@ Rect<T>& Rect<T>::operator/=(T rhs) {
 }
 
 template<typename T>
-Rect<T>::operator sf::Rect<T>() const {
-  return sf::Rect<T>(x, y, width, height);
-}
-
-template<typename T>
-Vec2<T> Rect<T>::midpoint() const {
-  return Vec2<T>(x + width / 2, y + height / 2);
-}
-
-template<typename T>
 bool Rect<T>::intersects(const Rect<T>& rhs) const {
   if (x < rhs.x + rhs.width
   and x + width > rhs.x
@@ -127,29 +139,34 @@ Rect<T> Rect<T>::intersection(const Rect<T>& rhs) const {
   return Rect<T>(
     std::max(x, rhs.x),
     std::max(y, rhs.y),
-    (x < rhs.x) ? (x + width - rhs.x) : (rhs.x + rhs.width - x),
-    (y < rhs.y) ? (y + height - rhs.y) : (rhs.y + rhs.height - y)
+    x < rhs.x ? x + width  - rhs.x : rhs.x + rhs.width  - x,
+    y < rhs.y ? y + height - rhs.y : rhs.y + rhs.height - y
   );
 }
 
 template<typename T>
-Rect<T>::Rect() : x(), y(), width(), height() {}
+Vec2<T> Rect<T>::midpoint() const {
+  const Vec2<T> r = radius();
+  return Vec2<T>(x + r.x, y + r.y);
+}
 
 template<typename T>
-Rect<T>::Rect(T all) : x(all), y(all), width(all), height(all) {}
+Vec2<T> Rect<T>::radius() const {
+  return Vec2<T>(width / 2, height / 2);
+}
 
 template<typename T>
-Rect<T>::Rect(T x, T y, T width, T height) :
-  x(x), y(y), width(width), height(height)
-{}
+Rect<T> Rect<T>::map(std::function<T (T)> f) {
+  return Rect<T>(f(x), f(y), f(width), f(height));
+}
+
+template<typename T> template<typename U>
+Rect<T>::operator Rect<U>() const {
+  return Rect<U>(x, y, width, height);
+}
 
 template<typename T>
-Rect<T>::Rect(const Rect<T>& rect) :
-  x(rect.x), y(rect.y), width(rect.width), height(rect.height)
-{}
-
-template<typename T>
-Rect<T>::Rect(const Vec2<T>& pos, const Vec2<T>& size) :
-  x(pos.x), y(pos.y), width(size.x), height(size.y)
-{}
+Rect<T>::operator sf::Rect<T>() const {
+  return sf::Rect<T>(x, y, width, height);
+}
 }

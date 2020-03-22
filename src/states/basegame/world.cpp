@@ -34,7 +34,7 @@ void Entity::setVel(Vec2f vel) {
 
 Entity Subworld::spawnEntity(EntityType type) {
   std::size_t index;
-  for (index = 0; index < entity_components_next.valid.size(); ++index) {
+  for (index = 0; index < entity_components_next.getCapacity(); ++index) {
     std::vector<bool>::reference valid = entity_components_next.valid.at(index);
     if (not valid) {
       valid = true;
@@ -62,13 +62,19 @@ Tilemap& Subworld::getTiles() {
   return const_cast<Tilemap&>(static_cast<const Subworld*>(this)->getTiles());
 }
 
-void Subworld::update() {
+void Subworld::update(float delta_time) {
+  for (std::size_t i = 0; i < entity_components.getSize(); ++i) {
+    if (entity_components.valid.at(i)) {
+      entity_components_next.pos.at(i) += entity_components.vel.at(i) * delta_time;
+    }
+  }
+
   entity_components = entity_components_next;
 }
 
 void Subworld::expandEntityComponents() {
-  std::size_t size = entity_components_next.valid.size();
-  std::size_t new_size = 2 * entity_components_next.valid.size();
+  std::size_t size = entity_components_next.getCapacity();
+  std::size_t new_size = 2 * size; // mimic most vector growth implementations
   try {
     entity_components.valid.resize(new_size);
     entity_components.id.resize(new_size);

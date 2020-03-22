@@ -36,7 +36,7 @@ public:
   const Tilemap& getTiles() const;
   Tilemap& getTiles();
 
-  void update();
+  void update(float delta_time);
 
 private:
   void expandEntityComponents();
