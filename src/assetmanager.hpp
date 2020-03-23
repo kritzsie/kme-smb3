@@ -33,7 +33,7 @@ public:
 
 class GFXAssets : public AssetManager {
 public:
-  static const sf::Texture none;
+  static const inline sf::Texture none;
 
   static GFXAssets& getInstance();
 
@@ -57,7 +57,7 @@ private:
 
 class SFXAssets : public AssetManager {
 public:
-  static const sf::SoundBuffer none;
+  static const inline sf::SoundBuffer none;
 
   static SFXAssets& getInstance();
 

@@ -1,10 +1,32 @@
 #include "input.hpp"
 
-#include <limits>
-
 namespace kme {
 template<typename TBase, typename TWide>
-Input<TBase, TWide>::operator TBase() const { return state; }
+Input<TBase, TWide>::Input() : state(), delta() {}
+
+template<typename TBase, typename TWide>
+Input<TBase, TWide>::Input(const Input& input)
+: state(input.state), delta(input.delta) {}
+
+template<typename TBase, typename TWide>
+TBase Input<TBase, TWide>::getState() const {
+  return state;
+}
+
+template<typename TBase, typename TWide>
+TWide Input<TBase, TWide>::getDelta() const {
+  return delta;
+}
+
+template<typename TBase, typename TWide>
+Input<TBase, TWide>::operator TBase() const {
+  return getState();
+}
+
+template<typename TBase, typename TWide>
+TWide Input<TBase, TWide>::operator ~() const {
+  return getDelta();
+}
 
 template<typename TBase, typename TWide>
 bool Input<TBase, TWide>::operator ==(const Input& rhs) const {
@@ -63,15 +85,10 @@ Input<TBase, TWide>& Input<TBase, TWide>::operator =(TBase rhs) {
   return *this;
 }
 
-template<typename TBase, typename TWide>
-TWide Input<TBase, TWide>::operator ~() const {
-  return delta;
-}
-
-template class Input<bool, int>;
-template class Input<SInt8, int>;
+template class Input<bool, signed char>;
+template class Input<signed char, short>;
 template class Input<short, int>;
-template class Input<int, long long>;
+template class Input<int, long>;
 template class Input<long, long long>;
 template class Input<long long, long long>;
 

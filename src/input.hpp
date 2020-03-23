@@ -7,33 +7,37 @@
 namespace kme {
 template<typename TBase, typename TWide>
 class Input {
-protected:
+private:
   TBase state;
-
-public:
   TWide delta;
 
+public:
+  Input();
+  Input(const Input& input);
+
+  Input& operator =(TBase);
+
+  TBase getState() const;
+  TWide getDelta() const;
+
   operator TBase() const;
+  TWide operator ~() const;
 
-  bool operator ==(const Input&) const;
-  bool operator !=(const Input&) const;
+  bool operator ==(const Input& rhs) const;
+  bool operator !=(const Input& rhs) const;
 
-  bool operator >(const Input&) const;
-  bool operator <(const Input&) const;
-  bool operator >=(const Input&) const;
-  bool operator <=(const Input&) const;
+  bool operator >(const Input& rhs) const;
+  bool operator <(const Input& rhs) const;
+  bool operator >=(const Input& rhs) const;
+  bool operator <=(const Input& rhs) const;
 
   TWide operator +() const;
   TWide operator -() const;
 
-  TWide operator +(const Input&) const;
-  TWide operator -(const Input&) const;
-
-  Input& operator =(TBase);
-
-  TWide operator ~() const;
+  TWide operator +(const Input& rhs) const;
+  TWide operator -(const Input& rhs) const;
 };
 
 using Axis = Input<short, int>;
-using Button = Input<bool, int>;
+using Button = Input<bool, signed char>;
 }

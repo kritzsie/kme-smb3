@@ -27,7 +27,7 @@ using ChunkMap = std::unordered_map<Vec2<Int16>, Chunk>;
 // TODO: create separate class for Chunk type
 class Tile {
 public:
-  static const TileID none;
+  static const inline TileID none;
 
   Tile(ChunkMap& chunks, Vec2<Int32> pos);
 

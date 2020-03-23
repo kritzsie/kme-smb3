@@ -4,8 +4,6 @@
 
 namespace kme {
 // begin Tile
-const TileID Tile::none;
-
 Tile::Tile(ChunkMap& chunks, Vec2<Int32> pos) : chunks(chunks), pos(pos) {}
 
 Tile& Tile::operator =(const TileID& rhs) {

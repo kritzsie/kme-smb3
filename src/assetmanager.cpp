@@ -44,8 +44,6 @@ bool AssetManager::load(std::string folder, std::string name) {
 // end AssetManager
 
 // begin GFXAssets
-const sf::Texture GFXAssets::none;
-
 GFXAssets::GFXAssets() : AssetManager(gfx_extensions) {
   assets["sprites" ][""] = GFXAssets::none;
   assets["tiles"   ][""] = GFXAssets::none;
@@ -121,8 +119,6 @@ const sf::Texture& GFXAssets::getSprite(std::string name) {
 // end GFXAssets
 
 // begin SFXAssets
-const sf::SoundBuffer SFXAssets::none;
-
 bool SFXAssets::onLoad(util::FileInputStream& ifs, std::string, std::string name) {
   sf::SoundBuffer sound;
 

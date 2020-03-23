@@ -80,8 +80,8 @@ void Gameplay::enter() {
   }
 
   // entities
-  Entity mario = subworld.spawnEntity("player_mario");
-  mario.setPos(Vec2f(2.f, 1.f));
+  Entity mario = subworld.spawnEntity("player_mario", Vec2f(2.f, 1.f));
+  (void)mario;
 }
 
 void Gameplay::exit() {}
@@ -96,6 +96,8 @@ void Gameplay::update(float delta_time) {
   }
 
   level.getSubworld(current_subworld).update(delta_time);
+
+  Vec2f a = level.getSubworld(current_subworld).getEntity(0).getComponent<Position>();
 
   ticktime += delta_time;
 }
@@ -171,19 +173,17 @@ void Gameplay::drawTiles(Rect<Int32> region) {
 }
 
 void Gameplay::drawEntities() {
-  const EntityComponents& entity_components = level.getSubworld(current_subworld).getEntityComponents();
-  std::size_t size = entity_components.valid.size();
+  const Subworld& subworld = level.getSubworld(current_subworld);
+  const EntityComponentManager& entities = subworld.getEntities();
 
-  for (std::size_t i = 0; i < size; ++i) {
-    if (entity_components.valid.at(i)) {
-      const RenderFrame& frame = getBaseGame()->entity_data.getRenderStates(entity_components.type.at(i))->getFrame();
-      std::string texture = frame.texture;
-      if (texture != "") {
-        sf::Sprite sprite(gfx.getSprite(texture), frame.cliprect);
-        Vec2f offset = frame.offset + Vec2f(0.f, frame.cliprect.height);
-        sprite.setPosition(toScreen(entity_components.pos.at(i)) - offset);
-        framebuffer->draw(sprite);
-      }
+  for (auto iter = entities.begin(); iter != entities.end(); ++iter) {
+    const RenderFrame& frame = getBaseGame()->entity_data.getRenderStates(entities.get<Type>(*iter))->getFrame();
+    std::string texture = frame.texture;
+    if (texture != "") {
+      sf::Sprite sprite(gfx.getSprite(texture), frame.cliprect);
+      Vec2f offset = frame.offset + Vec2f(0.f, frame.cliprect.height);
+      sprite.setPosition(toScreen(entities.get<Position>(*iter)) - offset);
+      framebuffer->draw(sprite);
     }
   }
 }

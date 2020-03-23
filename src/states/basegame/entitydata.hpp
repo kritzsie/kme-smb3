@@ -1,6 +1,6 @@
 #pragma once
 
-#include "entitycomponents.hpp"
+#include "entitycomponentmanager.hpp"
 #include "../../renderstates.hpp"
 
 #include <exception>
