@@ -81,7 +81,6 @@ void Gameplay::enter() {
 
   // entities
   Entity mario = subworld.spawnEntity("player_mario", Vec2f(2.f, 1.f));
-  (void)mario;
 }
 
 void Gameplay::exit() {}
@@ -90,16 +89,16 @@ void Gameplay::pause() {}
 
 void Gameplay::resume() {}
 
-void Gameplay::update(float delta_time) {
+void Gameplay::update(float delta) {
+  Subworld& subworld = level.getSubworld(current_subworld);
+
   if (pressedUp or pressedDown or pressedLeft or pressedRight) {
-    camera_pos += Vec2f(pressedRight - pressedLeft, pressedUp - pressedDown) * 16.f * delta_time;
+    camera_pos += Vec2f(pressedRight - pressedLeft, pressedUp - pressedDown) * 16.f * delta;
   }
 
-  level.getSubworld(current_subworld).update(delta_time);
+  subworld.update(delta);
 
-  Vec2f a = level.getSubworld(current_subworld).getEntity(0).getComponent<Position>();
-
-  ticktime += delta_time;
+  ticktime += delta;
 }
 
 static Rect<float> rectFromBox(Vec2f pos, Vec2f radius) {
@@ -111,18 +110,15 @@ static Rect<float> regionFromRect(Rect<float> rect) {
   return rect + border;
 }
 
-static Rect<Int32> viewportFromRegion(Rect<float> region) {
-  return Rect<Int32>(
-    std::round(region.x),     std::round(region.y),
-    std::round(region.width), std::round(region.height)
-  );
+static Rect<int> viewportFromRegion(Rect<float> region) {
+  return static_cast<Rect<int>>(region.map(std::roundf));
 }
 
 static Vec2f getCameraRadius() {
   return Vec2f(15.f, 8.4375f);
 }
 
-void Gameplay::draw(float delta_time) {
+void Gameplay::draw(float delta) {
   Window* window = engine->getWindow();
 
   if (window != nullptr) {
@@ -144,7 +140,7 @@ void Gameplay::draw(float delta_time) {
     window->getFramebuffer()->draw(sf::Sprite(framebuffer->getTexture()));
   }
 
-  rendertime += delta_time;
+  rendertime += delta;
 }
 
 void Gameplay::drawBackground(sf::Color color) {
@@ -152,18 +148,21 @@ void Gameplay::drawBackground(sf::Color color) {
 }
 
 void Gameplay::drawBackground(std::string texture) {
+  //sf::Sprite sprite(gfx.getTexture(texture), framebuffer->getViewport(framebuffer->getView()));
+  //sprite.setPosition(toScreen(camera_pos - getCameraRadius()) - Vec2f(0.f, 270.f));
+  //framebuffer->draw(sprite);
 }
 
-void Gameplay::drawTiles(Rect<Int32> region) {
-  for (Int32 y = region.y; y < region.y + region.height; ++y)
-  for (Int32 x = region.x; x < region.x + region.width;  ++x) {
+void Gameplay::drawTiles(Rect<int> region) {
+  for (int y = region.y; y < region.y + region.height; ++y)
+  for (int x = region.x; x < region.x + region.width;  ++x) {
     Tile tile = level.getSubworld(current_subworld).getTiles()[x][y];
     if (tile != Tile::none) {
       TileDef tiledef = getBaseGame()->level_tiles.getTileDef(tile);
       std::size_t frame = tiledef.getFrameOffset(rendertime);
       std::string texture = tiledef.getFrame(frame).texture;
       if (texture != "") {
-        Vec2<Int32> pos = tile.getPos();
+        Vec2<int> pos = tile.getPos();
         sf::Sprite sprite(gfx.getTile(texture), tiledef.getFrame(frame).cliprect);
         sprite.setPosition(sf::Vector2f(pos.x * 16.f, -(pos.y * 16.f + 16.f)));
         framebuffer->draw(sprite);

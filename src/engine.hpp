@@ -3,7 +3,6 @@
 #include "geometry.hpp"
 #include "input.hpp"
 #include "states.hpp"
-#include "types.hpp"
 
 #include <SFML/Graphics.hpp>
 #include <SFML/System.hpp>
@@ -21,8 +20,6 @@ using Clock = std::chrono::steady_clock;
 using Duration = std::chrono::duration<float>;
 using TimePoint = std::chrono::time_point<Clock, Duration>;
 
-using TextureMap = std::map<std::string, std::shared_ptr<sf::Texture>>;
-
 struct PhysFSInfo {
   std::string prefdir;
 };
@@ -38,12 +35,12 @@ public:
 class Window : public sf::RenderWindow {
 public:
   Window();
-  Window(UInt32 width, UInt32 height);
-  Window(UInt32 width, UInt32 height, const char* title);
+  Window(UInt width, UInt height);
+  Window(UInt width, UInt height, const char* title);
   ~Window();
 
   void drawWindow();
-  void resize(UInt32 width, UInt32 height);
+  void resize(UInt width, UInt height);
 
   sf::RenderTexture* getFramebuffer();
 
@@ -78,8 +75,8 @@ public:
 
 protected:
   bool main();
-  void update(float delta_time);
-  void draw(float delta_time);
+  void update(float delta);
+  void draw(float delta);
   void quit();
 
 private:

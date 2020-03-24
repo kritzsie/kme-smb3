@@ -5,7 +5,6 @@
 #include "basegame/world.hpp"
 #include "basegame.hpp"
 #include "../geometry.hpp"
-#include "../types.hpp"
 
 #include <SFML/Graphics.hpp>
 #include <SFML/Window/Event.hpp>
@@ -31,15 +30,15 @@ public:
   void pause() final;
   void resume() final;
 
-  void update(float delta_time) final;
-  void draw(float delta_time) final;
+  void update(float delta) final;
+  void draw(float delta) final;
 
 private:
   BaseGame* getBaseGame();
 
   void drawBackground(sf::Color color);
   void drawBackground(std::string texture);
-  void drawTiles(Rect<Int32> region);
+  void drawTiles(Rect<int> region);
   void drawEntities();
 
   Vec2f fromScreen(Vec2f pos);

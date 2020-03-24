@@ -6,7 +6,7 @@
 #include <cstdint>
 
 namespace kme {
-  // Shorter aliases for some common types.
+  // Shorter aliases for some common types
   using UInt8 = std::uint8_t;
   using SInt8 = std::int8_t;
   using Int8 = SInt8;
@@ -23,13 +23,13 @@ namespace kme {
   using SInt64 = std::int64_t;
   using Int64 = SInt64;
 
-  // Only Byte should be used from this list of alises.
-  // The others are there only for completeness.
-  using Byte = Int8;
-  using Short = Int16;
-  using Int = Int32;
-  using Long = Int64;
+  // Less common types
+  using Byte = signed char;
+  using UShort = unsigned short;
+  using UInt = unsigned int;
+  using ULong = unsigned long;
 
+  // Composite types
   using StringList = std::vector<std::string>;
 
   template<typename T>

@@ -20,9 +20,9 @@ TimeInfo::TimeInfo(float rate) : rate(rate), delta(1.f / rate) {}
 // Window functions
 Window::Window() : Window(1440, 810) {}
 
-Window::Window(UInt32 width, UInt32 height) : Window(width, height, "Klaymore Engine") {}
+Window::Window(UInt width, UInt height) : Window(width, height, "Klaymore Engine") {}
 
-Window::Window(UInt32 width, UInt32 height, const char* title)
+Window::Window(UInt width, UInt height, const char* title)
 : sf::RenderWindow(sf::VideoMode(width, height), title) {
   framebuffer = new sf::RenderTexture();
   framebuffer->create(480, 270);
@@ -55,12 +55,12 @@ void Window::drawWindow() {
   display();
 }
 
-void Window::resize(UInt32 width, UInt32 height) {
-  sf::Vector2u fbsize = framebuffer->getSize();
-  UInt32 scale = std::max(1u, std::min(width / fbsize.x, height / fbsize.y));
+void Window::resize(UInt width, UInt height) {
+  sf::Vector2u size = framebuffer->getSize();
+  UInt scale = std::max<UInt>(1, std::min(width / size.x, height / size.y));
 
   sf::View view(sf::FloatRect(0, 0, width, height));
-  view.setCenter(fbsize.x / 2, fbsize.y / 2);
+  view.setCenter(size.x / 2, size.y / 2);
   view.zoom(1.0f / scale);
   setView(view);
 }
@@ -167,7 +167,7 @@ bool Engine::main() {
 }
 
 // TODO: move event processing to update function
-void Engine::update(float delta_time) {
+void Engine::update(float delta) {
   if (window != nullptr) {
     sf::Event event;
     while (window->pollEvent(event)) {
@@ -221,13 +221,13 @@ void Engine::update(float delta_time) {
   }
 
   for (BaseState* state : states) {
-    state->update(delta_time);
+    state->update(delta);
   }
 }
 
-void Engine::draw(float delta_time) {
+void Engine::draw(float delta) {
   for (BaseState* state : states) {
-    state->draw(delta_time);
+    state->draw(delta);
   }
 
   if (window != nullptr) {

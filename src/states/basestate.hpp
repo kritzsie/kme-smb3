@@ -25,8 +25,8 @@ public:
   virtual void pause() = 0;
   virtual void resume() = 0;
 
-  virtual void update(float delta_time) = 0;
-  virtual void draw(float delta_time) = 0;
+  virtual void update(float delta) = 0;
+  virtual void draw(float delta) = 0;
 
 protected:
   BaseState* const parent;

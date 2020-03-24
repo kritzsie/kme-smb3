@@ -20,7 +20,7 @@ public:
   const Tilemap& getTiles() const;
   Tilemap& getTiles();
 
-  void update(float delta_time);
+  void update(float delta);
 
 private:
   EntityComponentManager entities;

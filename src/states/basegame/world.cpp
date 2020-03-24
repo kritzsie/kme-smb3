@@ -24,9 +24,9 @@ Tilemap& Subworld::getTiles() {
   return const_cast<Tilemap&>(static_cast<const Subworld*>(this)->getTiles());
 }
 
-void Subworld::update(float delta_time) {
+void Subworld::update(float delta) {
   for (auto iter = entities.begin(); iter != entities.end(); ++iter) {
-    entities_next.get<Position>(*iter) += entities.get<Velocity>(*iter) * delta_time;
+    entities_next.get<Position>(*iter) += entities.get<Velocity>(*iter) * delta;
   }
 
   entities = entities_next;

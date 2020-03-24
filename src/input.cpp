@@ -85,12 +85,10 @@ Input<TBase, TWide>& Input<TBase, TWide>::operator =(TBase rhs) {
   return *this;
 }
 
-template class Input<bool, signed char>;
-template class Input<signed char, short>;
-template class Input<short, int>;
-template class Input<int, long>;
-template class Input<long, long long>;
-template class Input<long long, long long>;
+template class Input<bool, Int8>;
+template class Input<Int8, Int16>;
+template class Input<Int16, Int32>;
+template class Input<Int32, Int64>;
 
 template class Input<float, double>;
 template class Input<double, long double>;

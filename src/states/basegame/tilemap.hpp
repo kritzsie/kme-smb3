@@ -10,11 +10,10 @@
 
 namespace std {
   template<>
-  struct hash<kme::Vec2<int16_t>> {
-    size_t operator()(const kme::Vec2<int16_t>& key) const {
+  struct hash<kme::Vec2<short>> {
+    size_t operator()(const kme::Vec2<short>& key) const {
       // size_t should be at least 32 bits.
-      static_assert(sizeof(size_t) >= 2 * sizeof(int16_t),
-                    "platform unsupported, word size too small");
+      static_assert(sizeof(size_t) >= 2 * sizeof(short), "platform unsupported, word size too small");
       return key.x | key.y << 16;
     }
   };
@@ -22,25 +21,25 @@ namespace std {
 
 namespace kme {
 using Chunk = std::array<std::array<TileID, 16>, 16>;
-using ChunkMap = std::unordered_map<Vec2<Int16>, Chunk>;
+using ChunkMap = std::unordered_map<Vec2<short>, Chunk>;
 
 // TODO: create separate class for Chunk type
 class Tile {
 public:
   static const inline TileID none;
 
-  Tile(ChunkMap& chunks, Vec2<Int32> pos);
+  Tile(ChunkMap& chunks, Vec2<int> pos);
 
   Tile& operator =(const TileID& rhs);
 
   bool operator ==(const TileID& rhs) const;
   bool operator !=(const TileID& rhs) const;
 
-  Vec2<Int32> getPos() const;
+  Vec2<int> getPos() const;
 
   Vec2<std::size_t> getLocalPos() const;
 
-  Vec2<Int16> getChunkPos() const;
+  Vec2<short> getChunkPos() const;
 
   const Chunk& getChunk() const;
   Chunk& getChunk();
@@ -52,25 +51,25 @@ public:
 private:
   ChunkMap& chunks;
 
-  const Vec2<Int32> pos;
+  const Vec2<int> pos;
 };
 
 class Tilemap {
 public:
   class Proxy {
   public:
-    Proxy(ChunkMap& chunks, Int32 x);
+    Proxy(ChunkMap& chunks, int x);
 
-    Tile operator [](Int32 y);
+    Tile operator [](int y);
 
   private:
     ChunkMap& chunks;
 
-    const Int32 x;
+    const int x;
   };
 
-  Proxy operator [](Int32 x);
-  Tile operator [](Vec2<Int32> pos);
+  Proxy operator [](int x);
+  Tile operator [](Vec2<int> pos);
 
 private:
   ChunkMap chunks;

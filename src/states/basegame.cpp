@@ -87,14 +87,14 @@ void BaseGame::resume() {
   paused = false;
 }
 
-void BaseGame::update(float delta_time) {
+void BaseGame::update(float delta) {
   if (not paused) {
     engine->pushState(Gameplay::create());
     pause();
   }
 }
 
-void BaseGame::draw(float delta_time) {}
+void BaseGame::draw(float delta) {}
 
 BaseGame::BaseGame(BaseState* parent, Engine* engine) : BaseState(parent, engine) {}
 }

@@ -15,7 +15,7 @@ public:
   Input();
   Input(const Input& input);
 
-  Input& operator =(TBase);
+  Input& operator =(TBase rhs);
 
   TBase getState() const;
   TWide getDelta() const;
@@ -38,6 +38,6 @@ public:
   TWide operator -(const Input& rhs) const;
 };
 
-using Axis = Input<short, int>;
-using Button = Input<bool, signed char>;
+using Axis = Input<Int16, Int32>;
+using Button = Input<bool, Int8>;
 }

@@ -4,7 +4,7 @@
 
 namespace kme {
 // begin Tile
-Tile::Tile(ChunkMap& chunks, Vec2<Int32> pos) : chunks(chunks), pos(pos) {}
+Tile::Tile(ChunkMap& chunks, Vec2<int> pos) : chunks(chunks), pos(pos) {}
 
 Tile& Tile::operator =(const TileID& rhs) {
   Chunk& chunk = chunks[getChunkPos()];
@@ -21,7 +21,7 @@ bool Tile::operator !=(const TileID& rhs) const {
   return not operator ==(rhs);
 }
 
-Vec2<Int32> Tile::getPos() const {
+Vec2<int> Tile::getPos() const {
   return pos;
 }
 
@@ -29,8 +29,8 @@ Vec2<std::size_t> Tile::getLocalPos() const {
   return Vec2<std::size_t>(util::absmod(pos.x, 16), util::absmod(pos.y, 16));
 }
 
-Vec2<Int16> Tile::getChunkPos() const {
-  return Vec2<Int16>(util::absdiv(pos.x, 16), util::absdiv(pos.y, 16));
+Vec2<short> Tile::getChunkPos() const {
+  return Vec2<short>(util::absdiv(pos.x, 16), util::absdiv(pos.y, 16));
 }
 
 const Chunk& Tile::getChunk() const {
@@ -59,17 +59,17 @@ Chunk& Tile::getChunk() {
 // end Tile
 
 // begin Tilemap
-Tilemap::Proxy::Proxy(ChunkMap& chunks, Int32 x) : chunks(chunks), x(x) {}
+Tilemap::Proxy::Proxy(ChunkMap& chunks, int x) : chunks(chunks), x(x) {}
 
-Tile Tilemap::Proxy::operator [](Int32 y) {
-  return Tile(chunks, Vec2<Int32>(x, y));
+Tile Tilemap::Proxy::operator [](int y) {
+  return Tile(chunks, Vec2<int>(x, y));
 }
 
-Tilemap::Proxy Tilemap::operator [](Int32 x) {
+Tilemap::Proxy Tilemap::operator [](int x) {
   return Proxy(chunks, x);
 }
 
-Tile Tilemap::operator [](Vec2<Int32> pos) {
+Tile Tilemap::operator [](Vec2<int> pos) {
   return operator [](pos.x)[pos.y];
 }
 // end Tilemap
