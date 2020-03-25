@@ -109,11 +109,11 @@ TimeInfo Engine::getRenderTime() const {
 }
 
 void Engine::pushState(BaseState::Factory factory) {
-  events.push_back(StateEvent(StateEventType::PUSH, factory));
+  events.push_back(StateEvent(StateEventType::Push, factory));
 }
 
 BaseState* Engine::popState() {
-  events.push_back(StateEvent(StateEventType::POP, nullptr));
+  events.push_back(StateEvent(StateEventType::Pop, nullptr));
   return states.back();
 }
 
@@ -203,12 +203,12 @@ void Engine::update(float delta) {
     for (const StateEvent& event : events) {
       BaseState* state;
       switch (event.first) {
-      case StateEventType::PUSH:
+      case StateEventType::Push:
         state = event.second(states.size() ? states.back() : nullptr, this);
         states.push_back(state);
         state->enter();
         break;
-      case StateEventType::POP:
+      case StateEventType::Pop:
         state = states.back();
         state->exit();
         states.pop_back();

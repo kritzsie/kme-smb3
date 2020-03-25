@@ -1,7 +1,6 @@
 #pragma once
 
 #include "basestate.hpp"
-//#include "basegame/entities.hpp"
 #include "basegame/world.hpp"
 #include "basegame.hpp"
 #include "../geometry.hpp"
@@ -37,7 +36,7 @@ private:
   BaseGame* getBaseGame();
 
   void drawBackground(sf::Color color);
-  void drawBackground(std::string texture);
+  void drawBackground(std::string texture, Vec2f origin, Vec2f parallax);
   void drawTiles(Rect<int> region);
   void drawEntities();
 

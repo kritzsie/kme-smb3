@@ -51,8 +51,8 @@ private:
 class Engine {
 public:
   enum class StateEventType {
-    PUSH,
-    POP
+    Push,
+    Pop
   };
 
   using StateEvent = std::pair<StateEventType, BaseState::Factory>;

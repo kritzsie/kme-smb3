@@ -122,13 +122,13 @@ void Gameplay::draw(float delta) {
   Window* window = engine->getWindow();
 
   if (window != nullptr) {
-    drawBackground(sf::Color(0x6898F8FF));
-    drawBackground("overworldblockstop");
-    drawBackground("cloudlayer");
-
     sf::View view = framebuffer->getView();
-    view.setCenter(toScreen(camera_pos).map(std::roundf));
+    view.setCenter(toScreen(camera_pos));
     framebuffer->setView(view);
+
+    drawBackground(sf::Color(0x6898F8FF));
+    drawBackground("overworldblockstop", Vec2f(0.f, -11.f), Vec2f(0.5f, 0.25f));
+    drawBackground("cloudlayer", Vec2f(0.f, 160.f), Vec2f(0.75f, 0.5f));
 
     Rect<float> camera_region = regionFromRect(rectFromBox(camera_pos, getCameraRadius()));
     drawTiles(viewportFromRegion(camera_region));
@@ -147,10 +147,15 @@ void Gameplay::drawBackground(sf::Color color) {
   framebuffer->clear(color);
 }
 
-void Gameplay::drawBackground(std::string texture) {
-  //sf::Sprite sprite(gfx.getTexture(texture), framebuffer->getViewport(framebuffer->getView()));
-  //sprite.setPosition(toScreen(camera_pos - getCameraRadius()) - Vec2f(0.f, 270.f));
-  //framebuffer->draw(sprite);
+void Gameplay::drawBackground(std::string texture, Vec2f origin, Vec2f parallax) {
+  sf::Sprite sprite(gfx.getTexture(texture));
+  Vec2f pos = Vec2f(origin.x, -(origin.y + sprite.getTexture()->getSize().y));
+  Vec2f offset = toScreen(camera_pos - getCameraRadius());
+  offset.x *= parallax.x;
+  offset.y *= parallax.y;
+  pos += offset;
+  sprite.setPosition(pos);
+  framebuffer->draw(sprite);
 }
 
 void Gameplay::drawTiles(Rect<int> region) {
