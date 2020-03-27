@@ -36,8 +36,9 @@ private:
   BaseGame* getBaseGame();
 
   void drawBackground(sf::Color color);
-  void drawBackground(std::string texture, Vec2f origin, Vec2f parallax);
-  void drawTiles(Rect<int> region);
+  void drawBackground(std::string texture, Vec2f offset, Vec2f parallax,
+                      bool vertical_tiling = false);
+  void drawTiles();
   void drawEntities();
 
   Vec2f fromScreen(Vec2f pos);
@@ -57,8 +58,9 @@ private:
   bool pressedRight = false;
 
   Vec2f camera_pos;
+  Vec2f camera_radius;
 
-  UInt32 current_subworld;
+  std::size_t current_subworld;
   Level level;
 };
 }

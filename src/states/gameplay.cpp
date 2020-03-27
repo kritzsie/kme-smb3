@@ -19,6 +19,7 @@ Gameplay::Gameplay(BaseState* parent, Engine* engine)
   framebuffer->create(480, 270);
 
   camera_pos = Vec2f(15.f, 8.4375f);
+  camera_radius = Vec2f(15.f, 8.4375f);
 
   current_subworld = 0;
 }
@@ -114,10 +115,6 @@ static Rect<int> viewportFromRegion(Rect<float> region) {
   return static_cast<Rect<int>>(region.map(std::roundf));
 }
 
-static Vec2f getCameraRadius() {
-  return Vec2f(15.f, 8.4375f);
-}
-
 void Gameplay::draw(float delta) {
   Window* window = engine->getWindow();
 
@@ -127,13 +124,24 @@ void Gameplay::draw(float delta) {
     framebuffer->setView(view);
 
     drawBackground(sf::Color(0x6898F8FF));
-    drawBackground("overworldblockstop", Vec2f(0.f, -11.f), Vec2f(0.5f, 0.25f));
-    drawBackground("cloudlayer", Vec2f(0.f, 160.f), Vec2f(0.75f, 0.5f));
+    drawBackground("overworldblockstop", Vec2f(128.f, 11.f), Vec2f(0.375f, 0.25f), true);
+    drawBackground("cloudlayer", Vec2f(0.f, -224.f), Vec2f(0.75f, 0.125f), true);
 
-    Rect<float> camera_region = regionFromRect(rectFromBox(camera_pos, getCameraRadius()));
-    drawTiles(viewportFromRegion(camera_region));
+    drawTiles();
 
     drawEntities();
+
+    // trusty debug rectangle (draws a rectangle around the camera viewport)
+    /*
+    sf::RectangleShape rect;
+    Vec2f pos = (camera_pos - camera_radius) * 16.f + Vec2f(1.f, 269.f);
+    rect.setPosition(Vec2f(pos.x, -pos.y));
+    rect.setSize(Vec2f(478.f, 268.f));
+    rect.setFillColor(sf::Color(0));
+    rect.setOutlineColor(sf::Color::Red);
+    rect.setOutlineThickness(2.f);
+    framebuffer->draw(rect);
+    */
 
     framebuffer->display();
 
@@ -147,18 +155,52 @@ void Gameplay::drawBackground(sf::Color color) {
   framebuffer->clear(color);
 }
 
-void Gameplay::drawBackground(std::string texture, Vec2f origin, Vec2f parallax) {
-  sf::Sprite sprite(gfx.getTexture(texture));
-  Vec2f pos = Vec2f(origin.x, -(origin.y + sprite.getTexture()->getSize().y));
-  Vec2f offset = toScreen(camera_pos - getCameraRadius());
-  offset.x *= parallax.x;
-  offset.y *= parallax.y;
-  pos += offset;
-  sprite.setPosition(pos);
-  framebuffer->draw(sprite);
+// NOTE: this function could use a few improvements
+void Gameplay::drawBackground(std::string texture, Vec2f offset, Vec2f parallax,
+                              bool vertical_tiling) {
+  const sf::Texture& sf_texture = gfx.getTexture(texture);
+  Vec2f size = static_cast<sf::Vector2f>(sf_texture.getSize());
+
+  Vec2f tiling_ratio = Vec2f(480.f / size.x, 270.f / size.y);
+
+  Vec2f start = camera_pos - camera_radius;
+  Vec2f bg_start = start;
+  bg_start.x = bg_start.x * (1.f - parallax.x);
+  bg_start.y = bg_start.y * (1.f - parallax.y);
+  Vec2f bg_end = bg_start + camera_radius * 2.f;
+  bg_start.x = bg_start.x * 16.f / 480.f * tiling_ratio.x;
+  bg_start.y = bg_start.y * 16.f / 270.f * tiling_ratio.y;
+  bg_end.x = bg_end.x * 16.f / 480.f * tiling_ratio.x;
+  bg_end.y = bg_end.y * 16.f / 270.f * tiling_ratio.y;
+
+  if (vertical_tiling == true) {
+    for (float y = std::floor(bg_start.y + offset.y / size.y); y < std::floor(bg_end.y + offset.y / size.y) + 1.f; y += 1.f)
+    for (float x = std::floor(bg_start.x + offset.x / size.x); x < std::floor(bg_end.x + offset.x / size.x) + 1.f; x += 1.f) {
+      sf::Sprite sprite(sf_texture);
+      Vec2f pos = Vec2f((start.x * parallax.x * 16.f) + x * size.x,
+                      -((start.y * parallax.y * 16.f) + y * size.y + size.y));
+      pos.x -= offset.x;
+      pos.y += offset.y;
+      sprite.setPosition(pos);
+      framebuffer->draw(sprite);
+    }
+  }
+  else {
+    for (float x = std::floor(bg_start.x + offset.x / size.x); x < std::floor(bg_end.x + offset.x / size.x) + 1.f; x += 1.f) {
+      sf::Sprite sprite(sf_texture);
+      Vec2f pos = Vec2f((start.x * parallax.x * 16.f) + x * size.x,
+                      -((start.y * parallax.y * 16.f) + size.y));
+      pos.x -= offset.x;
+      pos.y += offset.y;
+      sprite.setPosition(pos);
+      framebuffer->draw(sprite);
+    }
+  }
 }
 
-void Gameplay::drawTiles(Rect<int> region) {
+void Gameplay::drawTiles() {
+  Rect<int> region = viewportFromRegion(regionFromRect(rectFromBox(camera_pos, camera_radius)));
+
   for (int y = region.y; y < region.y + region.height; ++y)
   for (int x = region.x; x < region.x + region.width;  ++x) {
     Tile tile = level.getSubworld(current_subworld).getTiles()[x][y];
@@ -201,10 +243,10 @@ Vec2f Gameplay::toScreen(Vec2f pos) {
 }
 
 Vec2f Gameplay::fromTile(Vec2i pos) {
-  return Vec2f(pos.x, pos.y);
+  return static_cast<Vec2f>(pos);
 }
 
 Vec2i Gameplay::toTile(Vec2f pos) {
-  return Vec2i(pos.x, pos.y);
+  return static_cast<Vec2i>(pos);
 }
 }
