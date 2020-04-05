@@ -14,7 +14,7 @@ Gameplay::Factory Gameplay::create() {
 }
 
 Gameplay::Gameplay(BaseState* parent, Engine* engine)
-: BaseState(parent, engine) {
+: BaseState(parent, engine), level(getBaseGame()->entity_data) {
   framebuffer = new sf::RenderTexture;
   framebuffer->create(480, 270);
 
@@ -38,22 +38,6 @@ bool Gameplay::handleInput(sf::Event::EventType type, const sf::Event& event) {
   switch (type) {
   case sf::Event::KeyPressed:
   case sf::Event::KeyReleased:
-    switch (event.key.code) {
-    case sf::Keyboard::Key::Up:
-      pressedUp = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Up);
-      break;
-    case sf::Keyboard::Key::Down:
-      pressedDown = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Down);
-      break;
-    case sf::Keyboard::Key::Left:
-      pressedLeft = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left);
-      break;
-    case sf::Keyboard::Key::Right:
-      pressedRight = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right);
-      break;
-    default:
-      break;
-    }
     break;
   default:
     break;
@@ -82,6 +66,7 @@ void Gameplay::enter() {
 
   // entities
   Entity mario = subworld.spawnEntity("player_mario", Vec2f(2.f, 1.f));
+  mario.set<Velocity>(Vec2f(0.f, 12.f));
 }
 
 void Gameplay::exit() {}
@@ -93,26 +78,9 @@ void Gameplay::resume() {}
 void Gameplay::update(float delta) {
   Subworld& subworld = level.getSubworld(current_subworld);
 
-  if (pressedUp or pressedDown or pressedLeft or pressedRight) {
-    camera_pos += Vec2f(pressedRight - pressedLeft, pressedUp - pressedDown) * 16.f * delta;
-  }
-
   subworld.update(delta);
 
   ticktime += delta;
-}
-
-static Rect<float> rectFromBox(Vec2f pos, Vec2f radius) {
-  return Rect<float>(pos - radius, 2.f * radius);
-}
-
-static Rect<float> regionFromRect(Rect<float> rect) {
-  Rect<float> border(-0.5f, -0.5f, 1.f, 1.f);
-  return rect + border;
-}
-
-static Rect<int> viewportFromRegion(Rect<float> region) {
-  return static_cast<Rect<int>>(region.map(std::roundf));
 }
 
 void Gameplay::draw(float delta) {
@@ -198,6 +166,21 @@ void Gameplay::drawBackground(std::string texture, Vec2f offset, Vec2f parallax,
   }
 }
 
+// begin ugly
+static Rect<float> rectFromBox(Vec2f pos, Vec2f radius) {
+  return Rect<float>(pos - radius, 2.f * radius);
+}
+
+static Rect<float> regionFromRect(Rect<float> rect) {
+  Rect<float> border(-0.5f, -0.5f, 1.f, 1.f);
+  return rect + border;
+}
+
+static Rect<int> viewportFromRegion(Rect<float> region) {
+  return static_cast<Rect<int>>(region.map(std::roundf));
+}
+// end ugly
+
 void Gameplay::drawTiles() {
   Rect<int> region = viewportFromRegion(regionFromRect(rectFromBox(camera_pos, camera_radius)));
 
@@ -223,7 +206,9 @@ void Gameplay::drawEntities() {
   const EntityComponentManager& entities = subworld.getEntities();
 
   for (auto iter = entities.begin(); iter != entities.end(); ++iter) {
-    const RenderFrame& frame = getBaseGame()->entity_data.getRenderStates(entities.get<Type>(*iter))->getFrame();
+    const RenderFrame& frame = getBaseGame()->entity_data \
+      .getRenderStates(entities.get<Type>(*iter))->getFrame();
+
     std::string texture = frame.texture;
     if (texture != "") {
       sf::Sprite sprite(gfx.getSprite(texture), frame.cliprect);

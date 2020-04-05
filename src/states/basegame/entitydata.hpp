@@ -19,7 +19,7 @@ public:
   void registerRenderStates(EntityType type, RenderStates rs);
   void registerRenderStates(EntityType type, std::unique_ptr<RenderStates> rs);
   void registerRenderStates(EntityType type, std::shared_ptr<RenderStates> rs);
-  std::shared_ptr<RenderStates> getRenderStates(EntityType type);
+  const std::shared_ptr<RenderStates> getRenderStates(EntityType type) const;
 
 private:
   std::unordered_map<EntityType, std::shared_ptr<RenderStates>> render_states;

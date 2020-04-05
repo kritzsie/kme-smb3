@@ -20,13 +20,13 @@ void EntityData::registerRenderStates(EntityType type, std::unique_ptr<RenderSta
 void EntityData::registerRenderStates(EntityType type, std::shared_ptr<RenderStates> rs) {
   if (render_states.find(type) != render_states.end()) {
     std::stringstream ss;
-    ss << "attempted to redefine entity with type \"" << type << "\"";
+    ss << "attempted to redefine render states of entity \"" << type << "\"";
     throw EntityRedefinitionError(ss.str());
   }
   render_states[type] = rs;
 }
 
-std::shared_ptr<RenderStates> EntityData::getRenderStates(EntityType type) {
+const std::shared_ptr<RenderStates> EntityData::getRenderStates(EntityType type) const {
   return render_states.at(type);
 }
 }

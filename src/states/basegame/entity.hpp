@@ -3,6 +3,7 @@
 #include "entitycomponentmanager.hpp"
 
 namespace kme {
+/*
 // begin ComponentProxy
 template<typename T>
 class ComponentProxy {
@@ -38,6 +39,7 @@ ComponentProxy<T>& ComponentProxy<T>::operator =(const typename T::type& rhs) {
   return *this;
 }
 // end ComponentProxy
+*/
 
 // begin Entity
 class Entity {
@@ -47,7 +49,10 @@ public:
          EntityID entity);
 
   template<typename T>
-  ComponentProxy<T> getComponent();
+  const typename T::type& get() const;
+
+  template<typename T>
+  void set(const typename T::type& value);
 
   EntityID getID() const;
 
@@ -58,8 +63,13 @@ private:
 };
 
 template<typename T>
-ComponentProxy<T> Entity::getComponent()  {
-  return ComponentProxy<T>(entities, entities_next, entity);
+const typename T::type& Entity::get() const {
+  return entities.get<T>(entity);
+}
+
+template<typename T>
+void Entity::set(const typename T::type& value) {
+  entities_next.get<T>(entity) = value;
 }
 // end Entity
 }

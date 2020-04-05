@@ -90,8 +90,8 @@ private:
 
   bool running;
 
-  TimeInfo ticktime;
-  TimeInfo rendertime;
+  TimeInfo tickinfo;
+  TimeInfo renderinfo;
   PhysFSInfo physfsinfo;
 
   Window* window;

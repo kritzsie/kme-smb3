@@ -2,6 +2,7 @@
 
 #include "entity.hpp"
 #include "entitycomponentmanager.hpp"
+#include "entitydata.hpp"
 #include "tilemap.hpp"
 
 #include <unordered_map>
@@ -12,6 +13,8 @@ namespace kme {
 // begin Subworld
 class Subworld {
 public:
+  Subworld(const EntityData& entity_data);
+
   Entity spawnEntity(EntityType type, Vec2f pos);
   Entity getEntity(EntityID entity);
 
@@ -23,6 +26,8 @@ public:
   void update(float delta);
 
 private:
+  const EntityData& entity_data;
+
   EntityComponentManager entities;
   EntityComponentManager entities_next;
 
@@ -38,7 +43,7 @@ public:
   using const_iterator = Map::const_iterator;
   using iterator = Map::iterator;
 
-  Level();
+  Level(const EntityData& entity_data);
 
   std::size_t createSubworld();
   std::size_t createSubworld(std::size_t index_hint);
@@ -56,6 +61,8 @@ public:
   iterator end();
 
 private:
+  const EntityData& entity_data;
+
   std::size_t counter = 0;
 
   Map subworld;

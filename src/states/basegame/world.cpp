@@ -1,10 +1,13 @@
 #include "world.hpp"
 
 namespace kme {
+// begin Subworld
+Subworld::Subworld(const EntityData& entity_data) : entity_data(entity_data) {}
+
 Entity Subworld::spawnEntity(EntityType type, Vec2f pos) {
   Entity entity = getEntity(entities_next.createEntity());
-  entity.getComponent<Type>() = type;
-  entity.getComponent<Position>() = pos;
+  entity.set<Type>(type);
+  entity.set<Position>(pos);
   return entity;
 }
 
@@ -25,14 +28,22 @@ Tilemap& Subworld::getTiles() {
 }
 
 void Subworld::update(float delta) {
+  // apply gravity
+  for (auto iter = entities.begin(); iter != entities.end(); ++iter) {
+    entities_next.get<Velocity>(*iter).y -= 29.625f * delta;
+  }
+
+  // move
   for (auto iter = entities.begin(); iter != entities.end(); ++iter) {
     entities_next.get<Position>(*iter) += entities.get<Velocity>(*iter) * delta;
   }
 
   entities = entities_next;
 }
+// end Subworld
 
-Level::Level() {
+// begin Level
+Level::Level(const EntityData& entity_data) : entity_data(entity_data) {
   createSubworld();
 }
 
@@ -47,7 +58,7 @@ std::size_t Level::createSubworld(std::size_t index_hint) {
       ++counter;
     }
 
-    subworld.emplace(index_hint, Subworld());
+    subworld.emplace(index_hint, Subworld(entity_data));
     return index_hint;
   }
 
@@ -55,7 +66,7 @@ std::size_t Level::createSubworld(std::size_t index_hint) {
     ++counter;
   }
 
-  subworld.emplace(counter, Subworld());
+  subworld.emplace(counter, Subworld(entity_data));
   return counter;
 }
 
@@ -103,4 +114,5 @@ Level::iterator Level::begin() {
 Level::iterator Level::end() {
   return subworld.end();
 }
+// end Level
 }

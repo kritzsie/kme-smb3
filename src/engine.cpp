@@ -66,7 +66,7 @@ void Window::resize(UInt width, UInt height) {
 }
 
 // Engine functions
-Engine::Engine(std::vector<std::string>&& args) : args(args), ticktime(64.f), rendertime(60.f) {
+Engine::Engine(std::vector<std::string>&& args) : args(args), tickinfo(64.f), renderinfo(60.f) {
   window = new Window(1440, 810, "Super Mario Bros. 3");
 
   if (instance_count == 0) {
@@ -101,11 +101,11 @@ bool Engine::isRunning() const {
 }
 
 TimeInfo Engine::getTickTime() const {
-  return ticktime;
+  return tickinfo;
 }
 
 TimeInfo Engine::getRenderTime() const {
-  return rendertime;
+  return renderinfo;
 }
 
 void Engine::pushState(BaseState::Factory factory) {
@@ -134,8 +134,8 @@ int Engine::exec() {
 }
 
 bool Engine::main() {
-  Duration tickdelta = static_cast<Duration>(ticktime.delta);
-  Duration renderdelta = static_cast<Duration>(rendertime.delta);
+  Duration tickdelta = static_cast<Duration>(tickinfo.delta);
+  Duration renderdelta = static_cast<Duration>(renderinfo.delta);
   TimePoint curtime = Clock::now();
   TimePoint prevtime = curtime - tickdelta;
   TimePoint nexttick = prevtime + tickdelta;
@@ -143,12 +143,12 @@ bool Engine::main() {
 
   while (running) {
     if (nexttick < curtime) {
-      update(ticktime.delta);
+      update(tickinfo.delta);
       nexttick += tickdelta;
     }
 
     if (nextrender < curtime) {
-      draw(rendertime.delta);
+      draw(renderinfo.delta);
       nextrender += renderdelta;
     }
 
@@ -199,6 +199,8 @@ void Engine::update(float delta) {
     }
   }
 
+  // WARNING: immediate changes to event queue means it's impossible to create
+  // and delete states from within a BaseState::enter() call
   if (events.size() > 0) {
     for (const StateEvent& event : events) {
       BaseState* state;

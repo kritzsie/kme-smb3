@@ -36,6 +36,7 @@ private:
   BaseGame* getBaseGame();
 
   void drawBackground(sf::Color color);
+  // parallax here is a factor from 0.0 to 1.0, not distance
   void drawBackground(std::string texture, Vec2f offset, Vec2f parallax,
                       bool vertical_tiling = false);
   void drawTiles();
@@ -51,11 +52,6 @@ private:
   float rendertime;
 
   sf::RenderTexture* framebuffer;
-
-  bool pressedUp = false;
-  bool pressedDown = false;
-  bool pressedLeft = false;
-  bool pressedRight = false;
 
   Vec2f camera_pos;
   Vec2f camera_radius;
