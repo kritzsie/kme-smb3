@@ -46,12 +46,8 @@ const RenderFrame& TileDef::getFrame(std::size_t index) const {
 }
 // end TileDef
 
-TileRedefinitionError::TileRedefinitionError(const char* what)
-: TileRedefinitionError(std::string(what)) {}
-
-TileRedefinitionError::TileRedefinitionError(std::string what)
-: std::runtime_error(what) {}
-
+// begin TileDefs
+// ugly
 static TileDef getDefaultTileDef() {
   TileDef tiledef;
   tiledef.setCollisionType(TileDef::CollisionType::NONE);
@@ -59,7 +55,6 @@ static TileDef getDefaultTileDef() {
   return tiledef;
 }
 
-// begin TileDefs
 TileDefs::TileDefs() : TileDefs(getDefaultTileDef()) {}
 
 TileDefs::TileDefs(TileDef default_tile) {

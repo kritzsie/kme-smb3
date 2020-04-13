@@ -14,7 +14,7 @@ Gameplay::Factory Gameplay::create() {
 }
 
 Gameplay::Gameplay(BaseState* parent, Engine* engine)
-: BaseState(parent, engine), level(getBaseGame()->entity_data) {
+: BaseState(parent, engine), level(getBaseGame()->entity_data, getBaseGame()->level_tile_data) {
   framebuffer = new sf::RenderTexture;
   framebuffer->create(480, 270);
 
@@ -67,6 +67,7 @@ void Gameplay::enter() {
   // entities
   Entity mario = subworld.spawnEntity("player_mario", Vec2f(2.f, 1.f));
   mario.set<Velocity>(Vec2f(0.f, 12.f));
+  mario.set<Flags>(Flags::GRAVITY);
 }
 
 void Gameplay::exit() {}
@@ -188,7 +189,7 @@ void Gameplay::drawTiles() {
   for (int x = region.x; x < region.x + region.width;  ++x) {
     Tile tile = level.getSubworld(current_subworld).getTiles()[x][y];
     if (tile != Tile::none) {
-      TileDef tiledef = getBaseGame()->level_tiles.getTileDef(tile);
+      TileDef tiledef = getBaseGame()->level_tile_data.getTileDef(tile);
       std::size_t frame = tiledef.getFrameOffset(rendertime);
       std::string texture = tiledef.getFrame(frame).texture;
       if (texture != "") {

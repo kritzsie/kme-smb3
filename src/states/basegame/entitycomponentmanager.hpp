@@ -17,17 +17,32 @@ template<typename T>
 struct Component {
   using type = T;
 
-  std::unordered_map<EntityID, T> value {};
+  std::unordered_map<EntityID, T> value;
+};
+
+struct Box {
+  float radius;
+  float height;
 };
 
 struct Type : Component<EntityType> {};
+struct Flags : Component<UInt32> {
+  enum : UInt32 {
+    NONE      = 0,
+    GRAVITY   = 1 << 0,
+    LANDED    = 1 << 1
+  };
+};
 struct Position : Component<Vec2f> {};
 struct Velocity : Component<Vec2f> {};
+struct CollisionBox : Component<Box> {};
 
 using ComponentTypes = std::tuple<
   Type,
+  Flags,
   Position,
-  Velocity
+  Velocity,
+  CollisionBox
 >;
 
 class EntityComponentManager {

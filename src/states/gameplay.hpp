@@ -48,15 +48,15 @@ private:
   Vec2f fromTile(Vec2i pos);
   Vec2i toTile(Vec2f pos);
 
-  float ticktime;
-  float rendertime;
+  float ticktime = 0.f;
+  float rendertime = 0.f;
 
-  sf::RenderTexture* framebuffer;
+  sf::RenderTexture* framebuffer = nullptr;
 
   Vec2f camera_pos;
   Vec2f camera_radius;
 
-  std::size_t current_subworld;
+  std::size_t current_subworld = 0;
   Level level;
 };
 }

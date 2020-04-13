@@ -10,6 +10,11 @@
 namespace kme {
 using TileID = std::string;
 
+class TileRedefinitionError : public std::runtime_error {
+public:
+  using std::runtime_error::runtime_error;
+};
+
 class TileDef {
 public:
   enum class CollisionType {
@@ -31,12 +36,6 @@ private:
   CollisionType collision_type;
 
   RenderFrames frames;
-};
-
-class TileRedefinitionError : public std::runtime_error {
-public:
-  TileRedefinitionError(const char* what);
-  TileRedefinitionError(std::string what);
 };
 
 class TileDefs {

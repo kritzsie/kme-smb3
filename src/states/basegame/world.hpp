@@ -13,7 +13,7 @@ namespace kme {
 // begin Subworld
 class Subworld {
 public:
-  Subworld(const EntityData& entity_data);
+  Subworld(const EntityData& entity_data, const TileDefs& tile_data);
 
   Entity spawnEntity(EntityType type, Vec2f pos);
   Entity getEntity(EntityID entity);
@@ -26,7 +26,10 @@ public:
   void update(float delta);
 
 private:
+  void commit_entities();
+
   const EntityData& entity_data;
+  const TileDefs& tile_data;
 
   EntityComponentManager entities;
   EntityComponentManager entities_next;
@@ -43,7 +46,7 @@ public:
   using const_iterator = Map::const_iterator;
   using iterator = Map::iterator;
 
-  Level(const EntityData& entity_data);
+  Level(const EntityData& entity_data, const TileDefs& tile_data);
 
   std::size_t createSubworld();
   std::size_t createSubworld(std::size_t index_hint);
@@ -62,6 +65,7 @@ public:
 
 private:
   const EntityData& entity_data;
+  const TileDefs& tile_data;
 
   std::size_t counter = 0;
 

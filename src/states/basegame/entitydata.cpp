@@ -3,11 +3,18 @@
 #include <sstream>
 
 namespace kme {
-EntityRedefinitionError::EntityRedefinitionError(const char* what)
-: EntityRedefinitionError(std::string(what)) {}
+void EntityData::registerCollisionBox(EntityType type, Box cb) {
+  if (collision_boxes.find(type) != collision_boxes.end()) {
+    std::stringstream ss;
+    ss << "attempted to redefine collision box of entity \"" << type << "\"";
+    throw EntityRedefinitionError(ss.str());
+  }
+  collision_boxes[type] = cb;
+}
 
-EntityRedefinitionError::EntityRedefinitionError(std::string what)
-: std::runtime_error(what) {}
+const Box& EntityData::getCollisionBox(EntityType type) const {
+  return collision_boxes.at(type);
+}
 
 void EntityData::registerRenderStates(EntityType type, RenderStates rs) {
   registerRenderStates(type, std::make_unique<RenderStates>(rs));
