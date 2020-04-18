@@ -43,8 +43,12 @@ static Rect<float> toAABB(Vec2f pos, Box box) {
   return Rect<float>(pos.x - box.radius, pos.y, box.radius * 2.f, box.height);
 }
 
-void Subworld::commit_entities() {
-  entities = entities_next;
+// ugly
+static Rect<int> toRange(Rect<float> aabb) {
+  return Rect<int>(
+    std::floor(aabb.x), std::floor(aabb.y),
+    std::ceil(aabb.width + 1.f), std::ceil(aabb.height + 1.f)
+  );
 }
 
 void Subworld::update(float delta) {
@@ -53,45 +57,39 @@ void Subworld::update(float delta) {
     Entity entity = getEntity(*iter);
     if (entity.get<Flags>() & Flags::GRAVITY) {
       Vec2f vel = entity.get<Velocity>();
-      entity.set<Velocity>(vel - Vec2f(0.f, 29.625f * delta));
+      vel.y -= 29.625f * delta;
+      entity.set<Velocity>(vel);
     }
   }
 
   commit_entities();
 
-  // move
+  // move and collide
   for (auto iter = entities.begin(); iter != entities.end(); ++iter) {
+    // y axis
     Entity entity = getEntity(*iter);
     Vec2f pos = entity.get<Position>();
-    entity.set<Position>(pos + entity.get<Velocity>() * delta);
-  }
+    Vec2f vel = entity.get<Velocity>();
 
-  commit_entities();
+    pos.x += vel.x * delta;
 
-  // collide
-  for (auto iter = entities.begin(); iter != entities.end(); ++iter) {
-    Entity entity = getEntity(*iter);
-    Rect<float> plyr_bbox = toAABB(entity.get<Position>(), entity.get<CollisionBox>());
-    Rect<int> range = Rect<int>(
-      std::floor(plyr_bbox.x), std::floor(plyr_bbox.y),
-      std::ceil(plyr_bbox.width), std::ceil(plyr_bbox.height)
-    );
-
-    bool landed = false;
-
+    Rect<float> entity_aabb = toAABB(pos, entity.get<CollisionBox>());
+    Rect<int> range = toRange(entity_aabb);
     for (int y = range.y; y < range.y + range.height; ++y)
-    for (int x = range.x; x < range.x + range.width; ++x) {
-      Rect<float> tile_bbox = Rect<float>(x, y, 1.f, 1.f);
-      if (plyr_bbox.intersects(tile_bbox)) {
+    for (int x = range.x; x < range.x + range.width;  ++x) {
+      Rect<float> tile_aabb = Rect<float>(x, y, 1.f, 1.f);
+      if (entity_aabb.intersects(tile_aabb)) {
         switch (tile_data.getTileDef(tiles[x][y]).getCollisionType()) {
         case TileDef::CollisionType::SOLID: {
-          Rect<float> collision = plyr_bbox.intersection(tile_bbox);
-          if (plyr_bbox.y > y + 0.5f) {
-            Vec2f pos = entity.get<Position>();
-            entity.set<Position>(pos + Vec2f(0, collision.height));
-            entity.set<Velocity>(Vec2f());
-            landed = true;
+          Rect<float> collision = entity_aabb.intersection(tile_aabb);
+          if (entity_aabb.x > x + 0.5f) {
+            pos.x += collision.width;
           }
+          else {
+            pos.x -= collision.width;
+          }
+          vel.x = 0.f;
+          entity_aabb = toAABB(pos, entity.get<CollisionBox>());
           break;
         }
         case TileDef::CollisionType::NONE:
@@ -101,13 +99,55 @@ void Subworld::update(float delta) {
       }
     }
 
-    entity.set<Flags>(landed ?
-      entity.get<Flags>() |  Flags::LANDED :
-      entity.get<Flags>() & ~Flags::LANDED
-    );
+    bool landed = false;
+
+    pos.y += vel.y * delta;
+
+    entity_aabb = toAABB(pos, entity.get<CollisionBox>());
+    range = toRange(entity_aabb);
+    for (int y = range.y; y < range.y + range.height; ++y)
+    for (int x = range.x; x < range.x + range.width;  ++x) {
+      Rect<float> tile_aabb = Rect<float>(x, y, 1.f, 1.f);
+      if (entity_aabb.intersects(tile_aabb)) {
+        switch (tile_data.getTileDef(tiles[x][y]).getCollisionType()) {
+        case TileDef::CollisionType::SOLID: {
+          Rect<float> collision = entity_aabb.intersection(tile_aabb);
+          if (entity_aabb.y > y + 0.5f) {
+            landed = true;
+            pos.y += collision.height;
+          }
+          else {
+            pos.y -= collision.height;
+          }
+          vel.y = 0.f;
+          entity_aabb = toAABB(pos, entity.get<CollisionBox>());
+          break;
+        }
+        case TileDef::CollisionType::NONE:
+        default:
+          break;
+        }
+      }
+    }
+
+    if (landed) entity.set<Flags>(entity.get<Flags>() |  Flags::LANDED);
+    else        entity.set<Flags>(entity.get<Flags>() & ~Flags::LANDED);
+
+    entity.set<Position>(pos);
+    entity.set<Velocity>(vel);
   }
 
   commit_entities();
+
+  // update render states
+  for (auto iter = entities.begin(); iter != entities.end(); ++iter) {
+  }
+
+  commit_entities();
+}
+
+void Subworld::commit_entities() {
+  entities = entities_next;
 }
 // end Subworld
 

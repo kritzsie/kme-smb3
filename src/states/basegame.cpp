@@ -53,8 +53,8 @@ void BaseGame::enter() {
   level_tile_data.registerTileDef("gold_coin", std::move(gold_coin));
 
   Box mario_cb;
-  mario_cb.radius = 5.f / 16.f;
-  mario_cb.height = 25.f / 16.f;
+  mario_cb.radius = 6.f / 16.f;
+  mario_cb.height = 24.f / 16.f;
   entity_data.registerCollisionBox("player_mario", std::move(mario_cb));
 
   RenderStates mario_rs;

@@ -66,7 +66,6 @@ void Gameplay::enter() {
 
   // entities
   Entity mario = subworld.spawnEntity("player_mario", Vec2f(2.f, 1.f));
-  mario.set<Velocity>(Vec2f(0.f, 12.f));
   mario.set<Flags>(Flags::GRAVITY);
 }
 
