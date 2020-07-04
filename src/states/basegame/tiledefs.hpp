@@ -3,8 +3,8 @@
 #include "../../geometry/rect.hpp"
 #include "../../renderstates.hpp"
 
-#include <exception>
 #include <map>
+#include <stdexcept>
 #include <vector>
 
 namespace kme {

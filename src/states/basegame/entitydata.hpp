@@ -3,8 +3,8 @@
 #include "entitycomponentmanager.hpp"
 #include "../../renderstates.hpp"
 
-#include <exception>
 #include <memory>
+#include <stdexcept>
 #include <unordered_map>
 
 namespace kme {
@@ -15,6 +15,9 @@ public:
 
 class EntityData {
 public:
+  void registerFlags(EntityType type, UInt32 f);
+  const UInt32& getFlags(EntityType type) const;
+
   void registerCollisionBox(EntityType type, Box cb);
   const Box& getCollisionBox(EntityType type) const;
 
@@ -24,6 +27,7 @@ public:
   const std::shared_ptr<RenderStates> getRenderStates(EntityType type) const;
 
 private:
+  std::unordered_map<EntityType, UInt32> flags;
   std::unordered_map<EntityType, Box> collision_boxes;
   std::unordered_map<EntityType, std::shared_ptr<RenderStates>> render_states;
 };

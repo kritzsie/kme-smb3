@@ -1,5 +1,8 @@
 #include "world.hpp"
 
+#include <SFML/Window/Keyboard.hpp>
+#include <SFML/Window/Joystick.hpp>
+
 #include <exception>
 
 #include <ctgmath>
@@ -15,9 +18,14 @@ Entity Subworld::spawnEntity(EntityType type, Vec2f pos) {
   entity.set<Position>(pos);
 
   try {
+    entity.set<Flags>(entity_data.getFlags(type));
+  }
+  catch (const std::out_of_range&) {}
+
+  try {
     entity.set<CollisionBox>(entity_data.getCollisionBox(type));
   }
-  catch (const std::out_of_range& ex) {}
+  catch (const std::out_of_range&) {}
 
   return entity;
 }
@@ -52,9 +60,65 @@ static Rect<int> toRange(Rect<float> aabb) {
 }
 
 void Subworld::update(float delta) {
+  // move player
+  for (auto iter = entities.begin(); iter != entities.end(); ++iter) {
+    Entity entity = getEntity(*iter);
+
+    if (entity.get<Type>() == "player_mario") {
+      Vec2f vel = entity.get<Velocity>();
+      UInt32 flags = entity.get<Flags>();
+
+      float x = 0.f;
+      x += sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::PovX) / 100.f;
+      x += sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right);
+      x -= sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left);
+      x = std::clamp(x, -1.f, 1.f);
+
+      bool jump = false;
+      jump |= sf::Joystick::isButtonPressed(0, 1);
+      jump |= sf::Keyboard::isKeyPressed(sf::Keyboard::Key::X);
+
+      if (x) {
+        vel.x = std::clamp(vel.x + x, -8.f, 8.f);
+      }
+
+      if (jump) {
+        if (flags & Flags::LANDED) {
+          vel.y = 12.f;
+        }
+      }
+
+      entity.set<Velocity>(vel);
+    }
+  }
+
+  commit_entities();
+
+  // apply friction
+  for (auto iter = entities.begin(); iter != entities.end(); ++iter) {
+    Entity entity = getEntity(*iter);
+
+    Vec2f vel = entity.get<Velocity>();
+    UInt32 flags = entity.get<Flags>();
+
+    if (flags & Flags::LANDED) {
+      if (vel.x > 0.f) {
+        vel.x = std::max(vel.x - 8.f * delta, 0.f);
+      }
+      else if (vel.x < 0.f) {
+        vel.x = std::min(vel.x + 8.f * delta, 0.f);
+      }
+
+      entity.set<Velocity>(vel);
+    }
+  }
+
+  commit_entities();
+
   // apply gravity
   for (auto iter = entities.begin(); iter != entities.end(); ++iter) {
     Entity entity = getEntity(*iter);
+
     if (entity.get<Flags>() & Flags::GRAVITY) {
       Vec2f vel = entity.get<Velocity>();
       vel.y -= 29.625f * delta;
@@ -66,10 +130,10 @@ void Subworld::update(float delta) {
 
   // move and collide
   for (auto iter = entities.begin(); iter != entities.end(); ++iter) {
-    // y axis
     Entity entity = getEntity(*iter);
     Vec2f pos = entity.get<Position>();
     Vec2f vel = entity.get<Velocity>();
+    bool landed = false;
 
     pos.x += vel.x * delta;
 
@@ -98,8 +162,6 @@ void Subworld::update(float delta) {
         }
       }
     }
-
-    bool landed = false;
 
     pos.y += vel.y * delta;
 
@@ -130,17 +192,11 @@ void Subworld::update(float delta) {
       }
     }
 
-    if (landed) entity.set<Flags>(entity.get<Flags>() |  Flags::LANDED);
-    else        entity.set<Flags>(entity.get<Flags>() & ~Flags::LANDED);
-
     entity.set<Position>(pos);
     entity.set<Velocity>(vel);
-  }
 
-  commit_entities();
-
-  // update render states
-  for (auto iter = entities.begin(); iter != entities.end(); ++iter) {
+    if (landed) entity.set<Flags>(entity.get<Flags>() |  Flags::LANDED);
+    else        entity.set<Flags>(entity.get<Flags>() & ~Flags::LANDED);
   }
 
   commit_entities();

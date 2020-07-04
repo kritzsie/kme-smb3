@@ -2,8 +2,8 @@
 
 namespace kme::util {
 template<typename T>
-constexpr T absdiv(T lhs, T rhs);
+constexpr T absdiv(const T& lhs, const T& rhs);
 
 template<typename T>
-constexpr T absmod(T lhs, T rhs);
+constexpr T absmod(const T& lhs, const T& rhs);
 }

@@ -57,6 +57,8 @@ void BaseGame::enter() {
   mario_cb.height = 24.f / 16.f;
   entity_data.registerCollisionBox("player_mario", std::move(mario_cb));
 
+  entity_data.registerFlags("player_mario", Flags::GRAVITY);
+
   RenderStates mario_rs;
   mario_rs.pushFrame("idle", "bigmariowalk_0", Rect<int>(0, 0, 14, 27), Vec2f(7, -1), 0.f);
 

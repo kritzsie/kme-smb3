@@ -4,6 +4,7 @@
 #include "../../types.hpp"
 
 #include <set>
+#include <string>
 #include <tuple>
 #include <unordered_map>
 
