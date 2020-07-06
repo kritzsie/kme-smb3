@@ -17,12 +17,6 @@ Entity Subworld::spawnEntity(EntityType type, Vec2f pos) {
   entity.set<Type>(type);
   entity.set<Position>(pos);
 
-  /*
-  std::apply([this, &entity](auto&&... args) {
-    (entity.set(entity_data.getDefault(args)), ...);
-  }, entity_data.getDefaults(type));
-  */
-
   try {
     entity.set<Flags>(entity_data.getFlags(type));
   }
