@@ -11,7 +11,7 @@
 #include <string>
 
 namespace kme {
-class Gameplay : public BaseState {
+class Gameplay final : public BaseState {
 public:
   static Factory create();
 

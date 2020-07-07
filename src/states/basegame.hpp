@@ -5,7 +5,7 @@
 #include "basegame/tiledefs.hpp"
 
 namespace kme {
-class BaseGame : public BaseState {
+class BaseGame final : public BaseState {
 public:
   static Factory create();
 

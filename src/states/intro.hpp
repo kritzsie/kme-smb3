@@ -3,7 +3,7 @@
 #include "basestate.hpp"
 
 namespace kme {
-class Intro : public BaseState {
+class Intro final : public BaseState {
 public:
   static Factory create();
 
