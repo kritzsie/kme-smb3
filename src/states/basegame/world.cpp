@@ -16,15 +16,14 @@ using Unqualified = typename std::remove_cv<typename std::remove_reference<T>::t
 Subworld::Subworld(const EntityData& entity_data, const TileDefs& tile_data)
 : entity_data(entity_data), tile_data(tile_data) {}
 
-Entity Subworld::spawnEntity(EntityType type, Vec2f pos) {
+Entity Subworld::spawnEntity(EntityType type) {
   Entity entity = getEntity(entities_next.createEntity());
+
+  entity.set<Type>(type);
 
   std::apply([&entity](auto&&... args) {
     (entity.set<Unqualified<decltype(args)>>(args.value), ...);
   }, entity_data.getDefaults(type));
-
-  entity.set<Type>(type);
-  entity.set<Position>(pos);
 
   return entity;
 }

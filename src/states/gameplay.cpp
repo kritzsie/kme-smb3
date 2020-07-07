@@ -65,7 +65,8 @@ void Gameplay::enter() {
   }
 
   // entities
-  Entity mario = subworld.spawnEntity("player_mario", Vec2f(2.f, 1.f));
+  Entity mario = subworld.spawnEntity("player_mario");
+  mario.set<Position>(Vec2f(2.f, 1.f));
 }
 
 void Gameplay::exit() {}

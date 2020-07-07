@@ -7,32 +7,6 @@ const ComponentTypes::Types& EntityData::getDefaults(EntityType type) const {
   return defaults.at(type);
 }
 
-void EntityData::registerFlags(EntityType type, UInt32 f) {
-  if (flags.find(type) != flags.end()) {
-    std::stringstream ss;
-    ss << "attempted to redefine flags of entity \"" << type << "\"";
-    throw EntityRedefinitionError(ss.str());
-  }
-  flags[type] = f;
-}
-
-const UInt32& EntityData::getFlags(EntityType type) const {
-  return flags.at(type);
-}
-
-void EntityData::registerCollisionBox(EntityType type, Box cb) {
-  if (collision_boxes.find(type) != collision_boxes.end()) {
-    std::stringstream ss;
-    ss << "attempted to redefine collision box of entity \"" << type << "\"";
-    throw EntityRedefinitionError(ss.str());
-  }
-  collision_boxes[type] = cb;
-}
-
-const Box& EntityData::getCollisionBox(EntityType type) const {
-  return collision_boxes.at(type);
-}
-
 void EntityData::registerRenderStates(EntityType type, RenderStates rs) {
   registerRenderStates(type, std::make_unique<RenderStates>(rs));
 }

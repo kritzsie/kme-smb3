@@ -15,7 +15,7 @@ class Subworld {
 public:
   Subworld(const EntityData& entity_data, const TileDefs& tile_data);
 
-  Entity spawnEntity(EntityType type, Vec2f pos);
+  Entity spawnEntity(EntityType type);
   Entity getEntity(EntityID entity);
 
   const EntityComponentManager& getEntities() const;
