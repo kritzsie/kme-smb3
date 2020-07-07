@@ -18,7 +18,17 @@ template<typename T>
 struct Component {
   using type = T;
 
-  std::unordered_map<EntityID, T> value;
+  T value;
+};
+
+template<typename TKey, typename... Ts>
+struct TypeMap {
+  template<typename T>
+  using Map = std::unordered_map<EntityID, T>;
+
+  using Components = std::tuple<Map<TKey>, Map<Ts>...>;
+
+  using Defaults = std::unordered_map<typename TKey::type, std::tuple<Ts...>>;
 };
 
 struct Box {
@@ -27,6 +37,7 @@ struct Box {
 };
 
 struct Type : Component<EntityType> {};
+struct Parent : Component<EntityID> {};
 struct Flags : Component<UInt32> {
   enum : UInt32 {
     NONE      = 0,
@@ -38,13 +49,16 @@ struct Position : Component<Vec2f> {};
 struct Velocity : Component<Vec2f> {};
 struct CollisionBox : Component<Box> {};
 
-using ComponentTypes = std::tuple<
+using ComponentTypes = TypeMap<
   Type,
+  Parent,
   Flags,
   Position,
   Velocity,
   CollisionBox
 >;
+
+using Components = ComponentTypes::Components;
 
 class EntityComponentManager {
 public:
@@ -92,12 +106,12 @@ private:
   std::size_t slot = 0;
 
   Set entities;
-  ComponentTypes components;
+  Components components;
 };
 
 template<typename T>
 const typename T::type& EntityComponentManager::get(EntityID entity) const {
-  return std::get<T>(components).value.at(entity);
+  return std::get<ComponentTypes::Map<T>>(components).at(entity).value;
 }
 
 template<typename T>
@@ -107,6 +121,6 @@ typename T::type& EntityComponentManager::get(EntityID entity) {
 
 template<typename T>
 void EntityComponentManager::set(EntityID entity, const typename T::type& value) noexcept {
-  std::get<T>(components).value.at(entity) = value;
+  std::get<ComponentTypes::Map<T>>(components).at(entity).value = value;
 }
 }

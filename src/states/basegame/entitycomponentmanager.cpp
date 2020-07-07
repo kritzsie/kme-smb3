@@ -11,24 +11,24 @@ std::size_t EntityComponentManager::getCapacity() const noexcept {
 }
 
 void EntityComponentManager::setCapacity(std::size_t requested) {
-  std::size_t actual = std::max(requested, DEFAULT_CAPACITY);
-  std::apply([actual](auto&&... args) {
-    (args.value.reserve(actual), ...);
+  std::size_t actual_capacity = std::max(requested, DEFAULT_CAPACITY);
+  std::apply([actual_capacity](auto&&... args) {
+    (args.reserve(actual_capacity), ...);
   }, components);
-  capacity = actual;
+  capacity = actual_capacity;
 }
 
 EntityID EntityComponentManager::createEntity() noexcept {
   entities.insert(slot);
   std::apply([this](auto&&... args) {
-    (args.value[slot], ...);
+    (args[slot], ...);
   }, components);
   return slot++;
 }
 
 void EntityComponentManager::removeEntity(EntityID entity) {
   std::apply([entity](auto&&... args) {
-    (args.value.erase(entity), ...);
+    (args.erase(entity), ...);
   }, components);
   entities.erase(entity);
 }
