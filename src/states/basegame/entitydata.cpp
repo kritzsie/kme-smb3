@@ -3,6 +3,10 @@
 #include <sstream>
 
 namespace kme {
+const ComponentTypes::Types& EntityData::getDefaults(EntityType type) const {
+  return defaults.at(type);
+}
+
 void EntityData::registerFlags(EntityType type, UInt32 f) {
   if (flags.find(type) != flags.end()) {
     std::stringstream ss;

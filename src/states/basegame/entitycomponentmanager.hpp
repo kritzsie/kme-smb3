@@ -1,8 +1,6 @@
 #pragma once
 
 #include "entitycomponents.hpp"
-#include "../../geometry/vec2.hpp"
-#include "../../types.hpp"
 
 #include <set>
 #include <string>
@@ -10,38 +8,6 @@
 #include <cstdlib>
 
 namespace kme {
-using EntityID = std::size_t;
-using EntityType = std::string;
-
-struct Box {
-  float radius;
-  float height;
-};
-
-struct Type : Component<EntityType> {};
-struct Parent : Component<EntityID> {};
-struct Flags : Component<UInt32> {
-  enum : UInt32 {
-    NONE      = 0,
-    GRAVITY   = 1 << 0,
-    LANDED    = 1 << 1
-  };
-};
-struct Position : Component<Vec2f> {};
-struct Velocity : Component<Vec2f> {};
-struct CollisionBox : Component<Box> {};
-
-using ComponentTypes = TypeMap<EntityID,
-  Type,
-  Parent,
-  Flags,
-  Position,
-  Velocity,
-  CollisionBox
->;
-
-using Components = ComponentTypes::Components;
-
 class EntityComponentManager {
 public:
   static constexpr std::size_t DEFAULT_CAPACITY = 32;
@@ -56,12 +22,12 @@ public:
   EntityComponentManager() noexcept;
 
   template<typename T>
-  const typename T::type& get(EntityID entity) const;
+  const typename T::ComponentType& get(EntityID entity) const;
   template<typename T>
-  typename T::type& get(EntityID entity);
+  typename T::ComponentType& get(EntityID entity);
 
   template<typename T>
-  void set(EntityID entity, const typename T::type& value) noexcept;
+  void set(EntityID entity, const typename T::ComponentType& value) noexcept;
 
   std::size_t getCapacity() const noexcept;
   void setCapacity(std::size_t requested);
@@ -88,21 +54,21 @@ private:
   std::size_t slot = 0;
 
   Set entities;
-  Components components;
+  ComponentTypes::Components components;
 };
 
 template<typename T>
-const typename T::type& EntityComponentManager::get(EntityID entity) const {
+const typename T::ComponentType& EntityComponentManager::get(EntityID entity) const {
   return std::get<ComponentTypes::Map<T>>(components).at(entity).value;
 }
 
 template<typename T>
-typename T::type& EntityComponentManager::get(EntityID entity) {
-  return const_cast<typename T::type&>(static_cast<const EntityComponentManager*>(this)->get<T>(entity));
+typename T::ComponentType& EntityComponentManager::get(EntityID entity) {
+  return const_cast<typename T::ComponentType&>(static_cast<const EntityComponentManager*>(this)->get<T>(entity));
 }
 
 template<typename T>
-void EntityComponentManager::set(EntityID entity, const typename T::type& value) noexcept {
+void EntityComponentManager::set(EntityID entity, const typename T::ComponentType& value) noexcept {
   std::get<ComponentTypes::Map<T>>(components).at(entity).value = value;
 }
 }

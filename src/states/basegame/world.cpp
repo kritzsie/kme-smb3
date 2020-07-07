@@ -4,28 +4,27 @@
 #include <SFML/Window/Joystick.hpp>
 
 #include <exception>
+#include <type_traits>
 
 #include <ctgmath>
 
 namespace kme {
 // begin Subworld
+template<typename T>
+using Unqualified = typename std::remove_cv<typename std::remove_reference<T>::type>::type;
+
 Subworld::Subworld(const EntityData& entity_data, const TileDefs& tile_data)
 : entity_data(entity_data), tile_data(tile_data) {}
 
 Entity Subworld::spawnEntity(EntityType type, Vec2f pos) {
   Entity entity = getEntity(entities_next.createEntity());
+
+  std::apply([&entity](auto&&... args) {
+    (entity.set<Unqualified<decltype(args)>>(args.value), ...);
+  }, entity_data.getDefaults(type));
+
   entity.set<Type>(type);
   entity.set<Position>(pos);
-
-  try {
-    entity.set<Flags>(entity_data.getFlags(type));
-  }
-  catch (const std::out_of_range&) {}
-
-  try {
-    entity.set<CollisionBox>(entity_data.getCollisionBox(type));
-  }
-  catch (const std::out_of_range&) {}
 
   return entity;
 }

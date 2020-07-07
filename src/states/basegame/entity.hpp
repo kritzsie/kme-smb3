@@ -11,10 +11,10 @@ public:
          EntityID entity);
 
   template<typename T>
-  const typename T::type& get() const;
+  const typename T::ComponentType& get() const;
 
   template<typename T>
-  void set(const typename T::type& value);
+  void set(const typename T::ComponentType& value);
 
   EntityID getID() const;
 
@@ -25,12 +25,12 @@ private:
 };
 
 template<typename T>
-const typename T::type& Entity::get() const {
+const typename T::ComponentType& Entity::get() const {
   return entities.get<T>(entity);
 }
 
 template<typename T>
-void Entity::set(const typename T::type& value) {
+void Entity::set(const typename T::ComponentType& value) {
   entities_next.get<T>(entity) = value;
 }
 // end Entity
