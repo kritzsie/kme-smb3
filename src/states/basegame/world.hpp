@@ -1,6 +1,5 @@
 #pragma once
 
-#include "entity.hpp"
 #include "entitycomponentmanager.hpp"
 #include "entitydata.hpp"
 #include "tilemap.hpp"
@@ -10,6 +9,8 @@
 #include <cstdlib>
 
 namespace kme {
+class Entity;
+
 // begin Subworld
 class Subworld {
 public:
@@ -19,6 +20,7 @@ public:
   Entity getEntity(EntityID entity);
 
   const EntityComponentManager& getEntities() const;
+  EntityComponentManager& getEntities();
 
   const Tilemap& getTiles() const;
   Tilemap& getTiles();

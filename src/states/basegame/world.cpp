@@ -1,5 +1,7 @@
 #include "world.hpp"
 
+#include "entity.hpp"
+
 #include <SFML/Window/Keyboard.hpp>
 #include <SFML/Window/Joystick.hpp>
 
@@ -29,11 +31,15 @@ Entity Subworld::spawnEntity(EntityType type) {
 }
 
 Entity Subworld::getEntity(EntityID entity) {
-  return Entity(entities, entities_next, entity);
+  return Entity(*this, entity);
 }
 
 const EntityComponentManager& Subworld::getEntities() const {
   return entities;
+}
+
+EntityComponentManager& Subworld::getEntities() {
+  return entities_next;
 }
 
 const Tilemap& Subworld::getTiles() const {

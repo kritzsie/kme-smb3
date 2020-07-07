@@ -1,5 +1,7 @@
 #include "gameplay.hpp"
 
+#include "basegame/entity.hpp"
+
 #include "../assetmanager.hpp"
 #include "../engine.hpp"
 #include "../util/math.hpp"

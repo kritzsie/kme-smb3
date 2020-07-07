@@ -1,13 +1,13 @@
 #pragma once
 
 #include "entitycomponentmanager.hpp"
+#include "world.hpp"
 
 namespace kme {
 // begin Entity
 class Entity {
 public:
-  Entity(const EntityComponentManager& entities,
-         EntityComponentManager& entites_next,
+  Entity(Subworld& subworld,
          EntityID entity);
 
   template<typename T>
@@ -18,20 +18,22 @@ public:
 
   EntityID getID() const;
 
+  Entity spawnEntity(EntityType type);
+
 private:
-  const EntityComponentManager& entities;
-  EntityComponentManager& entities_next;
+  Subworld& subworld;
+
   EntityID entity;
 };
 
 template<typename T>
 const typename T::ComponentType& Entity::get() const {
-  return entities.get<T>(entity);
+  return static_cast<const Subworld&>(subworld).getEntities().get<T>(entity);
 }
 
 template<typename T>
 void Entity::set(const typename T::ComponentType& value) {
-  entities_next.get<T>(entity) = value;
+  subworld.getEntities().get<T>(entity) = value;
 }
 // end Entity
 }
