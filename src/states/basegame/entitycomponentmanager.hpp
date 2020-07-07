@@ -1,35 +1,17 @@
 #pragma once
 
+#include "entitycomponents.hpp"
 #include "../../geometry/vec2.hpp"
 #include "../../types.hpp"
 
 #include <set>
 #include <string>
-#include <tuple>
-#include <unordered_map>
 
 #include <cstdlib>
 
 namespace kme {
 using EntityID = std::size_t;
 using EntityType = std::string;
-
-template<typename T>
-struct Component {
-  using type = T;
-
-  T value;
-};
-
-template<typename TKey, typename... Ts>
-struct TypeMap {
-  template<typename T>
-  using Map = std::unordered_map<EntityID, T>;
-
-  using Components = std::tuple<Map<TKey>, Map<Ts>...>;
-
-  using Defaults = std::unordered_map<typename TKey::type, std::tuple<Ts...>>;
-};
 
 struct Box {
   float radius;
@@ -49,7 +31,7 @@ struct Position : Component<Vec2f> {};
 struct Velocity : Component<Vec2f> {};
 struct CollisionBox : Component<Box> {};
 
-using ComponentTypes = TypeMap<
+using ComponentTypes = TypeMap<EntityID,
   Type,
   Parent,
   Flags,
