@@ -69,7 +69,7 @@ bool Vec2<T>::operator==(const Vec2<T>& rhs) const {
 
 template<typename T>
 bool Vec2<T>::operator!=(const Vec2<T>& rhs) const {
-  return (x != rhs.x) and (y != rhs.y);
+  return (x != rhs.x) or (y != rhs.y);
 }
 
 template<typename T>

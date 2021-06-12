@@ -75,7 +75,7 @@ bool Rect<T>::operator==(const Rect<T>& rhs) const {
 
 template<typename T>
 bool Rect<T>::operator!=(const Rect<T>& rhs) const {
-  return (this->pos != rhs.pos) and (this->size != rhs.size);
+  return (this->pos != rhs.pos) or (this->size != rhs.size);
 }
 
 template<typename T>
