@@ -24,6 +24,9 @@ Gameplay::Gameplay(BaseState* parent, Engine* engine)
   camera_radius = Vec2f(15.f, 8.4375f);
 
   current_subworld = 0;
+
+  engine->music->open("athletic.spc");
+  engine->music->play();
 }
 
 Gameplay::~Gameplay() {
@@ -94,7 +97,7 @@ void Gameplay::draw(float delta) {
     framebuffer->setView(view);
 
     drawBackground(sf::Color(0x6898F8FF));
-    drawBackground("overworldblockstop", Vec2f(128.f, 11.f), Vec2f(0.375f, 0.25f));
+    drawBackground("athletichills", Vec2f(128.f, 11.f), Vec2f(0.375f, 0.25f));
     drawBackground("cloudlayer", Vec2f(0.f, -224.f), Vec2f(0.75f, 0.125f));
 
     drawTiles();

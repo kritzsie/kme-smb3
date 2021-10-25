@@ -68,6 +68,7 @@ void Window::resize(UInt width, UInt height) {
 // Engine functions
 Engine::Engine(std::vector<std::string>&& args) : args(args), tickinfo(64.f), renderinfo(60.f) {
   window = new Window(1440, 810, "Super Mario Bros. 3");
+  music = new Music();
 
   if (instance_count == 0) {
     PHYSFS_init(args.at(0).c_str());
@@ -83,6 +84,7 @@ Engine::Engine(int argc, char** argv) : Engine(std::vector<std::string>(argv, ar
 
 Engine::~Engine() {
   if (window != nullptr) delete window;
+  if (music != nullptr) delete music;
 
   if (instance_count > 0) {
     if (instance_count == 1) {
