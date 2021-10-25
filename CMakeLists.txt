@@ -2,10 +2,10 @@ cmake_minimum_required(VERSION 3.8.2)
 
 project(kme-smb3)
 
+find_package(PkgConfig REQUIRED)
 find_package(PhysFS REQUIRED)
 find_package(SFML 2.5 REQUIRED COMPONENTS audio graphics network system window)
-
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/json/include)
+pkg_check_modules(GME REQUIRED IMPORTED_TARGET libgme)
 
 add_executable(
   kme-smb3
@@ -23,6 +23,7 @@ add_executable(
   src/assetmanager.cpp
   src/engine.cpp
   src/input.cpp
+  src/music.cpp
   src/renderstates.cpp
   src/main.cpp
 )
@@ -31,6 +32,7 @@ target_link_libraries(
   kme-smb3
   physfs
   sfml-audio sfml-graphics sfml-network sfml-system sfml-window
+  PkgConfig::GME
 )
 
 set_target_properties(
