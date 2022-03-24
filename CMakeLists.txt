@@ -25,6 +25,11 @@ add_executable(
   src/main.cpp
 )
 
+target_include_directories(
+  kme-smb3
+  PUBLIC include
+)
+
 target_link_libraries(
   kme-smb3
   physfs
@@ -33,6 +38,7 @@ target_link_libraries(
 )
 
 set_target_properties(
-  kme-smb3 PROPERTIES
+  kme-smb3
+  PROPERTIES
   CXX_STANDARD 17
 )
