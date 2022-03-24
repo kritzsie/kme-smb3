@@ -1,7 +1,5 @@
 #pragma once
 
-#include "entitycomponentmanager.hpp"
-#include "entitydata.hpp"
 #include "tilemap.hpp"
 
 #include <unordered_map>
@@ -14,13 +12,7 @@ class Entity;
 // begin Subworld
 class Subworld {
 public:
-  Subworld(const EntityData& entity_data, const TileDefs& tile_data);
-
-  Entity spawnEntity(EntityType type);
-  Entity getEntity(EntityID entity);
-
-  const EntityComponentManager& getEntities() const;
-  EntityComponentManager& getEntities();
+  Subworld(const TileDefs& tile_data);
 
   const Tilemap& getTiles() const;
   Tilemap& getTiles();
@@ -28,13 +20,7 @@ public:
   void update(float delta);
 
 private:
-  void commit_entities();
-
-  const EntityData& entity_data;
   const TileDefs& tile_data;
-
-  EntityComponentManager entities;
-  EntityComponentManager entities_next;
 
   Tilemap tiles;
 };
@@ -48,7 +34,7 @@ public:
   using const_iterator = Map::const_iterator;
   using iterator = Map::iterator;
 
-  Level(const EntityData& entity_data, const TileDefs& tile_data);
+  Level(const TileDefs& tile_data);
 
   std::size_t createSubworld();
   std::size_t createSubworld(std::size_t index_hint);
@@ -66,7 +52,6 @@ public:
   iterator end();
 
 private:
-  const EntityData& entity_data;
   const TileDefs& tile_data;
 
   std::size_t counter = 0;

@@ -12,35 +12,8 @@
 
 namespace kme {
 // begin Subworld
-template<typename T>
-using Unqualified = typename std::remove_cv<typename std::remove_reference<T>::type>::type;
-
-Subworld::Subworld(const EntityData& entity_data, const TileDefs& tile_data)
-: entity_data(entity_data), tile_data(tile_data) {}
-
-Entity Subworld::spawnEntity(EntityType type) {
-  Entity entity = getEntity(entities_next.createEntity());
-
-  entity.set<Type>(type);
-
-  std::apply([&entity](auto&&... args) {
-    (entity.set<Unqualified<decltype(args)>>(args.value), ...);
-  }, entity_data.getDefaults(type));
-
-  return entity;
-}
-
-Entity Subworld::getEntity(EntityID entity) {
-  return Entity(*this, entity);
-}
-
-const EntityComponentManager& Subworld::getEntities() const {
-  return entities;
-}
-
-EntityComponentManager& Subworld::getEntities() {
-  return entities_next;
-}
+Subworld::Subworld(const TileDefs& tile_data)
+: tile_data(tile_data) {}
 
 const Tilemap& Subworld::getTiles() const {
   return tiles;
@@ -50,6 +23,7 @@ Tilemap& Subworld::getTiles() {
   return const_cast<Tilemap&>(static_cast<const Subworld*>(this)->getTiles());
 }
 
+/*
 // ugly
 static Rect<float> toAABB(Vec2f pos, Box box) {
   return Rect<float>(pos.x - box.radius, pos.y, box.radius * 2.f, box.height);
@@ -62,8 +36,10 @@ static Rect<int> toRange(Rect<float> aabb) {
     std::ceil(aabb.width + 1.f), std::ceil(aabb.height + 1.f)
   );
 }
+*/
 
 void Subworld::update(float delta) {
+  /*
   // move player
   for (auto iter = entities.begin(); iter != entities.end(); ++iter) {
     Entity entity = getEntity(*iter);
@@ -204,16 +180,13 @@ void Subworld::update(float delta) {
   }
 
   commit_entities();
-}
-
-void Subworld::commit_entities() {
-  entities = entities_next;
+  */
 }
 // end Subworld
 
 // begin Level
-Level::Level(const EntityData& entity_data, const TileDefs& tile_data)
-: entity_data(entity_data), tile_data(tile_data) {
+Level::Level(const TileDefs& tile_data)
+: tile_data(tile_data) {
   createSubworld();
 }
 
@@ -228,7 +201,7 @@ std::size_t Level::createSubworld(std::size_t index_hint) {
       ++counter;
     }
 
-    subworld.emplace(index_hint, Subworld(entity_data, tile_data));
+    subworld.emplace(index_hint, Subworld(tile_data));
     return index_hint;
   }
 
@@ -236,7 +209,7 @@ std::size_t Level::createSubworld(std::size_t index_hint) {
     ++counter;
   }
 
-  subworld.emplace(counter, Subworld(entity_data, tile_data));
+  subworld.emplace(counter, Subworld(tile_data));
   return counter;
 }
 

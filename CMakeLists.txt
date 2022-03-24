@@ -10,9 +10,6 @@ pkg_check_modules(GME REQUIRED IMPORTED_TARGET libgme)
 add_executable(
   kme-smb3
   src/states/basestate.cpp
-  src/states/basegame/entity.cpp
-  src/states/basegame/entitycomponentmanager.cpp
-  src/states/basegame/entitydata.cpp
   src/states/basegame/tiledefs.cpp
   src/states/basegame/tilemap.cpp
   src/states/basegame/world.cpp

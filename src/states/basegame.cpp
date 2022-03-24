@@ -52,6 +52,7 @@ void BaseGame::enter() {
   gold_coin.pushFrame("smb3_tile_atlas", Vec2i(48, 32), 8.f / 60.f);
   level_tile_data.registerTileDef("gold_coin", std::move(gold_coin));
 
+  /*
   Box mario_cb;
   mario_cb.radius = 6.f / 16.f;
   mario_cb.height = 24.f / 16.f;
@@ -82,6 +83,7 @@ void BaseGame::enter() {
 
   mario_rs.pushFrame("death", "mariodeath", Rect<int>(0, 0, 16, 16), Vec2f(8, -1), 0.f);
   entity_data.registerRenderStates("player_mario", std::move(mario_rs));
+  */
 }
 
 void BaseGame::exit() {}

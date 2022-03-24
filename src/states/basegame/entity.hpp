@@ -4,6 +4,7 @@
 #include "world.hpp"
 
 namespace kme {
+/*
 // begin Entity
 class Entity {
 public:
@@ -36,4 +37,5 @@ void Entity::set(const typename T::ComponentType& value) {
   subworld.getEntities().get<T>(entity) = value;
 }
 // end Entity
+*/
 }

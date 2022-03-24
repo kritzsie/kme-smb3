@@ -16,7 +16,7 @@ Gameplay::Factory Gameplay::create() {
 }
 
 Gameplay::Gameplay(BaseState* parent, Engine* engine)
-: BaseState(parent, engine), level(getBaseGame()->entity_data, getBaseGame()->level_tile_data) {
+: BaseState(parent, engine), level(getBaseGame()->level_tile_data) {
   framebuffer = new sf::RenderTexture;
   framebuffer->create(480, 270);
 
@@ -69,9 +69,11 @@ void Gameplay::enter() {
     else if (prev == TileID("item_block"))  tiles[x][5] = TileID("brick_block");
   }
 
+  /*
   // entities
   Entity mario = subworld.spawnEntity("player_mario");
   mario.set<Position>(Vec2f(2.f, 1.f));
+  */
 }
 
 void Gameplay::exit() {}
@@ -207,6 +209,7 @@ void Gameplay::drawTiles() {
 }
 
 void Gameplay::drawEntities() {
+  /*
   const Subworld& subworld = level.getSubworld(current_subworld);
   const EntityComponentManager& entities = subworld.getEntities();
 
@@ -222,6 +225,7 @@ void Gameplay::drawEntities() {
       framebuffer->draw(sprite);
     }
   }
+  */
 }
 
 Vec2f Gameplay::fromScreen(Vec2f pos) {

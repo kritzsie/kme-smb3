@@ -1,6 +1,7 @@
 #include "entity.hpp"
 
 namespace kme {
+/*
 Entity::Entity(Subworld& subworld,
                EntityID entity)
 : subworld(subworld), entity(entity) {}
@@ -17,4 +18,5 @@ Entity Entity::spawnEntity(EntityType type) {
 
   return entity;
 }
+*/
 }
