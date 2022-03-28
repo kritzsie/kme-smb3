@@ -1,6 +1,7 @@
 #include "gameplay.hpp"
 
-#include "basegame/entity.hpp"
+//#include "basegame/entity.hpp"
+#include "basegame/ecs/components.hpp"
 
 #include "../assetmanager.hpp"
 #include "../engine.hpp"
@@ -69,8 +70,15 @@ void Gameplay::enter() {
     else if (prev == TileID("item_block"))  tiles[x][5] = TileID("brick_block");
   }
 
-  /*
   // entities
+
+  auto& entities = subworld.getEntities();
+  auto player = entities.create();
+  entities.emplace<PositionComponent>(player, Vec2f(2.f, 1.f));
+  entities.emplace<FlagsComponent>(player);
+  entities.emplace<RenderComponent>(player);
+
+  /*
   Entity mario = subworld.spawnEntity("player_mario");
   mario.set<Position>(Vec2f(2.f, 1.f));
   */
@@ -209,10 +217,23 @@ void Gameplay::drawTiles() {
 }
 
 void Gameplay::drawEntities() {
-  /*
   const Subworld& subworld = level.getSubworld(current_subworld);
-  const EntityComponentManager& entities = subworld.getEntities();
+  const entt::registry& entities = subworld.getEntities();
 
+  auto view = entities.view<PositionComponent, FlagsComponent, RenderComponent>();
+
+  for (auto entity : view) {
+    const auto& pos = view.get<const PositionComponent>(entity);
+    sf::RectangleShape rect;
+    rect.setPosition(toScreen(pos.value + Vec2f(-0.5f, 0.f)));
+    rect.setSize(toScreen(Vec2f(1.f, 2.f)));
+    rect.setFillColor(sf::Color(0));
+    rect.setOutlineColor(sf::Color::Red);
+    rect.setOutlineThickness(2.f);
+    framebuffer->draw(rect);
+  }
+
+  /*
   for (auto iter = entities.begin(); iter != entities.end(); ++iter) {
     const RenderFrame& frame = getBaseGame()->entity_data \
       .getRenderStates(entities.get<Type>(*iter))->getFrame();

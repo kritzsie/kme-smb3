@@ -1,5 +1,6 @@
 #include "basegame.hpp"
 
+#include "basegame/ecs/components.hpp"
 #include "gameplay.hpp"
 #include "../engine.hpp"
 
@@ -52,13 +53,12 @@ void BaseGame::enter() {
   gold_coin.pushFrame("smb3_tile_atlas", Vec2i(48, 32), 8.f / 60.f);
   level_tile_data.registerTileDef("gold_coin", std::move(gold_coin));
 
-  /*
-  Box mario_cb;
-  mario_cb.radius = 6.f / 16.f;
-  mario_cb.height = 24.f / 16.f;
-  entity_data.setDefault<CollisionBox>("player_mario", std::move(mario_cb));
+  CollisionComponent mario_collision;
+  mario_collision.radius = 6.f / 16.f;
+  mario_collision.height = 24.f / 16.f;
+  //entity_data.setDefault<CollisionComponent>("player_mario", std::move(mario_collision));
 
-  entity_data.setDefault<Flags>("player_mario", Flags::GRAVITY);
+  //entity_data.setDefault<FlagsComponent>("player_mario", FlagsComponent::GRAVITY);
 
   RenderStates mario_rs;
   mario_rs.pushFrame("idle", "bigmariowalk_0", Rect<int>(0, 0, 14, 27), Vec2f(7, -1), 0.f);
@@ -82,8 +82,7 @@ void BaseGame::enter() {
   mario_rs.pushFrame("jumping", "bigmariojump", Rect<int>(0, 0, 16, 26), Vec2f(8, 0), 0.f);
 
   mario_rs.pushFrame("death", "mariodeath", Rect<int>(0, 0, 16, 16), Vec2f(8, -1), 0.f);
-  entity_data.registerRenderStates("player_mario", std::move(mario_rs));
-  */
+  //entity_data.registerRenderStates("player_mario", std::move(mario_rs));
 }
 
 void BaseGame::exit() {}

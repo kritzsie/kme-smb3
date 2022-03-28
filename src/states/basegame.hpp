@@ -1,6 +1,8 @@
 #pragma once
 
 #include "basestate.hpp"
+//#include "basegame/entitydata.hpp"
+#include "basegame/ecs/entitydata.hpp"
 #include "basegame/tiledefs.hpp"
 
 namespace kme {
@@ -23,6 +25,7 @@ public:
   void update(float delta) final;
   void draw(float delta) final;
 
+  EntityData entity_data;
   TileDefs level_tile_data;
 
 private:

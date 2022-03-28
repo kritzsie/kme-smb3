@@ -15,6 +15,14 @@ namespace kme {
 Subworld::Subworld(const TileDefs& tile_data)
 : tile_data(tile_data) {}
 
+const entt::registry& Subworld::getEntities() const {
+  return entities;
+}
+
+entt::registry& Subworld::getEntities() {
+  return const_cast<entt::registry&>(static_cast<const Subworld*>(this)->getEntities());
+}
+
 const Tilemap& Subworld::getTiles() const {
   return tiles;
 }

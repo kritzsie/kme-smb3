@@ -2,17 +2,20 @@
 
 #include "tilemap.hpp"
 
+#include <entt/entt.hpp>
+
 #include <unordered_map>
 
 #include <cstdlib>
 
 namespace kme {
-class Entity;
-
 // begin Subworld
 class Subworld {
 public:
   Subworld(const TileDefs& tile_data);
+
+  const entt::registry& getEntities() const;
+  entt::registry& getEntities();
 
   const Tilemap& getTiles() const;
   Tilemap& getTiles();
@@ -22,6 +25,7 @@ public:
 private:
   const TileDefs& tile_data;
 
+  entt::registry entities;
   Tilemap tiles;
 };
 // end Subworld
