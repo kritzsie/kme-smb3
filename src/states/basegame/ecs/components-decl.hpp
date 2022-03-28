@@ -4,17 +4,23 @@
 
 #include "../../../geometry/vec2.hpp"
 
-#include <type_traits>
+#include <entt/entt.hpp>
+
+#include <string>
 
 namespace kme {
 enum class Direction { RIGHT, LEFT };
 
-struct FlagsComponent {
-  enum : UInt32 {
-    GRAVITY  = 1 << 0,
-    AIRBORNE = 1 << 1,
-    NODRAW   = 1 << 16
+struct InfoComponent {
+  enum {
+    NOGRAVITY  = 1 << 0,
+    NOFRICTION = 1 << 1,
+    AIRBORNE   = 1 << 16,
+    MOVING     = 1 << 17
   };
+
+  std::string name;
+  UInt32 flags;
 };
 
 struct PositionComponent : Component<Vec2f> {};
@@ -29,6 +35,15 @@ struct CollisionComponent {
 };
 
 struct RenderComponent {
+  enum : UInt32 {
+    NODRAW = 1 << 0
+  };
+
+  UInt32 flags;
   Vec2f scale;
+};
+
+struct SpawnerComponent {
+  entt::entity child;
 };
 }

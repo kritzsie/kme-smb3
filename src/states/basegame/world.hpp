@@ -20,6 +20,9 @@ public:
   const Tilemap& getTiles() const;
   Tilemap& getTiles();
 
+  float getGravity();
+  void setGravity(float value);
+
   void update(float delta);
 
 private:
@@ -27,6 +30,8 @@ private:
 
   entt::registry entities;
   Tilemap tiles;
+
+  float gravity = -48.f;
 };
 // end Subworld
 

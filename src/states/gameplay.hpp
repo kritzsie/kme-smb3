@@ -5,6 +5,8 @@
 #include "basegame.hpp"
 #include "../geometry.hpp"
 
+#include <entt/entt.hpp>
+
 #include <SFML/Graphics.hpp>
 #include <SFML/Window/Event.hpp>
 
@@ -55,6 +57,7 @@ private:
 
   Vec2f camera_pos;
   Vec2f camera_radius;
+  entt::entity camera_target;
 
   std::size_t current_subworld = 0;
   Level level;

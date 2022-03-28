@@ -71,17 +71,15 @@ void Gameplay::enter() {
   }
 
   // entities
+  entt::registry& entities = subworld.getEntities();
 
-  auto& entities = subworld.getEntities();
-  auto player = entities.create();
+  entt::entity player = entities.create();
+  entities.emplace<InfoComponent>(player, "player_mario");
   entities.emplace<PositionComponent>(player, Vec2f(2.f, 1.f));
-  entities.emplace<FlagsComponent>(player);
+  entities.emplace<VelocityComponent>(player, Vec2f(4.f, 32.f));
+  entities.emplace<CollisionComponent>(player, 6.f / 16.f, 24.f / 16.f);
+  entities.emplace<DirectionComponent>(player);
   entities.emplace<RenderComponent>(player);
-
-  /*
-  Entity mario = subworld.spawnEntity("player_mario");
-  mario.set<Position>(Vec2f(2.f, 1.f));
-  */
 }
 
 void Gameplay::exit() {}
@@ -220,12 +218,14 @@ void Gameplay::drawEntities() {
   const Subworld& subworld = level.getSubworld(current_subworld);
   const entt::registry& entities = subworld.getEntities();
 
-  auto view = entities.view<PositionComponent, FlagsComponent, RenderComponent>();
+  auto view = entities.view<PositionComponent, RenderComponent>();
 
-  for (auto entity : view) {
-    const auto& pos = view.get<const PositionComponent>(entity);
+  for (entt::entity entity : view) {
+    const Vec2f& pos = view.get<const PositionComponent>(entity);
+    const auto& render = view.get<const RenderComponent>(entity);
+
     sf::RectangleShape rect;
-    rect.setPosition(toScreen(pos.value + Vec2f(-0.5f, 0.f)));
+    rect.setPosition(toScreen(pos + Vec2f(-0.5f, 0.f)));
     rect.setSize(toScreen(Vec2f(1.f, 2.f)));
     rect.setFillColor(sf::Color(0));
     rect.setOutlineColor(sf::Color::Red);

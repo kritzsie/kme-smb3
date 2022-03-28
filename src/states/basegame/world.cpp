@@ -2,6 +2,8 @@
 
 #include "entity.hpp"
 
+#include "ecs/components.hpp"
+
 #include <SFML/Window/Keyboard.hpp>
 #include <SFML/Window/Joystick.hpp>
 
@@ -31,9 +33,16 @@ Tilemap& Subworld::getTiles() {
   return const_cast<Tilemap&>(static_cast<const Subworld*>(this)->getTiles());
 }
 
-/*
+float Subworld::getGravity() {
+  return gravity;
+}
+
+void Subworld::setGravity(float value) {
+  gravity = value;
+}
+
 // ugly
-static Rect<float> toAABB(Vec2f pos, Box box) {
+static Rect<float> toAABB(Vec2f pos, CollisionComponent box) {
   return Rect<float>(pos.x - box.radius, pos.y, box.radius * 2.f, box.height);
 }
 
@@ -44,9 +53,120 @@ static Rect<int> toRange(Rect<float> aabb) {
     std::ceil(aabb.width + 1.f), std::ceil(aabb.height + 1.f)
   );
 }
-*/
 
 void Subworld::update(float delta) {
+  auto move_view = entities.view<InfoComponent, PositionComponent, VelocityComponent>();
+
+  float gravity = getGravity();
+
+  // movement code
+  for (entt::entity entity : move_view) {
+    auto& info = move_view.get<InfoComponent>(entity);
+    Vec2f& pos = move_view.get<PositionComponent>(entity);
+    Vec2f& vel = move_view.get<VelocityComponent>(entity);
+
+    if (~info.flags & InfoComponent::NOGRAVITY) {
+      vel.y += gravity * delta;
+    }
+
+    // apply friction
+    if (~info.flags & InfoComponent::NOFRICTION
+    and ~info.flags & InfoComponent::AIRBORNE
+    and ~info.flags & InfoComponent::MOVING) {
+      if (vel.x > 0.f) {
+        vel.x = std::max(vel.x - 8.f * delta, 0.f);
+      }
+      else if (vel.x < 0.f) {
+        vel.x = std::min(vel.x + 8.f * delta, 0.f);
+      }
+    }
+  }
+
+  auto nocollide_view = entities.view<
+    InfoComponent, PositionComponent, VelocityComponent
+  >(entt::exclude<CollisionComponent>);
+
+  for (entt::entity entity : nocollide_view) {
+    auto& info = move_view.get<InfoComponent>(entity);
+    Vec2f& pos = move_view.get<PositionComponent>(entity);
+    Vec2f& vel = move_view.get<VelocityComponent>(entity);
+
+    info.flags |= InfoComponent::AIRBORNE;
+    pos += vel * delta;
+  }
+
+  auto collide_view = entities.view<InfoComponent, PositionComponent, VelocityComponent, CollisionComponent>();
+
+  for (entt::entity entity : collide_view) {
+    auto& info = collide_view.get<InfoComponent>(entity);
+    Vec2f& pos = collide_view.get<PositionComponent>(entity);
+    Vec2f& vel = collide_view.get<VelocityComponent>(entity);
+    auto& bbox = collide_view.get<CollisionComponent>(entity);
+
+    // apply velocity and resolve collisions
+    bool landed = false;
+
+    pos.x += vel.x * delta;
+
+    Rect<float> entity_aabb = toAABB(pos, bbox);
+    Rect<int> range = toRange(entity_aabb);
+    for (int y = range.y; y < range.y + range.height; ++y)
+    for (int x = range.x; x < range.x + range.width;  ++x) {
+      Rect<float> tile_aabb = Rect<float>(x, y, 1.f, 1.f);
+      if (entity_aabb.intersects(tile_aabb)) {
+        switch (tile_data.getTileDef(tiles[x][y]).getCollisionType()) {
+        case TileDef::CollisionType::SOLID: {
+          Rect<float> collision = entity_aabb.intersection(tile_aabb);
+          if (entity_aabb.x > x + 0.5f) {
+            pos.x += collision.width;
+          }
+          else {
+            pos.x -= collision.width;
+          }
+          vel.x = 0.f;
+          entity_aabb = toAABB(pos, bbox);
+          break;
+        }
+        case TileDef::CollisionType::NONE:
+        default:
+          break;
+        }
+      }
+    }
+
+    pos.y += vel.y * delta;
+
+    entity_aabb = toAABB(pos, bbox);
+    range = toRange(entity_aabb);
+    for (int y = range.y; y < range.y + range.height; ++y)
+    for (int x = range.x; x < range.x + range.width;  ++x) {
+      Rect<float> tile_aabb = Rect<float>(x, y, 1.f, 1.f);
+      if (entity_aabb.intersects(tile_aabb)) {
+        switch (tile_data.getTileDef(tiles[x][y]).getCollisionType()) {
+        case TileDef::CollisionType::SOLID: {
+          Rect<float> collision = entity_aabb.intersection(tile_aabb);
+          if (entity_aabb.y > y + 0.5f) {
+            landed = true;
+            pos.y += collision.height;
+          }
+          else {
+            pos.y -= collision.height;
+          }
+          vel.y = 0.f;
+          entity_aabb = toAABB(pos, bbox);
+          break;
+        }
+        case TileDef::CollisionType::NONE:
+        default:
+          break;
+        }
+      }
+    }
+
+    if (landed) info.flags &= ~InfoComponent::AIRBORNE;
+    else        info.flags |=  InfoComponent::AIRBORNE;
+  }
+
   /*
   // move player
   for (auto iter = entities.begin(); iter != entities.end(); ++iter) {

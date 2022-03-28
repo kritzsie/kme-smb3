@@ -1,8 +1,5 @@
 #pragma once
 
-#include "entitycomponentmanager.hpp"
-#include "world.hpp"
-
 namespace kme {
 /*
 // begin Entity
