@@ -55,24 +55,65 @@ static Rect<int> toRange(Rect<float> aabb) {
 }
 
 void Subworld::update(float delta) {
-  auto move_view = entities.view<InfoComponent, PositionComponent, VelocityComponent>();
+  // player input
+  if (entities.valid(player)) {
+    UInt32& flags = entities.get<FlagsComponent>(player);
+    auto& timer = entities.get<TimerComponent>(player);
+    Vec2f& vel = entities.get<VelocityComponent>(player);
 
-  float gravity = getGravity();
+    float x = 0.f;
+    x += sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::PovX) / 100.f;
+    x += sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right);
+    x -= sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left);
+    x = std::clamp(x, -1.f, 1.f);
+
+    bool run = false;
+    run |= sf::Joystick::isButtonPressed(0, 2);
+    run |= sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Z);
+
+    if (x != 0) {
+      vel.x = std::clamp(vel.x + x * (run ? 32.f : 16.f) * delta, -16.f, 16.f);
+      flags |= FlagsComponent::NOFRICTION;
+    }
+    else {
+      flags &= ~FlagsComponent::NOFRICTION;
+    }
+
+    bool jump = false;
+    jump |= sf::Joystick::isButtonPressed(0, 0);
+    jump |= sf::Keyboard::isKeyPressed(sf::Keyboard::Key::X);
+
+    if (jump) {
+      if (~flags & FlagsComponent::AIRBORNE) {
+        timer.jump = 0.25f;
+        flags |= FlagsComponent::AIRBORNE;
+      }
+
+      if (flags & FlagsComponent::AIRBORNE and timer.jump > 0.f) {
+        vel.y = 16.f;
+        timer.jump = std::max(timer.jump - 1.f * delta, 0.f);
+      }
+    }
+    else {
+      timer.jump = 0.f;
+    }
+  }
 
   // movement code
+  auto move_view = entities.view<FlagsComponent, VelocityComponent>();
   for (entt::entity entity : move_view) {
-    auto& info = move_view.get<InfoComponent>(entity);
-    Vec2f& pos = move_view.get<PositionComponent>(entity);
+    UInt32& flags = move_view.get<FlagsComponent>(entity);
     Vec2f& vel = move_view.get<VelocityComponent>(entity);
 
-    if (~info.flags & InfoComponent::NOGRAVITY) {
+    // apply gravity
+    float gravity = getGravity();
+    if (~flags & FlagsComponent::NOGRAVITY) {
       vel.y += gravity * delta;
     }
 
     // apply friction
-    if (~info.flags & InfoComponent::NOFRICTION
-    and ~info.flags & InfoComponent::AIRBORNE
-    and ~info.flags & InfoComponent::MOVING) {
+    if (~flags & FlagsComponent::NOFRICTION
+    and ~flags & FlagsComponent::AIRBORNE) {
       if (vel.x > 0.f) {
         vel.x = std::max(vel.x - 8.f * delta, 0.f);
       }
@@ -82,34 +123,70 @@ void Subworld::update(float delta) {
     }
   }
 
+  // non-collision movement
   auto nocollide_view = entities.view<
-    InfoComponent, PositionComponent, VelocityComponent
+    FlagsComponent, PositionComponent, VelocityComponent
   >(entt::exclude<CollisionComponent>);
-
   for (entt::entity entity : nocollide_view) {
-    auto& info = move_view.get<InfoComponent>(entity);
-    Vec2f& pos = move_view.get<PositionComponent>(entity);
-    Vec2f& vel = move_view.get<VelocityComponent>(entity);
+    UInt32& flags = nocollide_view.get<FlagsComponent>(entity);
+    Vec2f& pos = nocollide_view.get<PositionComponent>(entity);
+    Vec2f& vel = nocollide_view.get<VelocityComponent>(entity);
 
-    info.flags |= InfoComponent::AIRBORNE;
+    flags |= FlagsComponent::AIRBORNE;
     pos += vel * delta;
   }
 
-  auto collide_view = entities.view<InfoComponent, PositionComponent, VelocityComponent, CollisionComponent>();
-
+  // collision code
+  auto collide_view = entities.view<
+    FlagsComponent, TimerComponent,
+    PositionComponent, VelocityComponent, CollisionComponent
+  >();
   for (entt::entity entity : collide_view) {
-    auto& info = collide_view.get<InfoComponent>(entity);
+    UInt32& flags = collide_view.get<FlagsComponent>(entity);
+    auto& timer = collide_view.get<TimerComponent>(entity);
     Vec2f& pos = collide_view.get<PositionComponent>(entity);
     Vec2f& vel = collide_view.get<VelocityComponent>(entity);
     auto& bbox = collide_view.get<CollisionComponent>(entity);
 
-    // apply velocity and resolve collisions
     bool landed = false;
 
-    pos.x += vel.x * delta;
+    pos.y += vel.y * delta;
 
     Rect<float> entity_aabb = toAABB(pos, bbox);
     Rect<int> range = toRange(entity_aabb);
+    for (int y = range.y; y < range.y + range.height; ++y)
+    for (int x = range.x; x < range.x + range.width;  ++x) {
+      Rect<float> tile_aabb = Rect<float>(x, y, 1.f, 1.f);
+      if (entity_aabb.intersects(tile_aabb)) {
+        switch (tile_data.getTileDef(tiles[x][y]).getCollisionType()) {
+        case TileDef::CollisionType::SOLID: {
+          Rect<float> collision = entity_aabb.intersection(tile_aabb);
+          if (entity_aabb.y > y + 0.5f) {
+            landed = true;
+            pos.y += collision.height;
+          }
+          else {
+            pos.y -= collision.height;
+            timer.jump = 0.f;
+          }
+          vel.y = 0.f;
+          entity_aabb = toAABB(pos, bbox);
+          break;
+        }
+        case TileDef::CollisionType::NONE:
+        default:
+          break;
+        }
+      }
+    }
+
+    if (landed) flags &= ~FlagsComponent::AIRBORNE;
+    else        flags |=  FlagsComponent::AIRBORNE;
+
+    pos.x += vel.x * delta;
+
+    entity_aabb = toAABB(pos, bbox);
+    range = toRange(entity_aabb);
     for (int y = range.y; y < range.y + range.height; ++y)
     for (int x = range.x; x < range.x + range.width;  ++x) {
       Rect<float> tile_aabb = Rect<float>(x, y, 1.f, 1.f);
@@ -133,38 +210,6 @@ void Subworld::update(float delta) {
         }
       }
     }
-
-    pos.y += vel.y * delta;
-
-    entity_aabb = toAABB(pos, bbox);
-    range = toRange(entity_aabb);
-    for (int y = range.y; y < range.y + range.height; ++y)
-    for (int x = range.x; x < range.x + range.width;  ++x) {
-      Rect<float> tile_aabb = Rect<float>(x, y, 1.f, 1.f);
-      if (entity_aabb.intersects(tile_aabb)) {
-        switch (tile_data.getTileDef(tiles[x][y]).getCollisionType()) {
-        case TileDef::CollisionType::SOLID: {
-          Rect<float> collision = entity_aabb.intersection(tile_aabb);
-          if (entity_aabb.y > y + 0.5f) {
-            landed = true;
-            pos.y += collision.height;
-          }
-          else {
-            pos.y -= collision.height;
-          }
-          vel.y = 0.f;
-          entity_aabb = toAABB(pos, bbox);
-          break;
-        }
-        case TileDef::CollisionType::NONE:
-        default:
-          break;
-        }
-      }
-    }
-
-    if (landed) info.flags &= ~InfoComponent::AIRBORNE;
-    else        info.flags |=  InfoComponent::AIRBORNE;
   }
 
   /*

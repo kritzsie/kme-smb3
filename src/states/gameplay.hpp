@@ -57,7 +57,6 @@ private:
 
   Vec2f camera_pos;
   Vec2f camera_radius;
-  entt::entity camera_target;
 
   std::size_t current_subworld = 0;
   Level level;

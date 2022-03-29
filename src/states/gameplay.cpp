@@ -73,13 +73,17 @@ void Gameplay::enter() {
   // entities
   entt::registry& entities = subworld.getEntities();
 
-  entt::entity player = entities.create();
+  entt::entity player = \
+    subworld.player = \
+    subworld.camera_target = entities.create();
   entities.emplace<InfoComponent>(player, "player_mario");
   entities.emplace<PositionComponent>(player, Vec2f(2.f, 1.f));
-  entities.emplace<VelocityComponent>(player, Vec2f(4.f, 32.f));
   entities.emplace<CollisionComponent>(player, 6.f / 16.f, 24.f / 16.f);
+  entities.emplace<FlagsComponent>(player);
+  entities.emplace<TimerComponent>(player);
+  entities.emplace<VelocityComponent>(player);
   entities.emplace<DirectionComponent>(player);
-  entities.emplace<RenderComponent>(player);
+  entities.emplace<RenderComponent>(player, Vec2f(1.f, 1.f));
 }
 
 void Gameplay::exit() {}
@@ -105,7 +109,7 @@ void Gameplay::draw(float delta) {
     framebuffer->setView(view);
 
     drawBackground(sf::Color(0x6898F8FF));
-    drawBackground("athletichills", Vec2f(128.f, 11.f), Vec2f(0.375f, 0.25f));
+    drawBackground("overworldblockstop", Vec2f(128.f, 11.f), Vec2f(0.375f, 0.25f));
     drawBackground("cloudlayer", Vec2f(0.f, -224.f), Vec2f(0.75f, 0.125f));
 
     drawTiles();

@@ -1,7 +1,6 @@
 #pragma once
 
 #include "geometry.hpp"
-#include "input.hpp"
 #include "music.hpp"
 #include "states.hpp"
 

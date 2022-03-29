@@ -1,8 +1,8 @@
 #pragma once
 
 #include "ecs.hpp"
-
 #include "../../../geometry/vec2.hpp"
+#include "../../../input.hpp"
 
 #include <entt/entt.hpp>
 
@@ -12,15 +12,21 @@ namespace kme {
 enum class Direction { RIGHT, LEFT };
 
 struct InfoComponent {
-  enum {
+  std::string name;
+};
+
+struct FlagsComponent : Component<UInt32> {
+  enum : UInt32 {
     NOGRAVITY  = 1 << 0,
     NOFRICTION = 1 << 1,
     AIRBORNE   = 1 << 16,
-    MOVING     = 1 << 17
+    CROUCHING  = 1 << 17,
+    MOVING     = 1 << 24
   };
+};
 
-  std::string name;
-  UInt32 flags;
+struct TimerComponent {
+  float jump;
 };
 
 struct PositionComponent : Component<Vec2f> {};
@@ -35,15 +41,6 @@ struct CollisionComponent {
 };
 
 struct RenderComponent {
-  enum : UInt32 {
-    NODRAW = 1 << 0
-  };
-
-  UInt32 flags;
   Vec2f scale;
-};
-
-struct SpawnerComponent {
-  entt::entity child;
 };
 }

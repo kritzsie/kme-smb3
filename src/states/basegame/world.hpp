@@ -25,6 +25,9 @@ public:
 
   void update(float delta);
 
+  entt::entity player;
+  entt::entity camera_target;
+
 private:
   const TileDefs& tile_data;
 
