@@ -1,10 +1,9 @@
 #pragma once
 
-#include "ecs.hpp"
 #include "../../../geometry/vec2.hpp"
 #include "../../../input.hpp"
-
-#include <entt/entt.hpp>
+#include "../../../renderstates.hpp"
+#include "ecs.hpp"
 
 #include <string>
 

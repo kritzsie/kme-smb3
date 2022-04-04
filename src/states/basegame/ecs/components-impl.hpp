@@ -1,5 +1,7 @@
 #pragma once
 
+#include "components-decl.hpp"
+
 namespace kme {
 template<typename T>
 T operator *(const Direction& lhs, const T& rhs) {

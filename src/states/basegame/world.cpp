@@ -101,7 +101,7 @@ void Subworld::update(float delta) {
 
   // movement code
   auto move_view = entities.view<FlagsComponent, VelocityComponent>();
-  for (entt::entity entity : move_view) {
+  for (Entity entity : move_view) {
     UInt32& flags = move_view.get<FlagsComponent>(entity);
     Vec2f& vel = move_view.get<VelocityComponent>(entity);
 
@@ -127,7 +127,7 @@ void Subworld::update(float delta) {
   auto nocollide_view = entities.view<
     FlagsComponent, PositionComponent, VelocityComponent
   >(entt::exclude<CollisionComponent>);
-  for (entt::entity entity : nocollide_view) {
+  for (Entity entity : nocollide_view) {
     UInt32& flags = nocollide_view.get<FlagsComponent>(entity);
     Vec2f& pos = nocollide_view.get<PositionComponent>(entity);
     Vec2f& vel = nocollide_view.get<VelocityComponent>(entity);
@@ -141,7 +141,7 @@ void Subworld::update(float delta) {
     FlagsComponent, TimerComponent,
     PositionComponent, VelocityComponent, CollisionComponent
   >();
-  for (entt::entity entity : collide_view) {
+  for (Entity entity : collide_view) {
     UInt32& flags = collide_view.get<FlagsComponent>(entity);
     auto& timer = collide_view.get<TimerComponent>(entity);
     Vec2f& pos = collide_view.get<PositionComponent>(entity);

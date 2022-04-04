@@ -26,7 +26,7 @@ Gameplay::Gameplay(BaseState* parent, Engine* engine)
 
   current_subworld = 0;
 
-  engine->music->open("athletic.spc");
+  engine->music->open("overworld.spc");
   engine->music->play();
 }
 
