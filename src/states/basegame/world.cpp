@@ -10,19 +10,19 @@
 #include <exception>
 #include <type_traits>
 
-#include <ctgmath>
+#include <cmath>
 
 namespace kme {
 // begin Subworld
 Subworld::Subworld(const TileDefs& tile_data)
 : tile_data(tile_data) {}
 
-const entt::registry& Subworld::getEntities() const {
+const EntityRegistry& Subworld::getEntities() const {
   return entities;
 }
 
-entt::registry& Subworld::getEntities() {
-  return const_cast<entt::registry&>(static_cast<const Subworld*>(this)->getEntities());
+EntityRegistry& Subworld::getEntities() {
+  return const_cast<EntityRegistry&>(static_cast<const Subworld*>(this)->getEntities());
 }
 
 const Tilemap& Subworld::getTiles() const {
@@ -148,11 +148,14 @@ void Subworld::update(float delta) {
     Vec2f& vel = collide_view.get<VelocityComponent>(entity);
     auto& bbox = collide_view.get<CollisionComponent>(entity);
 
+    Rect<float> entity_aabb;
+    Rect<int> range;
+
     // resolve X axis first to avoid slipping off edges
     pos.x += vel.x * delta;
 
-    Rect<float> entity_aabb = toAABB(pos, bbox);
-    Rect<int> range = toRange(entity_aabb);
+    entity_aabb = toAABB(pos, bbox);
+    range = toRange(entity_aabb);
     for (int y = range.y; y < range.y + range.height; ++y)
     for (int x = range.x; x < range.x + range.width;  ++x) {
       Rect<float> tile_aabb = Rect<float>(x, y, 1.f, 1.f);

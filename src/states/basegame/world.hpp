@@ -1,8 +1,7 @@
 #pragma once
 
+#include "ecs/ecs.hpp"
 #include "tilemap.hpp"
-
-#include <entt/entt.hpp>
 
 #include <unordered_map>
 
@@ -14,8 +13,8 @@ class Subworld {
 public:
   Subworld(const TileDefs& tile_data);
 
-  const entt::registry& getEntities() const;
-  entt::registry& getEntities();
+  const EntityRegistry& getEntities() const;
+  EntityRegistry& getEntities();
 
   const Tilemap& getTiles() const;
   Tilemap& getTiles();
@@ -25,13 +24,13 @@ public:
 
   void update(float delta);
 
-  entt::entity player;
-  entt::entity camera_target;
+  Entity player;
+  Entity camera_target;
 
 private:
   const TileDefs& tile_data;
 
-  entt::registry entities;
+  EntityRegistry entities;
   Tilemap tiles;
 
   float gravity = -48.f;

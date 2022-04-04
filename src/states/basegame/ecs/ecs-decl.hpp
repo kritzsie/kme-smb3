@@ -3,7 +3,8 @@
 #include <entt/entt.hpp>
 
 namespace kme {
-using EntityType = entt::entity;
+using Entity = entt::entity;
+using EntityRegistry = entt::registry;
 
 template<typename T>
 struct Component {

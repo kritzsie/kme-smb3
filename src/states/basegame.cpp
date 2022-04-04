@@ -5,6 +5,7 @@
 #include "../engine.hpp"
 
 #include <sstream>
+#include <utility>
 
 namespace kme {
 BaseGame::Factory BaseGame::create() {
@@ -82,7 +83,7 @@ void BaseGame::enter() {
   mario_rs.pushFrame("jumping", "bigmariojump", Rect<int>(0, 0, 16, 26), Vec2f(8, 0), 0.f);
 
   mario_rs.pushFrame("death", "mariodeath", Rect<int>(0, 0, 16, 16), Vec2f(8, -1), 0.f);
-  //entity_data.registerRenderStates("player_mario", std::move(mario_rs));
+  entity_data.registerRenderStates("player_mario", std::move(mario_rs));
 }
 
 void BaseGame::exit() {}

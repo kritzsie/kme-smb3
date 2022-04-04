@@ -2,7 +2,7 @@
 
 #include <algorithm>
 
-#include <ctgmath>
+#include <cmath>
 
 namespace kme::util {
 template<typename T>

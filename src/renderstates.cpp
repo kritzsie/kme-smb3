@@ -1,6 +1,6 @@
 #include "renderstates.hpp"
 
-#include <ctgmath>
+#include <cmath>
 
 namespace kme {
 RenderFrame::RenderFrame(

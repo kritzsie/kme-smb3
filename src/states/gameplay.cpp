@@ -7,7 +7,7 @@
 #include "../engine.hpp"
 #include "../util/math.hpp"
 
-#include <ctgmath>
+#include <cmath>
 
 namespace kme {
 Gameplay::Factory Gameplay::create() {
@@ -71,11 +71,9 @@ void Gameplay::enter() {
   }
 
   // entities
-  entt::registry& entities = subworld.getEntities();
+  EntityRegistry& entities = subworld.getEntities();
 
-  entt::entity player = \
-    subworld.player = \
-    subworld.camera_target = entities.create();
+  Entity player = subworld.player = subworld.camera_target = entities.create();
   entities.emplace<InfoComponent>(player, "player_mario");
   entities.emplace<PositionComponent>(player, Vec2f(2.f, 1.f));
   entities.emplace<CollisionComponent>(player, 6.f / 16.f, 24.f / 16.f);
@@ -220,11 +218,11 @@ void Gameplay::drawTiles() {
 
 void Gameplay::drawEntities() {
   const Subworld& subworld = level.getSubworld(current_subworld);
-  const entt::registry& entities = subworld.getEntities();
+  const EntityRegistry& entities = subworld.getEntities();
 
   auto view = entities.view<PositionComponent, RenderComponent>();
 
-  for (entt::entity entity : view) {
+  for (Entity entity : view) {
     const Vec2f& pos = view.get<const PositionComponent>(entity);
     const auto& render = view.get<const RenderComponent>(entity);
 

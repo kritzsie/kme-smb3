@@ -1,6 +1,8 @@
 #include "tiledefs.hpp"
 
-#include <ctgmath>
+#include <sstream>
+
+#include <cmath>
 
 namespace kme {
 // begin TileDef
