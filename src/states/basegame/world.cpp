@@ -1,7 +1,5 @@
 #include "world.hpp"
 
-#include "entity.hpp"
-
 #include "ecs/components.hpp"
 
 #include <SFML/Window/Keyboard.hpp>
