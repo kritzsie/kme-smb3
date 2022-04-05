@@ -10,6 +10,12 @@
 namespace kme {
 enum class Direction { RIGHT, LEFT };
 
+template<typename T>
+T operator *(const Direction& lhs, const T& rhs);
+
+template<typename T>
+T operator *(const T& lhs, const Direction& rhs);
+
 struct InfoComponent {
   std::string name;
 };
@@ -40,6 +46,7 @@ struct CollisionComponent {
 };
 
 struct RenderComponent {
-  Vec2f scale;
+  Vec2f scale = Vec2f(1.f, 1.f);
+  RenderState state;
 };
 }

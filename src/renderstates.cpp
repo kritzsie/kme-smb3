@@ -3,9 +3,11 @@
 #include <cmath>
 
 namespace kme {
+// begin RenderFrame
 RenderFrame::RenderFrame(
   std::string texture, Rect<int> cliprect, Vec2f offset, float duration
 ) : texture(texture), cliprect(cliprect), offset(offset), duration(duration) {}
+// end RenderFrame
 
 // begin RenderState
 RenderState::RenderState() : RenderState("idle", 0) {

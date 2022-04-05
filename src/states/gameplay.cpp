@@ -220,35 +220,24 @@ void Gameplay::drawEntities() {
   const Subworld& subworld = level.getSubworld(current_subworld);
   const EntityRegistry& entities = subworld.getEntities();
 
-  auto view = entities.view<PositionComponent, RenderComponent>();
+  BaseGame* basegame = getBaseGame();
 
+  auto view = entities.view<InfoComponent, PositionComponent, RenderComponent>();
   for (Entity entity : view) {
+    const auto& info = view.get<const InfoComponent>(entity);
     const Vec2f& pos = view.get<const PositionComponent>(entity);
     const auto& render = view.get<const RenderComponent>(entity);
 
-    sf::RectangleShape rect;
-    rect.setPosition(toScreen(pos + Vec2f(-0.5f, 0.f)));
-    rect.setSize(toScreen(Vec2f(1.f, 2.f)));
-    rect.setFillColor(sf::Color(0));
-    rect.setOutlineColor(sf::Color::Red);
-    rect.setOutlineThickness(2.f);
-    framebuffer->draw(rect);
-  }
-
-  /*
-  for (auto iter = entities.begin(); iter != entities.end(); ++iter) {
-    const RenderFrame& frame = getBaseGame()->entity_data \
-      .getRenderStates(entities.get<Type>(*iter))->getFrame();
+    const RenderFrame& frame = basegame->entity_data.getRenderStates(info.name)->getFrame(render.state);
 
     std::string texture = frame.texture;
     if (texture != "") {
       sf::Sprite sprite(gfx.getSprite(texture), frame.cliprect);
       Vec2f offset = frame.offset + Vec2f(0.f, frame.cliprect.height);
-      sprite.setPosition(toScreen(entities.get<Position>(*iter)) - offset);
+      sprite.setPosition(toScreen(pos) - offset);
       framebuffer->draw(sprite);
     }
   }
-  */
 }
 
 Vec2f Gameplay::fromScreen(Vec2f pos) {
