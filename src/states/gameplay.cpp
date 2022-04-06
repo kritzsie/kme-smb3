@@ -218,23 +218,28 @@ void Gameplay::drawTiles() {
 
 void Gameplay::drawEntities() {
   const Subworld& subworld = level.getSubworld(current_subworld);
+  const EntityData& entity_data = getBaseGame()->entity_data;
   const EntityRegistry& entities = subworld.getEntities();
 
-  BaseGame* basegame = getBaseGame();
-
-  auto view = entities.view<InfoComponent, PositionComponent, RenderComponent>();
+  auto view = entities.view<InfoComponent, PositionComponent, RenderComponent, DirectionComponent>();
   for (Entity entity : view) {
     const auto& info = view.get<const InfoComponent>(entity);
     const Vec2f& pos = view.get<const PositionComponent>(entity);
     const auto& render = view.get<const RenderComponent>(entity);
+    const Direction& direction = view.get<const DirectionComponent>(entity);
 
-    const RenderFrame& frame = basegame->entity_data.getRenderStates(info.name)->getFrame(render.state);
+    const RenderFrame& frame = entity_data.getRenderStates(info.type)->getFrame(render.state);
 
-    std::string texture = frame.texture;
-    if (texture != "") {
-      sf::Sprite sprite(gfx.getSprite(texture), frame.cliprect);
-      Vec2f offset = frame.offset + Vec2f(0.f, frame.cliprect.height);
+    std::string spritename = frame.texture;
+    if (spritename != "") {
+      sf::Sprite sprite(gfx.getSprite(spritename), frame.cliprect);
+      Vec2f scale = Vec2f(direction * render.scale.x, render.scale.y);
+      Vec2f offset = Vec2f(
+        scale.x * frame.offset.x,
+        scale.y * (frame.offset.y + frame.cliprect.height)
+      );
       sprite.setPosition(toScreen(pos) - offset);
+      sprite.setScale(scale);
       framebuffer->draw(sprite);
     }
   }

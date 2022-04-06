@@ -56,8 +56,9 @@ void Subworld::update(float delta) {
   // player input
   if (entities.valid(player)) {
     UInt32& flags = entities.get<FlagsComponent>(player);
-    auto& timer = entities.get<TimerComponent>(player);
     Vec2f& vel = entities.get<VelocityComponent>(player);
+    Direction& direction = entities.get<DirectionComponent>(player);
+    auto& timer = entities.get<TimerComponent>(player);
 
     float x = 0.f;
     x += sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::PovX) / 100.f;
@@ -71,10 +72,12 @@ void Subworld::update(float delta) {
 
     if (x != 0) {
       vel.x = std::clamp(vel.x + x * (run ? 32.f : 16.f) * delta, -16.f, 16.f);
-      flags |= FlagsComponent::NOFRICTION;
+      flags |= (FlagsComponent::MOVING | FlagsComponent::NOFRICTION);
+      if      (x < 0) direction = Direction::LEFT;
+      else if (x > 0) direction = Direction::RIGHT;
     }
     else {
-      flags &= ~FlagsComponent::NOFRICTION;
+      flags &= ~(FlagsComponent::MOVING | FlagsComponent::NOFRICTION);
     }
 
     bool jump = false;
