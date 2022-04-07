@@ -17,7 +17,8 @@ Gameplay::Factory Gameplay::create() {
 }
 
 Gameplay::Gameplay(BaseState* parent, Engine* engine)
-: BaseState(parent, engine), level(getBaseGame()->level_tile_data) {
+: BaseState(parent, engine)
+, level(getBaseGame()->entity_data, getBaseGame()->level_tile_data) {
   framebuffer = new sf::RenderTexture;
   framebuffer->create(480, 270);
 
@@ -74,14 +75,15 @@ void Gameplay::enter() {
   EntityRegistry& entities = subworld.getEntities();
 
   Entity player = subworld.player = subworld.camera_target = entities.create();
-  entities.emplace<InfoComponent>(player, "player_mario");
-  entities.emplace<PositionComponent>(player, Vec2f(2.f, 1.f));
-  entities.emplace<CollisionComponent>(player, 6.f / 16.f, 24.f / 16.f);
-  entities.emplace<FlagsComponent>(player);
-  entities.emplace<TimerComponent>(player);
-  entities.emplace<VelocityComponent>(player);
-  entities.emplace<DirectionComponent>(player);
-  entities.emplace<RenderComponent>(player, Vec2f(1.f, 1.f));
+  entities.emplace<CInfo>(player, "player_mario");
+  entities.emplace<CPosition>(player, Vec2f(2.f, 1.f));
+  entities.emplace<CCollision>(player, 6.f / 16.f, 24.f / 16.f);
+  entities.emplace<CFlags>(player);
+  entities.emplace<CState>(player);
+  entities.emplace<CTimer>(player);
+  entities.emplace<CVelocity>(player);
+  entities.emplace<CDirection>(player);
+  entities.emplace<CRender>(player, Vec2f(1.f, 1.f));
 }
 
 void Gameplay::exit() {}
@@ -221,12 +223,12 @@ void Gameplay::drawEntities() {
   const EntityData& entity_data = getBaseGame()->entity_data;
   const EntityRegistry& entities = subworld.getEntities();
 
-  auto view = entities.view<InfoComponent, PositionComponent, RenderComponent, DirectionComponent>();
+  auto view = entities.view<CInfo, CPosition, CRender, CDirection>();
   for (Entity entity : view) {
-    const auto& info = view.get<const InfoComponent>(entity);
-    const Vec2f& pos = view.get<const PositionComponent>(entity);
-    const auto& render = view.get<const RenderComponent>(entity);
-    const Direction& direction = view.get<const DirectionComponent>(entity);
+    const auto& info = view.get<const CInfo>(entity);
+    const Vec2f& pos = view.get<const CPosition>(entity);
+    const auto& render = view.get<const CRender>(entity);
+    const Direction& direction = view.get<const CDirection>(entity);
 
     const RenderFrame& frame = entity_data.getRenderStates(info.type)->getFrame(render.state);
 

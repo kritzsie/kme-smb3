@@ -22,7 +22,7 @@ struct RenderFrame {
 class RenderState {
 public:
   RenderState();
-  RenderState(std::string state, std::size_t offset);
+  RenderState(std::string state);
 
   void setState(std::string state);
   void setState(std::string state, std::size_t offset);
@@ -32,7 +32,7 @@ public:
 
 private:
   std::string state;
-  std::size_t offset;
+  std::size_t offset = 0;
 };
 
 class RenderStates {
@@ -52,6 +52,6 @@ public:
   const RenderFrame& getFrame(std::string state, std::size_t offset) const;
 
 private:
-  std::map<std::string, RenderFrames> states;
+  StringTable<RenderFrames> states;
 };
 }

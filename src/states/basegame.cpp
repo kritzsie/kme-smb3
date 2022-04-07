@@ -54,7 +54,7 @@ void BaseGame::enter() {
   gold_coin.pushFrame("smb3_tile_atlas", Vec2i(48, 32), 8.f / 60.f);
   level_tile_data.registerTileDef("gold_coin", std::move(gold_coin));
 
-  CollisionComponent mario_collision;
+  CCollision mario_collision;
   mario_collision.radius = 6.f / 16.f;
   mario_collision.height = 24.f / 16.f;
   //entity_data.setDefault<CollisionComponent>("player_mario", std::move(mario_collision));
@@ -62,7 +62,7 @@ void BaseGame::enter() {
   //entity_data.setDefault<FlagsComponent>("player_mario", FlagsComponent::GRAVITY);
 
   RenderStates mario_rs;
-  mario_rs.pushFrame("idle", "bigmariowalk_0", Rect<int>(0, 0, 14, 27), Vec2f(7, -1), 0.f);
+  mario_rs.pushFrame("idle", "bigmariowalk_0", Rect<int>(0, 0, 14, 27), Vec2f(6, -1), 0.f);
 
   mario_rs.pushFrame("walking", "bigmariowalk_1", Rect<int>(0, 0, 16, 27), Vec2f(9, -1), 0.125f);
   mario_rs.pushFrame("walking", "bigmariowalk_2", Rect<int>(0, 0, 16, 26), Vec2f(9, 0), 0.125f);
