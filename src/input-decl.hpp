@@ -5,11 +5,9 @@
 #include <cstdint>
 
 namespace kme {
-template<typename TBase>
+template<typename TBase, typename TWide = typename Widen<TBase>::type>
 class Input {
 private:
-  using TWide = typename Widen<TBase>::type;
-
   TBase state;
   TWide delta;
 
@@ -40,6 +38,6 @@ public:
   TWide operator -(const Input& rhs) const;
 };
 
-using Axis = Input<Int16>;
+using Axis = Input<float>;
 using Button = Input<bool>;
 }

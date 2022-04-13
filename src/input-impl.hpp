@@ -3,85 +3,85 @@
 #include "input.hpp"
 
 namespace kme {
-template<typename TBase>
-Input<TBase>::Input() : state(), delta() {}
+template<typename TBase, typename TWide>
+Input<TBase, TWide>::Input() : state(), delta() {}
 
-template<typename TBase>
-Input<TBase>::Input(const Input& input)
+template<typename TBase, typename TWide>
+Input<TBase, TWide>::Input(const Input& input)
 : state(input.state), delta(input.delta) {}
 
-template<typename TBase>
-TBase Input<TBase>::getState() const {
+template<typename TBase, typename TWide>
+TBase Input<TBase, TWide>::getState() const {
   return state;
 }
 
-template<typename TBase>
-typename Input<TBase>::TWide Input<TBase>::getDelta() const {
+template<typename TBase, typename TWide>
+TWide Input<TBase, TWide>::getDelta() const {
   return delta;
 }
 
-template<typename TBase>
-Input<TBase>::operator TBase() const {
+template<typename TBase, typename TWide>
+Input<TBase, TWide>::operator TBase() const {
   return getState();
 }
 
-template<typename TBase>
-typename Input<TBase>::TWide Input<TBase>::operator ~() const {
+template<typename TBase, typename TWide>
+TWide Input<TBase, TWide>::operator ~() const {
   return getDelta();
 }
 
-template<typename TBase>
-bool Input<TBase>::operator ==(const Input& rhs) const {
+template<typename TBase, typename TWide>
+bool Input<TBase, TWide>::operator ==(const Input& rhs) const {
   return (state == rhs.state);
 }
 
-template<typename TBase>
-bool Input<TBase>::operator !=(const Input& rhs) const {
+template<typename TBase, typename TWide>
+bool Input<TBase, TWide>::operator !=(const Input& rhs) const {
   return (state != rhs.state);
 }
 
-template<typename TBase>
-bool Input<TBase>::operator >(const Input& rhs) const {
+template<typename TBase, typename TWide>
+bool Input<TBase, TWide>::operator >(const Input& rhs) const {
   return (state > rhs.state);
 }
 
-template<typename TBase>
-bool Input<TBase>::operator <(const Input& rhs) const {
+template<typename TBase, typename TWide>
+bool Input<TBase, TWide>::operator <(const Input& rhs) const {
   return (state < rhs.state);
 }
 
-template<typename TBase>
-bool Input<TBase>::operator >=(const Input& rhs) const {
+template<typename TBase, typename TWide>
+bool Input<TBase, TWide>::operator >=(const Input& rhs) const {
   return (state >= rhs.state);
 }
 
-template<typename TBase>
-bool Input<TBase>::operator <=(const Input& rhs) const {
+template<typename TBase, typename TWide>
+bool Input<TBase, TWide>::operator <=(const Input& rhs) const {
   return (state <= rhs.state);
 }
 
-template<typename TBase>
-typename Input<TBase>::TWide Input<TBase>::operator +() const {
+template<typename TBase, typename TWide>
+TWide Input<TBase, TWide>::operator +() const {
   return +state;
 }
 
-template<typename TBase>
-typename Input<TBase>::TWide Input<TBase>::operator -() const {
+template<typename TBase, typename TWide>
+TWide Input<TBase, TWide>::operator -() const {
   return -state;
 }
 
-template<typename TBase>
-typename Input<TBase>::TWide Input<TBase>::operator +(const Input& rhs) const {
+template<typename TBase, typename TWide>
+TWide Input<TBase, TWide>::operator +(const Input& rhs) const {
   return (state + rhs.state);
 }
 
-template<typename TBase>
-typename Input<TBase>::TWide Input<TBase>::operator -(const Input& rhs) const {
+template<typename TBase, typename TWide>
+TWide Input<TBase, TWide>::operator -(const Input& rhs) const {
   return (state - rhs.state);
 }
 
-template<typename TBase>
-Input<TBase>& Input<TBase>::operator =(TBase rhs) {
+template<typename TBase, typename TWide>
+Input<TBase, TWide>& Input<TBase, TWide>::operator =(TBase rhs) {
   delta = rhs - state;
   state = rhs;
   return *this;
