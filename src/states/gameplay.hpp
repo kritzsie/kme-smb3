@@ -60,8 +60,6 @@ private:
   Vec2f fromTile(Vec2i pos);
   Vec2i toTile(Vec2f pos);
 
-
-
   float ticktime = 0.f;
   float rendertime = 0.f;
 
@@ -73,6 +71,7 @@ private:
   std::size_t current_subworld = 0;
   Level level;
 
+public:
   BindMap binds;
   InputMap inputs;
 };

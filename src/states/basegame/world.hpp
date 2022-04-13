@@ -1,18 +1,21 @@
 #pragma once
 
 #include "ecs/ecs.hpp"
-#include "ecs/entitydata.hpp"
 #include "tilemap.hpp"
+#include "../basegame.hpp"
+//#include "../gameplay.hpp"
 
 #include <unordered_map>
 
 #include <cstdlib>
 
 namespace kme {
+class Gameplay;
+
 // begin Subworld
 class Subworld {
 public:
-  Subworld(const EntityData& entity_data, const TileDefs& tile_data);
+  Subworld(const BaseGame* basegame, const Gameplay* gameplay);
 
   const EntityRegistry& getEntities() const;
   EntityRegistry& getEntities();
@@ -29,8 +32,8 @@ public:
   Entity camera_target;
 
 private:
-  const EntityData& entity_data;
-  const TileDefs& tile_data;
+  const BaseGame* basegame;
+  const Gameplay* gameplay;
 
   EntityRegistry entities;
   Tilemap tiles;
@@ -47,7 +50,7 @@ public:
   using const_iterator = Map::const_iterator;
   using iterator = Map::iterator;
 
-  Level(const EntityData& entity_data, const TileDefs& tile_data);
+  Level(const BaseGame* basegame, const Gameplay* gameplay);
 
   std::size_t createSubworld();
   std::size_t createSubworld(std::size_t index_hint);
@@ -65,8 +68,8 @@ public:
   iterator end();
 
 private:
-  const EntityData& entity_data;
-  const TileDefs& tile_data;
+  const BaseGame* basegame;
+  const Gameplay* gameplay;
 
   std::size_t counter = 0;
 

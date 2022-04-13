@@ -25,10 +25,11 @@ public:
   void update(float delta) final;
   void draw(float delta) final;
 
-  EntityData entity_data;
-  TileDefs level_tile_data;
-
 private:
   bool paused = false;
+
+public:
+  EntityData entity_data;
+  TileDefs level_tile_data;
 };
 }

@@ -12,8 +12,8 @@
 
 namespace kme {
 // begin Subworld
-Subworld::Subworld(const EntityData& entity_data, const TileDefs& tile_data)
-: entity_data(entity_data), tile_data(tile_data) {}
+Subworld::Subworld(const BaseGame* basegame, const Gameplay* gameplay)
+: basegame(basegame), gameplay(gameplay) {}
 
 const EntityRegistry& Subworld::getEntities() const {
   return entities;
@@ -143,7 +143,7 @@ void Subworld::update(float delta) {
 
     rs.time += delta;
 
-    const auto& states = entity_data.getRenderStates(info.type);
+    const auto& states = basegame->entity_data.getRenderStates(info.type);
   }
 
   // movement code
@@ -208,7 +208,7 @@ void Subworld::update(float delta) {
     for (int x = range.x; x < range.x + range.width;  ++x) {
       Rect<float> tile_aabb = Rect<float>(x, y, 1.f, 1.f);
       if (entity_aabb.intersects(tile_aabb)) {
-        switch (tile_data.getTileDef(tiles[x][y]).getCollisionType()) {
+        switch (basegame->level_tile_data.getTileDef(tiles[x][y]).getCollisionType()) {
         case TileDef::CollisionType::SOLID: {
           Rect<float> collision = entity_aabb.intersection(tile_aabb);
           if (entity_aabb.x > x + 0.5f) {
@@ -238,7 +238,7 @@ void Subworld::update(float delta) {
     for (int x = range.x; x < range.x + range.width;  ++x) {
       Rect<float> tile_aabb = Rect<float>(x, y, 1.f, 1.f);
       if (entity_aabb.intersects(tile_aabb)) {
-        switch (tile_data.getTileDef(tiles[x][y]).getCollisionType()) {
+        switch (basegame->level_tile_data.getTileDef(tiles[x][y]).getCollisionType()) {
         case TileDef::CollisionType::SOLID: {
           Rect<float> collision = entity_aabb.intersection(tile_aabb);
           if (entity_aabb.y > y + 0.5f) {
@@ -267,8 +267,8 @@ void Subworld::update(float delta) {
 // end Subworld
 
 // begin Level
-Level::Level(const EntityData& entity_data, const TileDefs& tile_data)
-: entity_data(entity_data), tile_data(tile_data) {
+Level::Level(const BaseGame* basegame, const Gameplay* gameplay)
+: basegame(basegame), gameplay(gameplay) {
   createSubworld();
 }
 
@@ -283,7 +283,7 @@ std::size_t Level::createSubworld(std::size_t index_hint) {
       ++counter;
     }
 
-    subworld.emplace(index_hint, Subworld(entity_data, tile_data));
+    subworld.emplace(index_hint, Subworld(basegame, gameplay));
     return index_hint;
   }
 
@@ -291,7 +291,7 @@ std::size_t Level::createSubworld(std::size_t index_hint) {
     ++counter;
   }
 
-  subworld.emplace(counter, Subworld(entity_data, tile_data));
+  subworld.emplace(counter, Subworld(basegame, gameplay));
   return counter;
 }
 

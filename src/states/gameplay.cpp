@@ -18,7 +18,7 @@ Gameplay::Factory Gameplay::create() {
 
 Gameplay::Gameplay(BaseState* parent, Engine* engine)
 : BaseState(parent, engine)
-, level(getBaseGame()->entity_data, getBaseGame()->level_tile_data) {
+, level(getBaseGame(), this) {
   framebuffer = new sf::RenderTexture;
   framebuffer->create(480, 270);
 
