@@ -8,7 +8,7 @@ Input<TBase, TWide>::Input() : state(), delta() {}
 
 template<typename TBase, typename TWide>
 Input<TBase, TWide>::Input(const Input& input)
-: state(input.state), delta(input.delta) {}
+: state(input.state), state_prev(input.state_prev), delta(input.delta) {}
 
 template<typename TBase, typename TWide>
 TBase Input<TBase, TWide>::getState() const {
@@ -82,8 +82,13 @@ TWide Input<TBase, TWide>::operator -(const Input& rhs) const {
 
 template<typename TBase, typename TWide>
 Input<TBase, TWide>& Input<TBase, TWide>::operator =(TBase rhs) {
-  delta = rhs - state;
   state = rhs;
   return *this;
+}
+
+template<typename TBase, typename TWide>
+void Input<TBase, TWide>::update() {
+  delta = state - state_prev;
+  state_prev = state;
 }
 }

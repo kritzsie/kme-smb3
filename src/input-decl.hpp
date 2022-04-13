@@ -9,6 +9,7 @@ template<typename TBase, typename TWide = typename Widen<TBase>::type>
 class Input {
 private:
   TBase state;
+  TBase state_prev;
   TWide delta;
 
 public:
@@ -16,6 +17,8 @@ public:
   Input(const Input& input);
 
   Input& operator =(TBase rhs);
+
+  void update();
 
   TBase getState() const;
   TWide getDelta() const;

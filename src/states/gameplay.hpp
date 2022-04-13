@@ -25,7 +25,7 @@ public:
   };
 
   using BindMap = std::map<sf::Keyboard::Key, Action>;
-  using InputMap = std::map<Action, Axis>;
+  using ButtonMap = std::map<Action, Button>;
 
 private:
   Gameplay(BaseState* parent, Engine* engine);
@@ -73,6 +73,6 @@ private:
 
 public:
   BindMap binds;
-  InputMap inputs;
+  ButtonMap buttons;
 };
 }

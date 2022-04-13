@@ -1,6 +1,7 @@
 #include "world.hpp"
 
 #include "ecs/components.hpp"
+#include "../gameplay.hpp"
 
 #include <SFML/Window/Keyboard.hpp>
 #include <SFML/Window/Joystick.hpp>
@@ -62,14 +63,12 @@ void Subworld::update(float delta) {
     auto& timer = entities.get<CTimer>(player);
 
     float x = 0.f;
-    x += sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::PovX) / 100.f;
-    x += sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right);
-    x -= sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left);
+    x += gameplay->buttons.at(Gameplay::Action::RIGHT);
+    x -= gameplay->buttons.at(Gameplay::Action::LEFT);
     x = std::clamp(x, -1.f, 1.f);
 
-    bool run = false;
-    run |= sf::Joystick::isButtonPressed(0, 2);
-    run |= sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Z);
+    auto& run = gameplay->buttons.at(Gameplay::Action::RUN);
+    auto& jump = gameplay->buttons.at(Gameplay::Action::JUMP);
 
     if (x != 0) {
       vel.x = std::clamp(vel.x + x * (run ? 32.f : 16.f) * delta, -16.f, 16.f);
@@ -81,12 +80,8 @@ void Subworld::update(float delta) {
       flags &= ~EFlags::MOVING;
     }
 
-    bool jump = false;
-    jump |= sf::Joystick::isButtonPressed(0, 0);
-    jump |= sf::Keyboard::isKeyPressed(sf::Keyboard::Key::X);
-
     if (jump) {
-      if (~flags & EFlags::AIRBORNE) {
+      if (~jump > 0 and ~flags & EFlags::AIRBORNE) {
         timer.jump = 0.25f;
         flags |= EFlags::AIRBORNE;
       }

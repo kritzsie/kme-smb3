@@ -36,15 +36,15 @@ Gameplay::Gameplay(BaseState* parent, Engine* engine)
   binds[sf::Keyboard::Key::C]      = Action::SPINJUMP;
   binds[sf::Keyboard::Key::Escape] = Action::PAUSE;
 
-  inputs[Action::UP]       = 0.f;
-  inputs[Action::DOWN]     = 0.f;
-  inputs[Action::LEFT]     = 0.f;
-  inputs[Action::RIGHT]    = 0.f;
-  inputs[Action::JUMP]     = 0.f;
-  inputs[Action::SPINJUMP] = 0.f;
-  inputs[Action::RUN]      = 0.f;
-  inputs[Action::SELECT]   = 0.f;
-  inputs[Action::PAUSE]    = 0.f;
+  buttons[Action::UP]       = 0;
+  buttons[Action::DOWN]     = 0;
+  buttons[Action::LEFT]     = 0;
+  buttons[Action::RIGHT]    = 0;
+  buttons[Action::JUMP]     = 0;
+  buttons[Action::SPINJUMP] = 0;
+  buttons[Action::RUN]      = 0;
+  buttons[Action::SELECT]   = 0;
+  buttons[Action::PAUSE]    = 0;
 
   engine->music->open("overworld.spc");
   engine->music->play();
@@ -66,7 +66,7 @@ bool Gameplay::handleInput(sf::Event::EventType type, const sf::Event& event) {
   case sf::Event::KeyReleased: {
     const auto& it = binds.find(event.key.code);
     if (it != binds.end()) {
-      inputs[it->second] = sf::Keyboard::isKeyPressed(event.key.code);
+      buttons[it->second] = sf::Keyboard::isKeyPressed(event.key.code);
     }
     break;
   }
@@ -121,6 +121,9 @@ void Gameplay::pause() {}
 void Gameplay::resume() {}
 
 void Gameplay::update(float delta) {
+  for (auto& input : buttons)
+    input.second.update();
+
   Subworld& subworld = level.getSubworld(current_subworld);
 
   subworld.update(delta);
