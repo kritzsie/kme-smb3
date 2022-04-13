@@ -72,9 +72,9 @@ void Gameplay::enter() {
   }
 
   // entities
-  EntityRegistry& entities = subworld.getEntities();
+  auto& entities = subworld.getEntities();
 
-  Entity player = subworld.player = subworld.camera_target = entities.create();
+  auto player = subworld.player = subworld.camera_target = entities.create();
   entities.emplace<CInfo>(player, "player_mario");
   entities.emplace<CPosition>(player, Vec2f(2.f, 1.f));
   entities.emplace<CCollision>(player, 6.f / 16.f, 24.f / 16.f);
@@ -224,7 +224,7 @@ void Gameplay::drawEntities() {
   const EntityRegistry& entities = subworld.getEntities();
 
   auto view = entities.view<CInfo, CPosition, CRender, CDirection>();
-  for (Entity entity : view) {
+  for (auto entity : view) {
     const auto& info = view.get<const CInfo>(entity);
     const Vec2f& pos = view.get<const CPosition>(entity);
     const auto& render = view.get<const CRender>(entity);
