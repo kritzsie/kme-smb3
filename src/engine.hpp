@@ -36,7 +36,7 @@ class Window : public sf::RenderWindow {
 public:
   Window();
   Window(UInt width, UInt height);
-  Window(UInt width, UInt height, const char* title);
+  Window(UInt width, UInt height, std::string title);
   ~Window();
 
   void drawWindow();
@@ -50,10 +50,7 @@ private:
 
 class Engine {
 public:
-  enum class StateEventType {
-    Push,
-    Pop
-  };
+  enum class StateEventType { PUSH, POP };
 
   using StateEvent = std::pair<StateEventType, BaseState::Factory>;
 

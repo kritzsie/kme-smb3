@@ -22,7 +22,7 @@ Window::Window() : Window(1440, 810) {}
 
 Window::Window(UInt width, UInt height) : Window(width, height, "Klaymore Engine") {}
 
-Window::Window(UInt width, UInt height, const char* title)
+Window::Window(UInt width, UInt height, std::string title)
 : sf::RenderWindow(sf::VideoMode(width, height), title) {
   framebuffer = new sf::RenderTexture();
   framebuffer->create(480, 270);
@@ -80,7 +80,7 @@ Engine::Engine(std::vector<std::string>&& args) : args(args), tickinfo(64.f), re
   pushState(Intro::create());
 }
 
-Engine::Engine(int argc, char** argv) : Engine(std::vector<std::string>(argv, argc + argv)) {}
+Engine::Engine(int argc, char** argv): Engine(std::vector<std::string>(argv, argc + argv)) {}
 
 Engine::~Engine() {
   if (window != nullptr) delete window;
@@ -111,11 +111,11 @@ TimeInfo Engine::getRenderTime() const {
 }
 
 void Engine::pushState(BaseState::Factory factory) {
-  events.push_back(StateEvent(StateEventType::Push, factory));
+  events.push_back(StateEvent(StateEventType::PUSH, factory));
 }
 
 BaseState* Engine::popState() {
-  events.push_back(StateEvent(StateEventType::Pop, nullptr));
+  events.push_back(StateEvent(StateEventType::POP, nullptr));
   return states.back();
 }
 
@@ -207,12 +207,12 @@ void Engine::update(float delta) {
     for (const StateEvent& event : events) {
       BaseState* state;
       switch (event.first) {
-      case StateEventType::Push:
+      case StateEventType::PUSH:
         state = event.second(states.size() ? states.back() : nullptr, this);
         states.push_back(state);
         state->enter();
         break;
-      case StateEventType::Pop:
+      case StateEventType::POP:
         state = states.back();
         state->exit();
         states.pop_back();

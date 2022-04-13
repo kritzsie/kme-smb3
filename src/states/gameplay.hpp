@@ -4,6 +4,7 @@
 #include "basegame/world.hpp"
 #include "basegame.hpp"
 #include "../geometry.hpp"
+#include "../input.hpp"
 
 #include <entt/entt.hpp>
 
@@ -16,6 +17,15 @@ namespace kme {
 class Gameplay final : public BaseState {
 public:
   static Factory create();
+
+  enum class Action {
+    UP, LEFT, DOWN, RIGHT,
+    JUMP, SPINJUMP, RUN,
+    SELECT, PAUSE
+  };
+
+  using BindMap = std::map<sf::Keyboard::Key, Action>;
+  using InputMap = std::map<Action, Axis>;
 
 private:
   Gameplay(BaseState* parent, Engine* engine);
@@ -50,6 +60,8 @@ private:
   Vec2f fromTile(Vec2i pos);
   Vec2i toTile(Vec2f pos);
 
+
+
   float ticktime = 0.f;
   float rendertime = 0.f;
 
@@ -60,5 +72,8 @@ private:
 
   std::size_t current_subworld = 0;
   Level level;
+
+  BindMap binds;
+  InputMap inputs;
 };
 }

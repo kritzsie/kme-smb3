@@ -27,6 +27,25 @@ Gameplay::Gameplay(BaseState* parent, Engine* engine)
 
   current_subworld = 0;
 
+  binds[sf::Keyboard::Key::Up]     = Action::UP;
+  binds[sf::Keyboard::Key::Down]   = Action::DOWN;
+  binds[sf::Keyboard::Key::Left]   = Action::LEFT;
+  binds[sf::Keyboard::Key::Right]  = Action::RIGHT;
+  binds[sf::Keyboard::Key::Z]      = Action::RUN;
+  binds[sf::Keyboard::Key::X]      = Action::JUMP;
+  binds[sf::Keyboard::Key::C]      = Action::SPINJUMP;
+  binds[sf::Keyboard::Key::Escape] = Action::PAUSE;
+
+  inputs[Action::UP]       = 0.f;
+  inputs[Action::DOWN]     = 0.f;
+  inputs[Action::LEFT]     = 0.f;
+  inputs[Action::RIGHT]    = 0.f;
+  inputs[Action::JUMP]     = 0.f;
+  inputs[Action::SPINJUMP] = 0.f;
+  inputs[Action::RUN]      = 0.f;
+  inputs[Action::SELECT]   = 0.f;
+  inputs[Action::PAUSE]    = 0.f;
+
   engine->music->open("overworld.spc");
   engine->music->play();
 }
@@ -44,7 +63,16 @@ BaseGame* Gameplay::getBaseGame() {
 bool Gameplay::handleInput(sf::Event::EventType type, const sf::Event& event) {
   switch (type) {
   case sf::Event::KeyPressed:
-  case sf::Event::KeyReleased:
+  case sf::Event::KeyReleased: {
+    const auto& it = binds.find(event.key.code);
+    if (it != binds.end()) {
+      inputs[it->second] = sf::Keyboard::isKeyPressed(event.key.code);
+    }
+    break;
+  }
+  case sf::Event::JoystickMoved:
+  case sf::Event::JoystickButtonPressed:
+  case sf::Event::JoystickButtonReleased:
     break;
   default:
     break;
