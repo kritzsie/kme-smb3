@@ -5,10 +5,10 @@
 
 #include "../assetmanager.hpp"
 #include "../engine.hpp"
-#include "../util/math.hpp"
+#include "../util.hpp"
 
 #include <cmath>
-#include <iostream>
+
 namespace kme {
 Gameplay::Factory Gameplay::create() {
   return [=](BaseState* parent, Engine* engine) -> BaseState* {
@@ -283,7 +283,7 @@ void Gameplay::drawEntities() {
     const auto& info = view.get<const CInfo>(entity);
     const Vec2f& pos = view.get<const CPosition>(entity);
     const auto& render = view.get<const CRender>(entity);
-    const Direction& direction = view.get<const CDirection>(entity);
+    const Sign& direction = view.get<const CDirection>(entity);
 
     const RenderFrame& frame = entity_data.getRenderStates(info.type)->getFrame(render.state);
 

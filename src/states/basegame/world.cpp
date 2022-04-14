@@ -2,6 +2,7 @@
 
 #include "ecs/components.hpp"
 #include "../gameplay.hpp"
+#include "../../util.hpp"
 
 #include <SFML/Window/Keyboard.hpp>
 #include <SFML/Window/Joystick.hpp>
@@ -58,7 +59,7 @@ void Subworld::update(float delta) {
   if (entities.valid(player)) {
     UInt32& flags = entities.get<CFlags>(player);
     Vec2f& vel = entities.get<CVelocity>(player);
-    Direction& direction = entities.get<CDirection>(player);
+    Sign& direction = entities.get<CDirection>(player);
     EState& state = entities.get<CState>(player);
     auto& timer = entities.get<CTimer>(player);
 
@@ -73,8 +74,8 @@ void Subworld::update(float delta) {
     if (x != 0) {
       vel.x = std::clamp(vel.x + x * (run ? 32.f : 16.f) * delta, -16.f, 16.f);
       flags |= EFlags::MOVING;
-      if      (x < 0) direction = Direction::LEFT;
-      else if (x > 0) direction = Direction::RIGHT;
+      if      (x < 0) direction = Sign::MINUS;
+      else if (x > 0) direction = Sign::PLUS;
     }
     else {
       flags &= ~EFlags::MOVING;
