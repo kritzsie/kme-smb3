@@ -1,7 +1,5 @@
 #pragma once
 
-#include "input.hpp"
-
 namespace kme {
 template<typename TBase, typename TWide>
 Input<TBase, TWide>::Input() : state(), delta() {}

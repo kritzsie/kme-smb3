@@ -8,7 +8,7 @@
 #include "../util/math.hpp"
 
 #include <cmath>
-
+#include <iostream>
 namespace kme {
 Gameplay::Factory Gameplay::create() {
   return [=](BaseState* parent, Engine* engine) -> BaseState* {
@@ -27,24 +27,30 @@ Gameplay::Gameplay(BaseState* parent, Engine* engine)
 
   current_subworld = 0;
 
-  binds[sf::Keyboard::Key::Up]     = Action::UP;
-  binds[sf::Keyboard::Key::Down]   = Action::DOWN;
-  binds[sf::Keyboard::Key::Left]   = Action::LEFT;
-  binds[sf::Keyboard::Key::Right]  = Action::RIGHT;
-  binds[sf::Keyboard::Key::Z]      = Action::RUN;
-  binds[sf::Keyboard::Key::X]      = Action::JUMP;
-  binds[sf::Keyboard::Key::C]      = Action::SPINJUMP;
-  binds[sf::Keyboard::Key::Escape] = Action::PAUSE;
+  inputs[Action::UP]       = 0;
+  inputs[Action::DOWN]     = 0;
+  inputs[Action::LEFT]     = 0;
+  inputs[Action::RIGHT]    = 0;
+  inputs[Action::JUMP]     = 0;
+  inputs[Action::SPINJUMP] = 0;
+  inputs[Action::RUN]      = 0;
+  inputs[Action::SELECT]   = 0;
+  inputs[Action::PAUSE]    = 0;
 
-  buttons[Action::UP]       = 0;
-  buttons[Action::DOWN]     = 0;
-  buttons[Action::LEFT]     = 0;
-  buttons[Action::RIGHT]    = 0;
-  buttons[Action::JUMP]     = 0;
-  buttons[Action::SPINJUMP] = 0;
-  buttons[Action::RUN]      = 0;
-  buttons[Action::SELECT]   = 0;
-  buttons[Action::PAUSE]    = 0;
+  keybinds[sf::Keyboard::Key::Up]     = Action::UP;
+  keybinds[sf::Keyboard::Key::Down]   = Action::DOWN;
+  keybinds[sf::Keyboard::Key::Left]   = Action::LEFT;
+  keybinds[sf::Keyboard::Key::Right]  = Action::RIGHT;
+  keybinds[sf::Keyboard::Key::Z]      = Action::RUN;
+  keybinds[sf::Keyboard::Key::X]      = Action::JUMP;
+  keybinds[sf::Keyboard::Key::C]      = Action::SPINJUMP;
+  keybinds[sf::Keyboard::Key::Escape] = Action::PAUSE;
+
+  axisbinds[std::tuple(0, sf::Joystick::Axis::X, Sign::MINUS)] = Action::LEFT;
+  axisbinds[std::tuple(0, sf::Joystick::Axis::X, Sign::PLUS)]  = Action::RIGHT;
+
+  buttonbinds[std::tuple(0, 0)] = Action::JUMP;
+  buttonbinds[std::tuple(0, 2)] = Action::RUN;
 
   engine->music->open("overworld.spc");
   engine->music->play();
@@ -64,16 +70,34 @@ bool Gameplay::handleInput(sf::Event::EventType type, const sf::Event& event) {
   switch (type) {
   case sf::Event::KeyPressed:
   case sf::Event::KeyReleased: {
-    const auto& it = binds.find(event.key.code);
-    if (it != binds.end()) {
-      buttons[it->second] = sf::Keyboard::isKeyPressed(event.key.code);
+    const auto& it = keybinds.find(event.key.code);
+    if (it != keybinds.end()) {
+      inputs[it->second] = sf::Keyboard::isKeyPressed(event.key.code);
     }
     break;
   }
-  case sf::Event::JoystickMoved:
+  case sf::Event::JoystickMoved: {
+    const auto& js = event.joystickMove;
+    Sign sign = toSign(js.position);
+    float pos = std::abs(js.position / 100.f);
+    const auto& it_pos = axisbinds.find(std::tuple(js.joystickId, js.axis, Sign::PLUS));
+    if (it_pos != axisbinds.end()) {
+      inputs[it_pos->second] = sign == Sign::PLUS ? pos : 0;
+    }
+    const auto& it_neg = axisbinds.find(std::tuple(js.joystickId, js.axis, Sign::MINUS));
+    if (it_neg != axisbinds.end()) {
+      inputs[it_neg->second] = sign == Sign::MINUS ? pos : 0;
+    }
+  }
   case sf::Event::JoystickButtonPressed:
-  case sf::Event::JoystickButtonReleased:
+  case sf::Event::JoystickButtonReleased: {
+    const auto& js = event.joystickButton;
+    const auto& it = buttonbinds.find(std::tuple(js.joystickId, js.button));
+    if (it != buttonbinds.end()) {
+      inputs[it->second] = sf::Joystick::isButtonPressed(js.joystickId, js.button);
+    }
     break;
+  }
   default:
     break;
   }
@@ -121,7 +145,7 @@ void Gameplay::pause() {}
 void Gameplay::resume() {}
 
 void Gameplay::update(float delta) {
-  for (auto& input : buttons)
+  for (auto& input : inputs)
     input.second.update();
 
   Subworld& subworld = level.getSubworld(current_subworld);

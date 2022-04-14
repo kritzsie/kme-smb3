@@ -22,6 +22,7 @@ add_executable(
   src/engine.cpp
   src/music.cpp
   src/renderstates.cpp
+  src/types.cpp
   src/main.cpp
 )
 

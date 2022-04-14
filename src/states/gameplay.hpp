@@ -5,11 +5,14 @@
 #include "basegame.hpp"
 #include "../geometry.hpp"
 #include "../input.hpp"
+#include "../types.hpp"
 
 #include <entt/entt.hpp>
 
 #include <SFML/Graphics.hpp>
 #include <SFML/Window/Event.hpp>
+#include <SFML/Window/Keyboard.hpp>
+#include <SFML/Window/Joystick.hpp>
 
 #include <string>
 
@@ -24,8 +27,10 @@ public:
     SELECT, PAUSE
   };
 
-  using BindMap = std::map<sf::Keyboard::Key, Action>;
-  using ButtonMap = std::map<Action, Button>;
+  using KeyMap = std::map<sf::Keyboard::Key, Action>;
+  using ButtonMap = std::map<std::tuple<UInt, UInt>, Action>;
+  using AxisMap = std::map<std::tuple<UInt, sf::Joystick::Axis, Sign>, Action>;
+  using InputMap = std::map<Action, Input<float>>;
 
 private:
   Gameplay(BaseState* parent, Engine* engine);
@@ -72,7 +77,10 @@ private:
   Level level;
 
 public:
-  BindMap binds;
-  ButtonMap buttons;
+  KeyMap keybinds;
+  ButtonMap buttonbinds;
+  AxisMap axisbinds;
+
+  InputMap inputs;
 };
 }

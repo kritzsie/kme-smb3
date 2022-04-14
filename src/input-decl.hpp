@@ -40,7 +40,4 @@ public:
   TWide operator +(const Input& rhs) const;
   TWide operator -(const Input& rhs) const;
 };
-
-using Axis = Input<float>;
-using Button = Input<bool>;
 }

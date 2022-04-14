@@ -63,12 +63,12 @@ void Subworld::update(float delta) {
     auto& timer = entities.get<CTimer>(player);
 
     float x = 0.f;
-    x += gameplay->buttons.at(Gameplay::Action::RIGHT);
-    x -= gameplay->buttons.at(Gameplay::Action::LEFT);
+    x += gameplay->inputs.at(Gameplay::Action::RIGHT) > 0.4f;
+    x -= gameplay->inputs.at(Gameplay::Action::LEFT) > 0.4f;
     x = std::clamp(x, -1.f, 1.f);
 
-    auto& run = gameplay->buttons.at(Gameplay::Action::RUN);
-    auto& jump = gameplay->buttons.at(Gameplay::Action::JUMP);
+    auto& run = gameplay->inputs.at(Gameplay::Action::RUN);
+    auto& jump = gameplay->inputs.at(Gameplay::Action::JUMP);
 
     if (x != 0) {
       vel.x = std::clamp(vel.x + x * (run ? 32.f : 16.f) * delta, -16.f, 16.f);
