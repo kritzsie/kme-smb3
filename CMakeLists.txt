@@ -18,11 +18,11 @@ add_executable(
   src/states/gameplay.cpp
   src/states/intro.cpp
   src/util/file.cpp
+  src/util/util.cpp
   src/assetmanager.cpp
   src/engine.cpp
   src/music.cpp
   src/renderstates.cpp
-  src/types.cpp
   src/main.cpp
 )
 

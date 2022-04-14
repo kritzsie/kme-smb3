@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cmath>
+
 namespace kme {
 template<typename T>
 T operator *(const Sign& lhs, const T& rhs) {
@@ -13,6 +15,6 @@ T operator *(const T& lhs, const Sign& rhs) {
 
 template<typename T>
 Sign toSign(const T& value) {
-  return std::copysign(1, value) > 0 ? Sign::PLUS : Sign::MINUS;
+  return std::copysign(1, value) >= 0 ? Sign::PLUS : Sign::MINUS;
 }
 }
