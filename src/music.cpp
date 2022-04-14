@@ -2,7 +2,6 @@
 
 #include "util/file.hpp"
 
-#include <stdexcept> // for std::runtime_error
 #include <string>
 #include <vector>
 
@@ -67,12 +66,6 @@ void MusicStream::setTempo(double tempo) {
 }
 
 bool MusicStream::onGetData(Chunk& data) {
-  if (gme == nullptr) {
-    // Music_Emu crashes on exit, maybe this is why?
-    throw std::runtime_error("gme is null during onGetData");
-    return false;
-  }
-
   if (gme_err_t error = gme_play(gme, buffer.size(), buffer.data())) {
     return false;
   }
@@ -83,12 +76,6 @@ bool MusicStream::onGetData(Chunk& data) {
 }
 
 void MusicStream::onSeek(sf::Time time) {
-  if (gme == nullptr) {
-    // Ditto, as above
-    throw std::runtime_error("gme is null during onSeek");
-    return;
-  }
-
   gme_seek(gme, time.asMilliseconds());
 }
 
