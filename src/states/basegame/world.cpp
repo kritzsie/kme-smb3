@@ -41,18 +41,18 @@ void Subworld::setGravity(float value) {
   gravity = value;
 }
 
-// ugly
+// begin ugly
 static Rect<float> toAABB(Vec2f pos, CCollision box) {
   return Rect<float>(pos.x - box.radius, pos.y, box.radius * 2.f, box.height);
 }
 
-// ugly
 static Rect<int> toRange(Rect<float> aabb) {
   return Rect<int>(
     std::floor(aabb.x), std::floor(aabb.y),
     std::ceil(aabb.width + 1.f), std::ceil(aabb.height + 1.f)
   );
 }
+// end ugly
 
 void Subworld::update(float delta) {
   // player entity
@@ -74,8 +74,7 @@ void Subworld::update(float delta) {
     if (x != 0) {
       vel.x = std::clamp(vel.x + x * (run ? 32.f : 16.f) * delta, -16.f, 16.f);
       flags |= EFlags::MOVING;
-      if      (x < 0) direction = Sign::MINUS;
-      else if (x > 0) direction = Sign::PLUS;
+      direction = toSign(x);
     }
     else {
       flags &= ~EFlags::MOVING;
@@ -168,9 +167,7 @@ void Subworld::update(float delta) {
   }
 
   // non-collision movement
-  auto nocollide_view = entities.view<
-    CFlags, CPosition, CVelocity
-  >(entt::exclude<CCollision>);
+  auto nocollide_view = entities.view<CFlags, CPosition, CVelocity>(entt::exclude<CCollision>);
   for (auto entity : nocollide_view) {
     UInt32& flags = nocollide_view.get<CFlags>(entity);
     Vec2f& pos = nocollide_view.get<CPosition>(entity);

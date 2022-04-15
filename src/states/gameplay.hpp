@@ -80,7 +80,6 @@ public:
   KeyMap keybinds;
   ButtonMap buttonbinds;
   AxisMap axisbinds;
-
   InputMap inputs;
 };
 }
