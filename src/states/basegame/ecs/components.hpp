@@ -49,8 +49,8 @@ struct CTimer {
 
 enum class EState {
   IDLE, DEAD, DOOR, PIPE,
-  WALKING, RUNNING, SLIPPING, DUCKING,
-  AIRBORNE, RUNJUMPING, UNDERWATER, SWIMMING
+  WALK, RUN, SLIP, DUCK,
+  AIRBORNE, RUNJUMP, UNDERWATER, SWIM
 };
 
 struct CState : Component<EState> {};

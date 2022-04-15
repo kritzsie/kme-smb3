@@ -126,11 +126,11 @@ void Gameplay::enter() {
   }
   tiles[23][0] = TileID("wood_floor_2");
 
-  tiles[13][5] = TileID("brick_block");
+  tiles[13][4] = TileID("brick_block");
   for (int x = 14; x < 18; ++x) {
-    Tile prev = tiles[x - 1][5];
-    if      (prev == TileID("brick_block")) tiles[x][5] = TileID("item_block");
-    else if (prev == TileID("item_block"))  tiles[x][5] = TileID("brick_block");
+    Tile prev = tiles[x - 1][4];
+    if      (prev == TileID("brick_block")) tiles[x][4] = TileID("item_block");
+    else if (prev == TileID("item_block"))  tiles[x][4] = TileID("brick_block");
   }
 
   // entities

@@ -10,11 +10,12 @@ RenderFrame::RenderFrame(
 // end RenderFrame
 
 // begin RenderState
-RenderState::RenderState() : RenderState("idle") {
-}
+RenderState::RenderState() : RenderState("IDLE") {}
 
-RenderState::RenderState(std::string state)
-: state(state), offset() {}
+RenderState::RenderState(std::string state_new) {
+  state = state_new;
+  offset = 0;
+}
 
 void RenderState::setState(std::string state_new, std::size_t offset_new) {
   state = state_new;
