@@ -14,8 +14,11 @@
 
 namespace kme {
 // begin Subworld
-Subworld::Subworld(const BaseGame* basegame, const Gameplay* gameplay)
-: basegame(basegame), gameplay(gameplay) {}
+Subworld::Subworld(const BaseGame* basegame_new, const Gameplay* gameplay_new) {
+  basegame = basegame_new;
+  gameplay = gameplay_new;
+  gravity = -48.f;
+}
 
 const EntityRegistry& Subworld::getEntities() const {
   return entities;
@@ -73,7 +76,8 @@ void Subworld::update(float delta) {
     auto& jump = gameplay->inputs.at(Gameplay::Action::JUMP);
 
     if (x != 0) {
-      vel.x = std::clamp(vel.x + x * (run ? 32.f : 16.f) * delta, -16.f, 16.f);
+      float max_x = run ? 12.f : 6.f;
+      vel.x = std::clamp(vel.x + toSign(x) * 24.f * delta, -max_x, max_x);
       flags |= EFlags::MOVING;
       direction = toSign(x);
     }
@@ -285,32 +289,34 @@ void Subworld::update(float delta) {
 // end Subworld
 
 // begin Level
-Level::Level(const BaseGame* basegame, const Gameplay* gameplay)
-: basegame(basegame), gameplay(gameplay) {
+Level::Level(const BaseGame* basegame_new, const Gameplay* gameplay_new) {
+  basegame = basegame_new;
+  gameplay = gameplay_new;
+  count = 0;
   createSubworld();
 }
 
 std::size_t Level::createSubworld() {
-  return createSubworld(counter++);
+  return createSubworld(count++);
 }
 
 // TODO: de-duplicate this
 std::size_t Level::createSubworld(std::size_t index_hint) {
   if (subworld.find(index_hint) == subworld.end()) {
-    if (counter == index_hint) {
-      ++counter;
+    if (count == index_hint) {
+      ++count;
     }
 
     subworld.emplace(index_hint, Subworld(basegame, gameplay));
     return index_hint;
   }
 
-  while (subworld.find(counter) != subworld.end()) {
-    ++counter;
+  while (subworld.find(count) != subworld.end()) {
+    ++count;
   }
 
-  subworld.emplace(counter, Subworld(basegame, gameplay));
-  return counter;
+  subworld.emplace(count, Subworld(basegame, gameplay));
+  return count;
 }
 
 bool Level::subworldExists(std::size_t index) {

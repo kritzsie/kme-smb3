@@ -14,7 +14,7 @@ RenderState::RenderState() : RenderState("idle") {
 }
 
 RenderState::RenderState(std::string state)
-: state(state) {}
+: state(state), offset() {}
 
 void RenderState::setState(std::string state_new, std::size_t offset_new) {
   state = state_new;

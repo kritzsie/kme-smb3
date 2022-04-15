@@ -32,7 +32,7 @@ public:
 
 private:
   std::string state;
-  std::size_t offset = 0;
+  std::size_t offset;
 };
 
 class RenderStates {

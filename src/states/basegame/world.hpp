@@ -38,7 +38,7 @@ private:
   EntityRegistry entities;
   Tilemap tiles;
 
-  float gravity = -48.f;
+  float gravity;
 };
 // end Subworld
 
@@ -71,7 +71,7 @@ private:
   const BaseGame* basegame;
   const Gameplay* gameplay;
 
-  std::size_t counter = 0;
+  std::size_t count;
 
   Map subworld;
 };
