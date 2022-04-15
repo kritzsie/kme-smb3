@@ -66,6 +66,10 @@ void MusicStream::setTempo(double tempo) {
 }
 
 bool MusicStream::onGetData(Chunk& data) {
+  if (gme == nullptr) {
+    return false;
+  }
+
   if (gme_err_t error = gme_play(gme, buffer.size(), buffer.data())) {
     return false;
   }
@@ -83,8 +87,18 @@ Music::Music() : stream() {}
 
 Music::~Music() {}
 
+bool Music::open(const char* name, bool start_playing) {
+  bool success = stream.openFromFile(name);
+
+  if (success and start_playing) {
+    play();
+  }
+
+  return success;
+}
+
 bool Music::open(const char* name) {
-  return stream.openFromFile(name);
+  return open(name, true);
 }
 
 void Music::play() {

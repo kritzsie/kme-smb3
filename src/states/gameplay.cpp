@@ -64,7 +64,6 @@ Gameplay::Gameplay(BaseState* parent, Engine* engine)
   buttonbinds[std::tuple(0, 7)] = Action::PAUSE;
 
   engine->music->open("overworld.spc");
-  engine->music->play();
 }
 
 Gameplay::~Gameplay() {

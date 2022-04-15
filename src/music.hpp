@@ -36,6 +36,7 @@ public:
   ~Music();
 
   bool open(const char* path);
+  bool open(const char* path, bool start_playing);
 
   void play();
   void pause();
