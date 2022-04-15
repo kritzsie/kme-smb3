@@ -13,6 +13,7 @@ namespace kme {
 struct CDirection : Component<Sign> {};
 
 struct CInfo {
+  bool valid;
   std::string type;
 };
 
@@ -30,10 +31,8 @@ struct EFlags {
     NOGRAVITY  = 1 << 5,
     NOFRICTION = 1 << 6,
 
-    AIRBORNE   = 1 << 16,
-    CROUCHING  = 1 << 17,
-
-    MOVING     = 1 << 24
+    MOVING     = 1 << 16,
+    AIRBORNE   = 1 << 17
   };
 };
 
@@ -57,7 +56,7 @@ enum class EState {
 struct CState : Component<EState> {};
 
 struct CRender {
-  Vec2f scale = Vec2f(1.f, 1.f);
+  Vec2f scale;
   RenderState state;
   float time;
 };

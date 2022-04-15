@@ -58,37 +58,55 @@ static Rect<int> toRange(Rect<float> aabb) {
 // end ugly
 
 void Subworld::update(float delta) {
+  for (auto entity : entities.view<CInfo>()) {
+    if (not entities.get<CInfo>(entity).valid) {
+      entities.destroy(entity);
+    }
+  }
+
   // player entity
   if (entities.valid(player)) {
     UInt32& flags = entities.get<CFlags>(player);
     Vec2f& vel = entities.get<CVelocity>(player);
     Sign& direction = entities.get<CDirection>(player);
     EState& state = entities.get<CState>(player);
+    auto& bbox = entities.get<CCollision>(player);
     auto& timer = entities.get<CTimer>(player);
     auto& render = entities.get<CRender>(player);
 
     float x = 0.f;
-    x += gameplay->inputs.at(Gameplay::Action::RIGHT) > 0.4f;
-    x -= gameplay->inputs.at(Gameplay::Action::LEFT) > 0.4f;
+    x += gameplay->inputs.at(Gameplay::Action::RIGHT) > 0.125f;
+    x -= gameplay->inputs.at(Gameplay::Action::LEFT) > 0.125f;
     x = std::clamp(x, -1.f, 1.f);
 
-    auto& run = gameplay->inputs.at(Gameplay::Action::RUN);
-    auto& jump = gameplay->inputs.at(Gameplay::Action::JUMP);
+    const auto& run = gameplay->inputs.at(Gameplay::Action::RUN);
+    const auto& jump = gameplay->inputs.at(Gameplay::Action::JUMP);
+    const auto& duck = gameplay->inputs.at(Gameplay::Action::DOWN);
+
+    float max_x = run ? 12.f : 6.f;
+
+    if (~flags & EFlags::AIRBORNE) {
+      flags &= ~EFlags::DUCKING;
+      bbox.height = 25.f / 16.f;
+    }
 
     if (x != 0) {
-      float max_x = run ? 12.f : 6.f;
-      vel.x = std::clamp(vel.x + toSign(x) * 24.f * delta, -max_x, max_x);
       flags |= EFlags::MOVING;
+      vel.x = std::clamp(vel.x + toSign(x) * 24.f * delta, -max_x, max_x);
       direction = toSign(x);
     }
     else {
       flags &= ~EFlags::MOVING;
+      if (duck and ~flags & EFlags::AIRBORNE) {
+        flags |= EFlags::DUCKING;
+        bbox.height = 15.f / 16.f;
+      }
     }
 
     if (jump) {
       if (~jump > 0 and ~flags & EFlags::AIRBORNE) {
-        timer.jump = 0.25f;
         flags |= EFlags::AIRBORNE;
+        timer.jump = 0.25f;
       }
 
       if (flags & EFlags::AIRBORNE and timer.jump > 0.f) {
@@ -155,10 +173,10 @@ void Subworld::update(float delta) {
     and ~flags & EFlags::AIRBORNE
     and ~flags & EFlags::MOVING) {
       if (vel.x > 0.f) {
-        vel.x = std::max(vel.x - 8.f * delta, 0.f);
+        vel.x = std::max(vel.x - 12.f * delta, 0.f);
       }
       else if (vel.x < 0.f) {
-        vel.x = std::min(vel.x + 8.f * delta, 0.f);
+        vel.x = std::min(vel.x + 12.f * delta, 0.f);
       }
     }
   }
@@ -267,6 +285,9 @@ void Subworld::update(float delta) {
     switch (state) {
     case EState::AIRBORNE:
       render.state.setState("jumping", states->getFrameOffset("jumping", render.time));
+      break;
+    case EState::DUCKING:
+      render.state.setState("ducking", states->getFrameOffset("ducking", render.time));
       break;
     case EState::SLIPPING:
       render.state.setState("slipping", states->getFrameOffset("slipping", render.time));

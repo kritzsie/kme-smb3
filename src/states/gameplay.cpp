@@ -137,9 +137,9 @@ void Gameplay::enter() {
   auto& entities = subworld.getEntities();
 
   auto player = subworld.player = subworld.camera_target = entities.create();
-  entities.emplace<CInfo>(player, "player_mario");
+  entities.emplace<CInfo>(player, true, "PlayerMario");
   entities.emplace<CPosition>(player, Vec2f(2.f, 1.f));
-  entities.emplace<CCollision>(player, 6.f / 16.f, 24.f / 16.f);
+  entities.emplace<CCollision>(player, 4.f / 16.f, 25.f / 16.f);
   entities.emplace<CFlags>(player);
   entities.emplace<CState>(player);
   entities.emplace<CTimer>(player);
