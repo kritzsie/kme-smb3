@@ -64,25 +64,25 @@ void BaseGame::enter() {
   RenderStates mario_rs;
   mario_rs.pushFrame("idle", "bigmariowalk_0", Rect<int>(0, 0, 14, 27), Vec2f(6, -1), 0.f);
 
-  mario_rs.pushFrame("walking", "bigmariowalk_1", Rect<int>(0, 0, 16, 27), Vec2f(9, -1), 0.125f);
-  mario_rs.pushFrame("walking", "bigmariowalk_2", Rect<int>(0, 0, 16, 26), Vec2f(9, 0), 0.125f);
-  mario_rs.pushFrame("walking", "bigmariowalk_1", Rect<int>(0, 0, 16, 27), Vec2f(9, -1), 0.125f);
-  mario_rs.pushFrame("walking", "bigmariowalk_0", Rect<int>(0, 0, 14, 27), Vec2f(7, -1), 0.125f);
+  mario_rs.pushFrame("walking", "bigmariowalk_1", Rect<int>(0, 0, 16, 27), Vec2f(8, -1), 0.125f);
+  mario_rs.pushFrame("walking", "bigmariowalk_2", Rect<int>(0, 0, 16, 26), Vec2f(8, 0), 0.125f);
+  mario_rs.pushFrame("walking", "bigmariowalk_1", Rect<int>(0, 0, 16, 27), Vec2f(8, -1), 0.125f);
+  mario_rs.pushFrame("walking", "bigmariowalk_0", Rect<int>(0, 0, 14, 27), Vec2f(6, -1), 0.125f);
 
-  mario_rs.pushFrame("running", "bigmariorun_1", Rect<int>(0, 0, 19, 27), Vec2f(11, -1), 1.f / 60.f);
-  mario_rs.pushFrame("running", "bigmariorun_2", Rect<int>(0, 0, 19, 26), Vec2f(11, 0), 1.f / 60.f);
-  mario_rs.pushFrame("running", "bigmariorun_1", Rect<int>(0, 0, 19, 27), Vec2f(11, -1), 1.f / 60.f);
-  mario_rs.pushFrame("running", "bigmariorun_0", Rect<int>(0, 0, 19, 27), Vec2f(11, -1), 1.f / 60.f);
+  mario_rs.pushFrame("running", "bigmariorun_1", Rect<int>(0, 0, 19, 27), Vec2f(10, -1), 1.f / 60.f);
+  mario_rs.pushFrame("running", "bigmariorun_2", Rect<int>(0, 0, 19, 26), Vec2f(10, 0), 1.f / 60.f);
+  mario_rs.pushFrame("running", "bigmariorun_1", Rect<int>(0, 0, 19, 27), Vec2f(10, -1), 1.f / 60.f);
+  mario_rs.pushFrame("running", "bigmariorun_0", Rect<int>(0, 0, 19, 27), Vec2f(10, -1), 1.f / 60.f);
 
-  mario_rs.pushFrame("slipping", "bigmarioslip", Rect<int>(0, 0, 16, 28), Vec2f(8, -1), 0.f);
+  mario_rs.pushFrame("slipping", "bigmarioslip", Rect<int>(0, 0, 16, 28), Vec2f(7, -1), 0.f);
 
-  mario_rs.pushFrame("runjumping", "bigmariorunjump", Rect<int>(0, 0, 19, 26), Vec2f(11, 0), 0.f);
+  mario_rs.pushFrame("runjumping", "bigmariorunjump", Rect<int>(0, 0, 19, 26), Vec2f(10, 0), 0.f);
 
-  mario_rs.pushFrame("ducking", "bigmarioduck", Rect<int>(0, 0, 14, 18), Vec2f(7, -1), 0.f);
+  mario_rs.pushFrame("ducking", "bigmarioduck", Rect<int>(0, 0, 14, 18), Vec2f(6, -1), 0.f);
 
-  mario_rs.pushFrame("jumping", "bigmariojump", Rect<int>(0, 0, 16, 26), Vec2f(8, 0), 0.f);
+  mario_rs.pushFrame("jumping", "bigmariojump", Rect<int>(0, 0, 16, 26), Vec2f(7, 0), 0.f);
 
-  mario_rs.pushFrame("death", "mariodeath", Rect<int>(0, 0, 16, 16), Vec2f(8, -1), 0.f);
+  mario_rs.pushFrame("death", "mariodeath", Rect<int>(0, 0, 16, 16), Vec2f(7, -1), 0.f);
   entity_data.registerRenderStates("player_mario", std::move(mario_rs));
 }
 
