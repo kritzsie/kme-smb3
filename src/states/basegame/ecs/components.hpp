@@ -29,8 +29,10 @@ struct EFlags {
     FROZEN     = 1 << 4,
     NOGRAVITY  = 1 << 5,
     NOFRICTION = 1 << 6,
+
     AIRBORNE   = 1 << 16,
     CROUCHING  = 1 << 17,
+
     MOVING     = 1 << 24
   };
 };

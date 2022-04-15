@@ -62,6 +62,7 @@ void Subworld::update(float delta) {
     Sign& direction = entities.get<CDirection>(player);
     EState& state = entities.get<CState>(player);
     auto& timer = entities.get<CTimer>(player);
+    auto& render = entities.get<CRender>(player);
 
     float x = 0.f;
     x += gameplay->inputs.at(Gameplay::Action::RIGHT) > 0.4f;
@@ -98,6 +99,7 @@ void Subworld::update(float delta) {
     // TODO: implement p-speed
     float p_meter = 0.f;
 
+    EState state_prev = state;
     if (flags & EFlags::DEAD) {
       state = EState::DEAD;
     }
@@ -105,40 +107,31 @@ void Subworld::update(float delta) {
       state = EState::DUCKING;
     }
     else if (flags & EFlags::AIRBORNE) {
-      if (p_meter >= 7.f) {
-        state = EState::RUNJUMPING;
+      if (p_meter < 7.f) {
+        state = EState::AIRBORNE;
       }
       else {
-        state = EState::AIRBORNE;
+        state = EState::RUNJUMPING;
       }
     }
     else if (flags & EFlags::RUNNING) {
       state = EState::RUNNING;
     }
-    else if (!(flags & EFlags::AIRBORNE)) {
-      if (flags & EFlags::MOVING
-      and x * vel.x < 0) {
+    else if (~flags & EFlags::AIRBORNE) {
+      if (x != 0 and x * vel.x < 0) {
         state = EState::SLIPPING;
       }
-      else if (flags & EFlags::WALKING) {
+      else if (vel.x != 0) {
         state = EState::WALKING;
       }
       else {
         state = EState::IDLE;
       }
     }
-  }
 
-  // drawable entities
-  auto render_view = entities.view<CInfo, CState, CRender>();
-  for (auto entity : render_view) {
-    const auto& info = render_view.get<CInfo>(entity);
-    const EState& state = render_view.get<CState>(entity);
-    auto& rs = render_view.get<CRender>(entity);
-
-    rs.time += delta;
-
-    const auto& states = basegame->entity_data.getRenderStates(info.type);
+    if (state != state_prev) {
+      render.time = 0.f;
+    }
   }
 
   // movement code
@@ -255,6 +248,38 @@ void Subworld::update(float delta) {
 
     if (landed) flags &= ~EFlags::AIRBORNE;
     else        flags |=  EFlags::AIRBORNE;
+  }
+
+  // drawable entities
+  auto render_view = entities.view<CInfo, CVelocity, CState, CRender>();
+  for (auto entity : render_view) {
+    auto& info = render_view.get<CInfo>(entity);
+    Vec2f& vel = render_view.get<CVelocity>(entity);
+    const EState& state = render_view.get<CState>(entity);
+    auto& render = render_view.get<CRender>(entity);
+
+    auto& states = basegame->entity_data.getRenderStates(info.type);
+
+    switch (state) {
+    case EState::AIRBORNE:
+      render.state.setState("jumping", states->getFrameOffset("jumping", render.time));
+      break;
+    case EState::SLIPPING:
+      render.state.setState("slipping", states->getFrameOffset("slipping", render.time));
+      break;
+    case EState::WALKING:
+      render.state.setState("walking", states->getFrameOffset("walking", render.time));
+      break;
+    case EState::DEAD:
+      render.state.setState("dead", states->getFrameOffset("dead", render.time));
+      break;
+    case EState::IDLE:
+    default:
+      render.state.setState("idle", states->getFrameOffset("idle", render.time));
+      break;
+    }
+
+    render.time += std::clamp(std::abs(vel.x) / 4.f, 1.f, 4.f) * delta;
   }
 }
 // end Subworld

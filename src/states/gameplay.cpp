@@ -48,9 +48,20 @@ Gameplay::Gameplay(BaseState* parent, Engine* engine)
 
   axisbinds[std::tuple(0, sf::Joystick::Axis::X, Sign::MINUS)] = Action::LEFT;
   axisbinds[std::tuple(0, sf::Joystick::Axis::X, Sign::PLUS)]  = Action::RIGHT;
+  axisbinds[std::tuple(0, sf::Joystick::Axis::Y, Sign::MINUS)] = Action::UP;
+  axisbinds[std::tuple(0, sf::Joystick::Axis::Y, Sign::PLUS)]  = Action::DOWN;
+
+  axisbinds[std::tuple(0, sf::Joystick::Axis::PovX, Sign::MINUS)] = Action::LEFT;
+  axisbinds[std::tuple(0, sf::Joystick::Axis::PovX, Sign::PLUS)]  = Action::RIGHT;
+  axisbinds[std::tuple(0, sf::Joystick::Axis::PovY, Sign::MINUS)] = Action::UP;
+  axisbinds[std::tuple(0, sf::Joystick::Axis::PovY, Sign::PLUS)]  = Action::DOWN;
 
   buttonbinds[std::tuple(0, 0)] = Action::JUMP;
+  buttonbinds[std::tuple(0, 1)] = Action::SPINJUMP;
   buttonbinds[std::tuple(0, 2)] = Action::RUN;
+  buttonbinds[std::tuple(0, 3)] = Action::RUN;
+  buttonbinds[std::tuple(0, 6)] = Action::SELECT;
+  buttonbinds[std::tuple(0, 7)] = Action::PAUSE;
 
   engine->music->open("overworld.spc");
   engine->music->play();
