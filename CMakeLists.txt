@@ -22,6 +22,7 @@ add_executable(
   src/assetmanager.cpp
   src/engine.cpp
   src/music.cpp
+  src/sound.cpp
   src/renderstates.cpp
   src/main.cpp
 )

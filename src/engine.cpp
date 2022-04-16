@@ -1,5 +1,7 @@
 #include "engine.hpp"
 
+#include "music.hpp"
+#include "sound.hpp"
 #include "states.hpp"
 
 #include <physfs.h>
@@ -69,6 +71,7 @@ void Window::resize(UInt width, UInt height) {
 Engine::Engine(std::vector<std::string>&& args) : args(args), tickinfo(64.f), renderinfo(60.f) {
   window = new Window(1440, 810, "Super Mario Bros. 3");
   music = new Music();
+  sound = new Sound();
 
   if (instance_count == 0) {
     PHYSFS_init(args.at(0).c_str());

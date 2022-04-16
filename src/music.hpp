@@ -4,6 +4,8 @@
 
 #include <gme/gme.h>
 
+#include <string>
+
 namespace kme {
 class MusicStream final : public sf::SoundStream {
 public:
@@ -11,7 +13,7 @@ public:
   MusicStream();
   ~MusicStream();
 
-  bool openFromFile(const char* name);
+  bool openFromFile(std::string name);
 
   double getTempo() const;
   void setTempo(double tempo);
@@ -35,8 +37,8 @@ public:
   Music();
   ~Music();
 
-  bool open(const char* path);
-  bool open(const char* path, bool start_playing);
+  bool open(std::string path);
+  bool open(std::string path, bool start);
 
   void play();
   void pause();

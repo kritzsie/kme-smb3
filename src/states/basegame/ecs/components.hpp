@@ -5,15 +5,18 @@
 #include "../../../geometry.hpp"
 #include "../../../input.hpp"
 #include "../../../renderstates.hpp"
+#include "../../../sound.hpp"
 #include "../../../util.hpp"
 
 #include <string>
+
+#include <cstddef>
 
 namespace kme {
 struct CDirection : Component<Sign> {};
 
 struct CInfo {
-  bool valid;
+  bool valid = true;
   std::string type;
 };
 
@@ -39,12 +42,12 @@ struct EFlags {
 struct CFlags : Component<UInt32> {};
 
 struct CCollision {
-  float radius;
-  float height;
+  float radius = 8.f;
+  float height = 16.f;
 };
 
 struct CTimer {
-  float jump;
+  float jump = 0.f;
 };
 
 enum class EState {
@@ -56,8 +59,15 @@ enum class EState {
 struct CState : Component<EState> {};
 
 struct CRender {
-  Vec2f scale;
+  Vec2f scale = Vec2f(1.f, 1.f);
   RenderState state;
-  float time;
+  float time = 0.f;
+};
+
+struct CAudio {
+  struct Channels {
+    std::size_t slip;
+    std::size_t speed;
+  } channels {Sound::MAX_VOICES};
 };
 }

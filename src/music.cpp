@@ -24,7 +24,7 @@ void MusicStream::destroy() {
   }
 }
 
-bool MusicStream::openFromFile(const char* name) {
+bool MusicStream::openFromFile(std::string name) {
   using namespace std::literals;
 
   destroy();
@@ -87,17 +87,17 @@ Music::Music() : stream() {}
 
 Music::~Music() {}
 
-bool Music::open(const char* name, bool start_playing) {
+bool Music::open(std::string name, bool start) {
   bool success = stream.openFromFile(name);
 
-  if (success and start_playing) {
+  if (success and start) {
     play();
   }
 
   return success;
 }
 
-bool Music::open(const char* name) {
+bool Music::open(std::string name) {
   return open(name, true);
 }
 

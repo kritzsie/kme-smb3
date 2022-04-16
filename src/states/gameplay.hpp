@@ -16,6 +16,8 @@
 
 #include <string>
 
+#include <cstddef>
+
 namespace kme {
 class Gameplay final : public BaseState {
 public:
@@ -48,6 +50,15 @@ public:
 
   void update(float delta) final;
   void draw(float delta) final;
+
+  bool playMusic(std::string name);
+  void stopMusic();
+
+  std::size_t playSound(std::string name);
+  bool stopSound(std::size_t index);
+
+  std::size_t playSoundLoop(std::string name);
+  void stopSoundLoop(std::size_t index);
 
 private:
   BaseGame* getBaseGame();

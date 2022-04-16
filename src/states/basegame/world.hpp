@@ -15,7 +15,7 @@ class Gameplay;
 // begin Subworld
 class Subworld {
 public:
-  Subworld(const BaseGame* basegame, const Gameplay* gameplay);
+  Subworld(const BaseGame* basegame, Gameplay* gameplay);
 
   const EntityRegistry& getEntities() const;
   EntityRegistry& getEntities();
@@ -33,7 +33,7 @@ public:
 
 private:
   const BaseGame* basegame;
-  const Gameplay* gameplay;
+  Gameplay* gameplay;
 
   EntityRegistry entities;
   Tilemap tiles;
@@ -50,7 +50,7 @@ public:
   using const_iterator = Map::const_iterator;
   using iterator = Map::iterator;
 
-  Level(const BaseGame* basegame, const Gameplay* gameplay);
+  Level(const BaseGame* basegame, Gameplay* gameplay);
 
   std::size_t createSubworld();
   std::size_t createSubworld(std::size_t index_hint);
@@ -69,7 +69,7 @@ public:
 
 private:
   const BaseGame* basegame;
-  const Gameplay* gameplay;
+  Gameplay* gameplay;
 
   std::size_t count;
 

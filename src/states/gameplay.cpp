@@ -63,7 +63,7 @@ Gameplay::Gameplay(BaseState* parent, Engine* engine)
   buttonbinds[std::tuple(0, 6)] = Action::SELECT;
   buttonbinds[std::tuple(0, 7)] = Action::PAUSE;
 
-  engine->music->open("overworld.spc");
+  playMusic("overworld.spc");
 }
 
 Gameplay::~Gameplay() {
@@ -145,7 +145,8 @@ void Gameplay::enter() {
   entities.emplace<CTimer>(player);
   entities.emplace<CVelocity>(player);
   entities.emplace<CDirection>(player);
-  entities.emplace<CRender>(player, Vec2f(1.f, 1.f));
+  entities.emplace<CRender>(player);
+  entities.emplace<CAudio>(player);
 }
 
 void Gameplay::exit() {}
@@ -326,5 +327,29 @@ Vec2f Gameplay::fromTile(Vec2i pos) {
 
 Vec2i Gameplay::toTile(Vec2f pos) {
   return static_cast<Vec2i>(pos);
+}
+
+bool Gameplay::playMusic(std::string name) {
+  return engine->music->open(name);
+}
+
+void Gameplay::stopMusic() {
+  engine->music->stop();
+}
+
+std::size_t Gameplay::playSound(std::string name) {
+  return engine->sound->play(name);
+}
+
+bool Gameplay::stopSound(std::size_t index) {
+  return engine->sound->stop(index);
+}
+
+std::size_t Gameplay::playSoundLoop(std::string name) {
+  return engine->sound->playLoop(name);
+}
+
+void Gameplay::stopSoundLoop(std::size_t index) {
+  engine->sound->setLoop(index, false);
 }
 }

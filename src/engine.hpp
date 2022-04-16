@@ -2,6 +2,7 @@
 
 #include "geometry.hpp"
 #include "music.hpp"
+#include "sound.hpp"
 #include "states.hpp"
 
 #include <SFML/Graphics.hpp>
@@ -95,6 +96,7 @@ private:
 
 public:
   Music* music;
+  Sound* sound;
 
 private:
   std::vector<StateEvent> events;

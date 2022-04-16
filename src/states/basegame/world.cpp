@@ -2,6 +2,7 @@
 
 #include "ecs/components.hpp"
 #include "../gameplay.hpp"
+#include "../../sound.hpp"
 #include "../../util.hpp"
 
 #include <SFML/Window/Keyboard.hpp>
@@ -14,7 +15,7 @@
 
 namespace kme {
 // begin Subworld
-Subworld::Subworld(const BaseGame* basegame_new, const Gameplay* gameplay_new) {
+Subworld::Subworld(const BaseGame* basegame_new, Gameplay* gameplay_new) {
   basegame = basegame_new;
   gameplay = gameplay_new;
   gravity = -48.f;
@@ -73,6 +74,7 @@ void Subworld::update(float delta) {
     auto& bbox = entities.get<CCollision>(player);
     auto& timer = entities.get<CTimer>(player);
     auto& render = entities.get<CRender>(player);
+    auto& audio = entities.get<CAudio>(player);
 
     float x = 0.f;
     x += gameplay->inputs.at(Gameplay::Action::RIGHT) > 0.25f;
@@ -93,6 +95,9 @@ void Subworld::update(float delta) {
     if (x != 0) {
       flags |= EFlags::MOVING;
       direction = toSign(x);
+      if (direction * vel.x < 0) {
+        vel.x += direction * 8.f * delta;
+      }
       vel.x = std::clamp(vel.x + direction * 24.f * delta, -max_x, max_x);
     }
     else {
@@ -107,6 +112,7 @@ void Subworld::update(float delta) {
       if (~jump > 0 and ~flags & EFlags::AIRBORNE) {
         flags |= EFlags::AIRBORNE;
         timer.jump = 0.1875f;
+        gameplay->playSound("jump");
       }
 
       if (flags & EFlags::AIRBORNE and timer.jump > 0.f) {
@@ -142,6 +148,9 @@ void Subworld::update(float delta) {
     else if (~flags & EFlags::AIRBORNE) {
       if (x != 0 and direction * vel.x < 0) {
         state = EState::SLIP;
+        if (audio.channels.slip == Sound::MAX_VOICES) {
+          audio.channels.slip = gameplay->playSoundLoop("slip");
+        }
       }
       else if (vel.x != 0) {
         state = EState::WALK;
@@ -153,6 +162,11 @@ void Subworld::update(float delta) {
 
     if (state != state_prev) {
       render.time = 0.f;
+
+      if (state_prev == EState::SLIP) {
+        gameplay->stopSoundLoop(audio.channels.slip);
+        audio.channels.slip = Sound::MAX_VOICES;
+      }
     }
   }
 
@@ -256,6 +270,7 @@ void Subworld::update(float delta) {
           else {
             pos.y -= collision.height;
             timer.jump = 0.f;
+            gameplay->playSound("bump");
           }
           vel.y = 0.f;
           entity_aabb = toAABB(pos, bbox);
@@ -310,7 +325,7 @@ void Subworld::update(float delta) {
 // end Subworld
 
 // begin Level
-Level::Level(const BaseGame* basegame_new, const Gameplay* gameplay_new) {
+Level::Level(const BaseGame* basegame_new, Gameplay* gameplay_new) {
   basegame = basegame_new;
   gameplay = gameplay_new;
   count = 0;
