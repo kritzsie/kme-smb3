@@ -34,8 +34,7 @@ struct EFlags {
     NOGRAVITY  = 1 << 5,
     NOFRICTION = 1 << 6,
 
-    MOVING     = 1 << 16,
-    AIRBORNE   = 1 << 17
+    AIRBORNE   = 1 << 16
   };
 };
 

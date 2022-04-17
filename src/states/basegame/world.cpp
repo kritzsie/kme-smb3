@@ -18,7 +18,6 @@ namespace kme {
 Subworld::Subworld(const BaseGame* basegame_new, Gameplay* gameplay_new) {
   basegame = basegame_new;
   gameplay = gameplay_new;
-  gravity = -48.f;
 }
 
 const EntityRegistry& Subworld::getEntities() const {
@@ -78,11 +77,12 @@ void Subworld::update(float delta) {
 
     float x = 0.f;
     x += gameplay->inputs.at(Gameplay::Action::RIGHT) > 0.25f;
-    x -= gameplay->inputs.at(Gameplay::Action::LEFT) > 0.25f;
+    x -= gameplay->inputs.at(Gameplay::Action::LEFT)  > 0.25f;
     x = std::clamp(x, -1.f, 1.f);
 
-    const auto& run = gameplay->inputs.at(Gameplay::Action::RUN);
-    const auto& jump = gameplay->inputs.at(Gameplay::Action::JUMP);
+    const auto& jump_input = gameplay->inputs.at(Gameplay::Action::JUMP);
+    bool jump = jump_input > 0.25f;
+    bool run  = gameplay->inputs.at(Gameplay::Action::RUN) > 0.25f;
     bool duck = gameplay->inputs.at(Gameplay::Action::DOWN) > 0.25f;
 
     float max_x = run ? 12.f : 6.f;
@@ -92,16 +92,21 @@ void Subworld::update(float delta) {
       bbox.height = 25.f / 16.f;
     }
 
+    if (not jump) {
+      flags &= ~EFlags::NOGRAVITY;
+    }
+
     if (x != 0) {
-      flags |= EFlags::MOVING;
+      flags |= EFlags::NOFRICTION;
       direction = toSign(x);
       if (direction * vel.x < 0) {
-        vel.x += direction * 8.f * delta;
+        vel.x += direction * 12.f * delta;
       }
-      vel.x = std::clamp(vel.x + direction * 24.f * delta, -max_x, max_x);
+      vel.x = vel.x + direction * 16.f * delta;
+      vel.x = std::clamp(vel.x, -max_x, max_x);
     }
     else {
-      flags &= ~EFlags::MOVING;
+      flags &= ~EFlags::NOFRICTION;
       if (duck and ~flags & EFlags::AIRBORNE) {
         flags |= EFlags::DUCKING;
         bbox.height = 15.f / 16.f;
@@ -109,15 +114,19 @@ void Subworld::update(float delta) {
     }
 
     if (jump) {
-      if (~jump > 0 and ~flags & EFlags::AIRBORNE) {
+      if (~jump_input > 0 and ~flags & EFlags::AIRBORNE) {
         flags |= EFlags::AIRBORNE;
-        timer.jump = 0.1875f;
+        timer.jump = 0.275f + std::min(std::abs(vel.x) / 12.f / 10.f, 0.125f);
         gameplay->playSound("jump");
       }
 
       if (flags & EFlags::AIRBORNE and timer.jump > 0.f) {
-        vel.y = 15.f;
+        flags |= EFlags::NOGRAVITY;
+        vel.y = 12.f;
         timer.jump = std::max(timer.jump - 1.f * delta, 0.f);
+      }
+      else {
+        flags &= ~EFlags::NOGRAVITY;
       }
     }
     else {
@@ -179,13 +188,15 @@ void Subworld::update(float delta) {
     // apply gravity
     float gravity = getGravity();
     if (~flags & EFlags::NOGRAVITY) {
+      float min_y = -15.f;
+
       vel.y += gravity * delta;
+      vel.y = std::max(vel.y, min_y);
     }
 
     // apply friction
     if (~flags & EFlags::NOFRICTION
-    and ~flags & EFlags::AIRBORNE
-    and ~flags & EFlags::MOVING) {
+    and ~flags & EFlags::AIRBORNE) {
       if (vel.x > 0.f) {
         vel.x = std::max(vel.x - 12.f * delta, 0.f);
       }
@@ -328,7 +339,6 @@ void Subworld::update(float delta) {
 Level::Level(const BaseGame* basegame_new, Gameplay* gameplay_new) {
   basegame = basegame_new;
   gameplay = gameplay_new;
-  count = 0;
   createSubworld();
 }
 
