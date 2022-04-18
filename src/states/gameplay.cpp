@@ -170,6 +170,13 @@ void Gameplay::draw(float delta) {
   Window* window = engine->getWindow();
 
   if (window != nullptr) {
+    const Subworld& subworld = level.getSubworld(current_subworld);
+    const EntityRegistry& entities = subworld.getEntities();
+    const Vec2f& pos = entities.get<CPosition>(subworld.camera_target);
+
+    camera_pos.x = std::floor(pos.x * 16.f + 0.5f) / 16.f;
+    camera_pos.y = std::floor(pos.y * 16.f + 0.5f) / 16.f;
+
     sf::View view = framebuffer->getView();
     view.setCenter(toScreen(camera_pos));
     framebuffer->setView(view);
