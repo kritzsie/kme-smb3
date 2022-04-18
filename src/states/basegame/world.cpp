@@ -100,7 +100,7 @@ void Subworld::update(float delta) {
       flags |= EFlags::NOFRICTION;
       direction = toSign(x);
       if (direction * vel.x < 0) {
-        vel.x += direction * 12.f * delta;
+        vel.x += direction * 16.f * delta;
       }
       vel.x = vel.x + direction * 16.f * delta;
       vel.x = std::clamp(vel.x, -max_x, max_x);
