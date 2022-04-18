@@ -306,7 +306,10 @@ void Gameplay::drawEntities() {
         scale.x * frame.offset.x,
         scale.y * (frame.offset.y + frame.cliprect.height)
       );
-      sprite.setPosition(toScreen(pos) - offset);
+      Vec2f pos_render = toScreen(pos) - offset;
+      pos_render.x = std::floor(pos_render.x + 0.5f);
+      pos_render.y = std::floor(pos_render.y + 0.5f);
+      sprite.setPosition(pos_render);
       sprite.setScale(scale);
       framebuffer->draw(sprite);
     }
