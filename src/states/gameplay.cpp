@@ -8,7 +8,7 @@
 #include "../util.hpp"
 
 #include <cmath>
-
+#include <iostream>
 namespace kme {
 Gameplay::Factory Gameplay::create() {
   return [=](BaseState* parent, Engine* engine) -> BaseState* {
@@ -117,6 +117,8 @@ bool Gameplay::handleInput(sf::Event::EventType type, const sf::Event& event) {
 void Gameplay::enter() {
   Subworld& subworld = level.getSubworld(current_subworld);
 
+  subworld.setSize(172, 27);
+
   // tiles
   Tilemap& tiles = subworld.getTiles();
 
@@ -173,9 +175,23 @@ void Gameplay::draw(float delta) {
     const Subworld& subworld = level.getSubworld(current_subworld);
     const EntityRegistry& entities = subworld.getEntities();
     const Vec2f& pos = entities.get<CPosition>(subworld.camera_target);
+    Rect size = subworld.getSize();
 
-    camera_pos.x = std::floor(pos.x * 16.f + 0.5f) / 16.f;
-    camera_pos.y = std::floor(pos.y * 16.f + 0.5f) / 16.f;
+    camera_pos.x = std::clamp(
+      pos.x,
+      camera_radius.x + size.x,
+      size.width - camera_radius.x + size.x
+    );
+    camera_pos.y = std::clamp(
+      pos.y,
+      camera_radius.y + size.y,
+      size.height - camera_radius.y + size.y
+    );
+
+    camera_pos = toScreen(camera_pos);
+    camera_pos.x = util::round(camera_pos.x);
+    camera_pos.y = util::round(camera_pos.y);
+    camera_pos = fromScreen(camera_pos);
 
     sf::View view = framebuffer->getView();
     view.setCenter(toScreen(camera_pos));
@@ -192,8 +208,8 @@ void Gameplay::draw(float delta) {
     // trusty debug rectangle (draws a rectangle around the camera viewport)
     /*
     sf::RectangleShape rect;
-    Vec2f pos = (camera_pos - camera_radius) * 16.f + Vec2f(1.f, 269.f);
-    rect.setPosition(Vec2f(pos.x, -pos.y));
+    Vec2f pos_rect = (camera_pos - camera_radius) * 16.f + Vec2f(1.f, 269.f);
+    rect.setPosition(Vec2f(pos_rect.x, -pos_rect.y));
     rect.setSize(Vec2f(478.f, 268.f));
     rect.setFillColor(sf::Color(0));
     rect.setOutlineColor(sf::Color::Red);

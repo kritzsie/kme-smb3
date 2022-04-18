@@ -36,7 +36,23 @@ Tilemap& Subworld::getTiles() {
   return const_cast<Tilemap&>(static_cast<const Subworld*>(this)->getTiles());
 }
 
-float Subworld::getGravity() {
+Rect<int> Subworld::getSize() const {
+  return size;
+}
+
+void Subworld::setSize(Rect<int> size_new) {
+  size = size_new;
+}
+
+void Subworld::setSize(int x, int y, int width, int height) {
+  setSize(Rect<int>(x, y, width, height));
+}
+
+void Subworld::setSize(int width, int height) {
+  setSize(0, 0, width, height);
+}
+
+float Subworld::getGravity() const {
   return gravity;
 }
 

@@ -31,4 +31,9 @@ template<>
 constexpr long double absmod<long double>(const long double& lhs, const long double& rhs) {
   return std::fmod<long double>(std::fmod<long double>(lhs, rhs) + rhs, rhs);
 }
+
+template<typename T>
+constexpr T round(const T& value) {
+  return std::floor(value + 0.5);
+}
 }
