@@ -177,22 +177,40 @@ void Gameplay::draw(float delta) {
     const Vec2f& pos = entities.get<CPosition>(subworld.camera_target);
     Rect size = subworld.getSize();
 
+    // position camera relative to world
+    if (pos.x - 1.f > camera_pos.x) {
+      camera_pos.x = pos.x - 1.f;
+    }
+    else if (pos.x + 1.f < camera_pos.x) {
+      camera_pos.x = pos.x + 1.f;
+    }
+
+    if (pos.y - 1.5f > camera_pos.y) {
+      camera_pos.y = pos.y - 1.5f;
+    }
+    else if (pos.y + 3.f < camera_pos.y) {
+      camera_pos.y = pos.y + 3.f;
+    }
+
+    // restrict camera to world boundaries
     camera_pos.x = std::clamp(
-      pos.x,
+      camera_pos.x,
       camera_radius.x + size.x,
       size.width - camera_radius.x + size.x
     );
     camera_pos.y = std::clamp(
-      pos.y,
+      camera_pos.y,
       camera_radius.y + size.y,
       size.height - camera_radius.y + size.y
     );
 
+    // snap camera to integer coordinates on screen
     camera_pos = toScreen(camera_pos);
     camera_pos.x = util::round(camera_pos.x);
     camera_pos.y = util::round(camera_pos.y);
     camera_pos = fromScreen(camera_pos);
 
+    // set view to camera
     sf::View view = framebuffer->getView();
     view.setCenter(toScreen(camera_pos));
     framebuffer->setView(view);
