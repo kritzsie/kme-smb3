@@ -248,35 +248,6 @@ void Subworld::update(float delta) {
     Rect<float> entity_aabb;
     Rect<int> range;
 
-    // resolve X axis first to avoid slipping off edges
-    pos.x += vel.x * delta;
-
-    entity_aabb = toAABB(pos, bbox);
-    range = toRange(entity_aabb);
-    for (int y = range.y; y < range.y + range.height; ++y)
-    for (int x = range.x; x < range.x + range.width;  ++x) {
-      Rect<float> tile_aabb = Rect<float>(x, y, 1.f, 1.f);
-      if (entity_aabb.intersects(tile_aabb)) {
-        switch (basegame->level_tile_data.getTileDef(tiles[x][y]).getCollisionType()) {
-        case TileDef::CollisionType::SOLID: {
-          Rect<float> collision = entity_aabb.intersection(tile_aabb);
-          if (entity_aabb.x > x + 0.5f) {
-            pos.x += collision.width;
-          }
-          else {
-            pos.x -= collision.width;
-          }
-          vel.x = 0.f;
-          entity_aabb = toAABB(pos, bbox);
-          break;
-        }
-        case TileDef::CollisionType::NONE:
-        default:
-          break;
-        }
-      }
-    }
-
     bool landed = false;
 
     pos.y += vel.y * delta;
@@ -290,7 +261,7 @@ void Subworld::update(float delta) {
         switch (basegame->level_tile_data.getTileDef(tiles[x][y]).getCollisionType()) {
         case TileDef::CollisionType::SOLID: {
           Rect<float> collision = entity_aabb.intersection(tile_aabb);
-          if (entity_aabb.y > y + 0.5f) {
+          if (entity_aabb.y >= y + 0.5f) {
             landed = true;
             pos.y += collision.height;
           }
@@ -300,6 +271,45 @@ void Subworld::update(float delta) {
             gameplay->playSound("bump");
           }
           vel.y = 0.f;
+          entity_aabb = toAABB(pos, bbox);
+          break;
+        }
+        case TileDef::CollisionType::PLATFORM: {
+          Rect<float> collision = entity_aabb.intersection(tile_aabb);
+          if (entity_aabb.y > y + 0.5f
+          and pos.y - vel.y * delta >= y + 14.f / 16.f) {
+            landed = true;
+            pos.y += collision.height;
+            vel.y = 0.f;
+            entity_aabb = toAABB(pos, bbox);
+          }
+          break;
+        }
+        case TileDef::CollisionType::NONE:
+        default:
+          break;
+        }
+      }
+    }
+
+    pos.x += vel.x * delta;
+
+    entity_aabb = toAABB(pos, bbox);
+    range = toRange(entity_aabb);
+    for (int y = range.y; y < range.y + range.height; ++y)
+    for (int x = range.x; x < range.x + range.width;  ++x) {
+      Rect<float> tile_aabb = Rect<float>(x, y, 1.f, 1.f);
+      if (entity_aabb.intersects(tile_aabb)) {
+        switch (basegame->level_tile_data.getTileDef(tiles[x][y]).getCollisionType()) {
+        case TileDef::CollisionType::SOLID: {
+          Rect<float> collision = entity_aabb.intersection(tile_aabb);
+          if (entity_aabb.x >= x + 0.5f) {
+            pos.x += collision.width;
+          }
+          else {
+            pos.x -= collision.width;
+          }
+          vel.x = 0.f;
           entity_aabb = toAABB(pos, bbox);
           break;
         }
