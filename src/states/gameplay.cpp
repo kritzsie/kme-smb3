@@ -4,9 +4,10 @@
 
 #include "../assetmanager.hpp"
 #include "../engine.hpp"
-#include "../map_codec.hpp"
+#include "../maploader.hpp"
 #include "../util.hpp"
 
+#include <map>
 #include <vector>
 
 #include <cmath>
@@ -39,10 +40,10 @@ Gameplay::Gameplay(BaseState* parent, Engine* engine)
   inputs[Action::SELECT]   = 0;
   inputs[Action::PAUSE]    = 0;
 
-  keybinds[sf::Keyboard::Key::Up]     = Action::UP;
-  keybinds[sf::Keyboard::Key::Down]   = Action::DOWN;
   keybinds[sf::Keyboard::Key::Left]   = Action::LEFT;
   keybinds[sf::Keyboard::Key::Right]  = Action::RIGHT;
+  keybinds[sf::Keyboard::Key::Up]     = Action::UP;
+  keybinds[sf::Keyboard::Key::Down]   = Action::DOWN;
   keybinds[sf::Keyboard::Key::Z]      = Action::RUN;
   keybinds[sf::Keyboard::Key::X]      = Action::JUMP;
   keybinds[sf::Keyboard::Key::C]      = Action::SPINJUMP;
@@ -119,24 +120,6 @@ bool Gameplay::handleInput(sf::Event::EventType type, const sf::Event& event) {
 void Gameplay::enter() {
   Subworld& subworld = level.getSubworld(current_subworld);
 
-  subworld.setSize(172, 27);
-
-  // tiles
-  Tilemap& tiles = subworld.getTiles();
-
-  tiles[0][0] = TileID("wood_floor_0");
-  for (int x = 1; x < 23; ++x) {
-    tiles[x][0] = TileID("wood_floor_1");
-  }
-  tiles[23][0] = TileID("wood_floor_2");
-
-  tiles[13][4] = TileID("brick_block");
-  for (int x = 14; x < 18; ++x) {
-    Tile prev = tiles[x - 1][4];
-    if      (prev == TileID("brick_block")) tiles[x][4] = TileID("item_block");
-    else if (prev == TileID("item_block"))  tiles[x][4] = TileID("brick_block");
-  }
-
   // entities
   auto& entities = subworld.getEntities();
 
@@ -154,8 +137,94 @@ void Gameplay::enter() {
 
   MapLoader loader = MapLoader("smb3_1-1/0");
 
+  std::map<UInt, TileID> tile_index;
+  tile_index[1] = "brick_block";
+  tile_index[97] = "item_block";
+  tile_index[65] = "gold_coin";
+  tile_index[24] = "cloud_platform";
+  tile_index[26] = "bush";
+
+  tile_index[5] = "hills1_0";
+  tile_index[6] = "hills1_1";
+  tile_index[37] = "hills1_2";
+  tile_index[38] = "hills1_3";
+
+  tile_index[7] = "hills2_0";
+  tile_index[8] = "hills2_1";
+  tile_index[39] = "hills2_2";
+  tile_index[40] = "hills2_3";
+
+  tile_index[70] = "hills3_0";
+  tile_index[71] = "hills3_1";
+
+  tile_index[102] = "wood_floor_0";
+  tile_index[103] = "wood_floor_1";
+  tile_index[104] = "wood_floor_2";
+  tile_index[134] = "wood_floor_3";
+  tile_index[135] = "wood_floor_4";
+  tile_index[136] = "wood_floor_5";
+
+  tile_index[133] = "wood_block";
+
+  tile_index[9] = "orange_platform_0";
+  tile_index[10] = "orange_platform_1";
+  tile_index[11] = "orange_platform_2";
+  tile_index[12] = "orange_platform_3";
+  tile_index[41] = "orange_platform_4";
+  tile_index[42] = "orange_platform_5";
+  tile_index[43] = "orange_platform_6";
+  tile_index[44] = "orange_platform_7";
+  tile_index[73] = "orange_platform_8";
+  tile_index[74] = "orange_platform_9";
+  tile_index[75] = "orange_platform_10";
+  tile_index[76] = "orange_platform_11";
+
+  tile_index[13] = "green_platform_0";
+  tile_index[14] = "green_platform_1";
+  tile_index[15] = "green_platform_2";
+  tile_index[16] = "green_platform_3";
+  tile_index[45] = "green_platform_4";
+  tile_index[46] = "green_platform_5";
+  tile_index[47] = "green_platform_6";
+  tile_index[48] = "green_platform_7";
+  tile_index[77] = "green_platform_8";
+  tile_index[78] = "green_platform_9";
+  tile_index[79] = "green_platform_10";
+  tile_index[80] = "green_platform_11";
+
+  tile_index[105] = "blue_platform_0";
+  tile_index[106] = "blue_platform_1";
+  tile_index[107] = "blue_platform_2";
+  tile_index[108] = "blue_platform_3";
+  tile_index[137] = "blue_platform_4";
+  tile_index[138] = "blue_platform_5";
+  tile_index[139] = "blue_platform_6";
+  tile_index[140] = "blue_platform_7";
+  tile_index[169] = "blue_platform_8";
+  tile_index[170] = "blue_platform_9";
+  tile_index[171] = "blue_platform_10";
+  tile_index[172] = "blue_platform_11";
+
+  tile_index[109] = "gray_platform_0";
+  tile_index[110] = "gray_platform_1";
+  tile_index[111] = "gray_platform_2";
+  tile_index[112] = "gray_platform_3";
+  tile_index[141] = "gray_platform_4";
+  tile_index[142] = "gray_platform_5";
+  tile_index[143] = "gray_platform_6";
+  tile_index[144] = "gray_platform_7";
+  tile_index[173] = "gray_platform_8";
+  tile_index[174] = "gray_platform_9";
+  tile_index[175] = "gray_platform_10";
+  tile_index[176] = "gray_platform_11";
+
+  tile_index[229] = "green_pipe_0";
+  tile_index[230] = "green_pipe_1";
+  tile_index[261] = "green_pipe_2";
+  tile_index[262] = "green_pipe_3";
+
   subworld.setSize(loader.getBounds());
-  loader.loadTiles(tiles);
+  loader.loadTiles(subworld.getTiles(), tile_index);
 }
 
 void Gameplay::exit() {}

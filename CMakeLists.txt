@@ -23,7 +23,7 @@ add_executable(
   src/util/util.cpp
   src/assetmanager.cpp
   src/engine.cpp
-  src/map_codec.cpp
+  src/maploader.cpp
   src/music.cpp
   src/sound.cpp
   src/renderstates.cpp

@@ -5,6 +5,7 @@
 
 #include <json/value.h>
 
+#include <map>
 #include <vector>
 
 namespace kme {
@@ -13,7 +14,7 @@ public:
   MapLoader(std::string name);
 
   Rect<int> getBounds();
-  void loadTiles(Tilemap& tiles);
+  void loadTiles(Tilemap& tilemap, const std::map<UInt, TileID>& tiles);
 
 private:
   Json::Value root;

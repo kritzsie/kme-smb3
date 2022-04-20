@@ -1,10 +1,11 @@
-#include "map_codec.hpp"
+#include "maploader.hpp"
 
 #include "states/basegame/tilemap.hpp"
 #include "util.hpp"
 
 #include <json/reader.h>
 
+#include <map>
 #include <vector>
 
 namespace kme {
@@ -28,7 +29,7 @@ Rect<int> MapLoader::getBounds() {
   return bounds;
 }
 
-void MapLoader::loadTiles(Tilemap& tiles) {
+void MapLoader::loadTiles(Tilemap& tilemap, const std::map<UInt, TileID>& tiles) {
   for (auto it : root["layers"]) {
     if (it["name"].asString() == "Tile Layer 1") {
       auto data = util::base64_decode(it["data"].asString());
@@ -37,6 +38,12 @@ void MapLoader::loadTiles(Tilemap& tiles) {
         id += static_cast<UInt8>(data[i + 1]) << 8;
         id += static_cast<UInt8>(data[i + 2]) << 16;
         id += static_cast<UInt8>(data[i + 3]) << 24;
+        auto it = tiles.find(id);
+        int x = (i / 4) % bounds.width;
+        int y = bounds.height - (i / 4) / bounds.width - 1;
+        if (it != tiles.end()) {
+          tilemap[x][y] = it->second;
+        }
       }
       break;
     }

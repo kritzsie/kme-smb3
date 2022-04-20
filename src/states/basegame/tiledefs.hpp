@@ -18,7 +18,7 @@ public:
 class TileDef {
 public:
   enum class CollisionType {
-    NONE, SOLID
+    NONE, SOLID, PLATFORM
   };
 
   TileDef();
