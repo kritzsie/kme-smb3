@@ -125,7 +125,9 @@ void BaseGame::enter() {
   for (std::size_t i = 0; i < 12; ++i) {
     std::stringstream ss;
     ss << "orange_platform_" << i;
-    orange_platforms[i].setCollisionType(i < 3 ? TileDef::CollisionType::PLATFORM : TileDef::CollisionType::NONE);
+    orange_platforms[i].setCollisionType(
+      i < 3 ? TileDef::CollisionType::PLATFORM : TileDef::CollisionType::NONE
+    );
     level_tile_data.registerTileDef(ss.str(), std::move(orange_platforms[i]));
   }
 
@@ -145,7 +147,9 @@ void BaseGame::enter() {
   for (std::size_t i = 0; i < 12; ++i) {
     std::stringstream ss;
     ss << "green_platform_" << i;
-    green_platforms[i].setCollisionType(i < 3 ? TileDef::CollisionType::PLATFORM : TileDef::CollisionType::NONE);
+    green_platforms[i].setCollisionType(
+      i < 3 ? TileDef::CollisionType::PLATFORM : TileDef::CollisionType::NONE
+    );
     level_tile_data.registerTileDef(ss.str(), std::move(green_platforms[i]));
   }
 
@@ -165,7 +169,9 @@ void BaseGame::enter() {
   for (std::size_t i = 0; i < 12; ++i) {
     std::stringstream ss;
     ss << "blue_platform_" << i;
-    blue_platforms[i].setCollisionType(i < 3 ? TileDef::CollisionType::PLATFORM : TileDef::CollisionType::NONE);
+    blue_platforms[i].setCollisionType(
+      i < 3 ? TileDef::CollisionType::PLATFORM : TileDef::CollisionType::NONE
+    );
     level_tile_data.registerTileDef(ss.str(), std::move(blue_platforms[i]));
   }
 
@@ -185,7 +191,9 @@ void BaseGame::enter() {
   for (std::size_t i = 0; i < 12; ++i) {
     std::stringstream ss;
     ss << "gray_platform_" << i;
-    gray_platforms[i].setCollisionType(i < 3 ? TileDef::CollisionType::PLATFORM : TileDef::CollisionType::NONE);
+    gray_platforms[i].setCollisionType(
+      i < 3 ? TileDef::CollisionType::PLATFORM : TileDef::CollisionType::NONE
+    );
     level_tile_data.registerTileDef(ss.str(), std::move(gray_platforms[i]));
   }
 

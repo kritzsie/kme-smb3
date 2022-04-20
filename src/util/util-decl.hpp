@@ -34,12 +34,10 @@ template<> struct Widen<bool> { using type = SInt8; };
 template<> struct Widen<SInt8>  { using type = SInt16; };
 template<> struct Widen<SInt16> { using type = SInt32; };
 template<> struct Widen<SInt32> { using type = SInt64; };
-template<> struct Widen<SInt64> { using type = SInt64; };
 
 template<> struct Widen<UInt8>  { using type = SInt16; };
 template<> struct Widen<UInt16> { using type = SInt32; };
 template<> struct Widen<UInt32> { using type = SInt64; };
-template<> struct Widen<UInt64> { using type = SInt64; };
 
 template<> struct Widen<float>       { using type = float; };
 template<> struct Widen<double>      { using type = double; };
