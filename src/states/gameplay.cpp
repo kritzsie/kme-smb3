@@ -1,14 +1,16 @@
 #include "gameplay.hpp"
 
-//#include "basegame/entity.hpp"
 #include "basegame/ecs/components.hpp"
 
 #include "../assetmanager.hpp"
 #include "../engine.hpp"
+#include "../map_codec.hpp"
 #include "../util.hpp"
 
+#include <vector>
+
 #include <cmath>
-#include <iostream>
+
 namespace kme {
 Gameplay::Factory Gameplay::create() {
   return [=](BaseState* parent, Engine* engine) -> BaseState* {
@@ -149,6 +151,11 @@ void Gameplay::enter() {
   entities.emplace<CDirection>(player);
   entities.emplace<CRender>(player);
   entities.emplace<CAudio>(player);
+
+  MapLoader loader = MapLoader("smb3_1-1/0");
+
+  subworld.setSize(loader.getBounds());
+  loader.loadTiles(tiles);
 }
 
 void Gameplay::exit() {}

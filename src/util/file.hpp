@@ -8,16 +8,16 @@
 #include <vector>
 
 namespace kme::util {
-std::vector<char> readFile(std::string);
+std::vector<char> readFile(std::string path);
 
 class FileInputStream : public sf::FileInputStream {
 public:
   FileInputStream();
   virtual ~FileInputStream() override;
 
-  bool open(const std::string&);
-  virtual sf::Int64 read(void*, sf::Int64) override;
-  virtual sf::Int64 seek(sf::Int64) override;
+  bool open(const std::string& path);
+  virtual sf::Int64 read(void* data, sf::Int64 size) override;
+  virtual sf::Int64 seek(sf::Int64 position) override;
   virtual sf::Int64 tell() override;
   virtual sf::Int64 getSize() override;
 

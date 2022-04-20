@@ -6,6 +6,7 @@ find_package(PkgConfig REQUIRED)
 find_package(PhysFS REQUIRED)
 find_package(SFML 2.5 REQUIRED COMPONENTS audio graphics network system window)
 pkg_check_modules(GME REQUIRED IMPORTED_TARGET libgme)
+pkg_check_modules(JSONCPP REQUIRED IMPORTED_TARGET jsoncpp)
 
 add_executable(
   kme-smb3
@@ -17,10 +18,12 @@ add_executable(
   src/states/basegame.cpp
   src/states/gameplay.cpp
   src/states/intro.cpp
+  src/util/base64.cpp
   src/util/file.cpp
   src/util/util.cpp
   src/assetmanager.cpp
   src/engine.cpp
+  src/map_codec.cpp
   src/music.cpp
   src/sound.cpp
   src/renderstates.cpp
@@ -34,9 +37,11 @@ target_include_directories(
 
 target_link_libraries(
   kme-smb3
+  jsoncpp
   physfs
   sfml-audio sfml-graphics sfml-network sfml-system sfml-window
   PkgConfig::GME
+  PkgConfig::JSONCPP
 )
 
 set_target_properties(
