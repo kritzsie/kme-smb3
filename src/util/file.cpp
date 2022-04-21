@@ -29,7 +29,7 @@ StringList sanitize(const StringList& path) {
 }
 
 std::string sanitize(const std::string& path) {
-  return util::join(sanitize(util::split(path, "/")), "/");
+  return join(sanitize(split(path, "/")), "/");
 }
 
 std::vector<char> readFile(std::string path) {
