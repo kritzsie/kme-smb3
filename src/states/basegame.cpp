@@ -20,7 +20,7 @@ void BaseGame::enter() {
   brick_block.pushFrame("smb3_tile_atlas", Vec2i(16, 0), 8.f / 60.f);
   brick_block.pushFrame("smb3_tile_atlas", Vec2i(32, 0), 8.f / 60.f);
   brick_block.pushFrame("smb3_tile_atlas", Vec2i(48, 0), 8.f / 60.f);
-  level_tile_data.registerTileDef("brick_block", std::move(brick_block));
+  level_tile_data.registerTileDef("BrickGold", std::move(brick_block));
 
   TileDef gold_coin;
   gold_coin.setCollisionType(TileDef::CollisionType::NONE);
@@ -28,52 +28,36 @@ void BaseGame::enter() {
   gold_coin.pushFrame("smb3_tile_atlas", Vec2i(16, 32), 8.f / 60.f);
   gold_coin.pushFrame("smb3_tile_atlas", Vec2i(32, 32), 8.f / 60.f);
   gold_coin.pushFrame("smb3_tile_atlas", Vec2i(48, 32), 8.f / 60.f);
-  level_tile_data.registerTileDef("gold_coin", std::move(gold_coin));
+  level_tile_data.registerTileDef("CoinGold", std::move(gold_coin));
 
-  TileDef item_block;
-  item_block.pushFrame("smb3_tile_atlas", Vec2i(0, 48), 8.f / 60.f);
-  item_block.pushFrame("smb3_tile_atlas", Vec2i(16, 48), 8.f / 60.f);
-  item_block.pushFrame("smb3_tile_atlas", Vec2i(32, 48), 8.f / 60.f);
-  item_block.pushFrame("smb3_tile_atlas", Vec2i(48, 48), 8.f / 60.f);
-  level_tile_data.registerTileDef("item_block", std::move(item_block));
+  TileDef question_block;
+  question_block.pushFrame("smb3_tile_atlas", Vec2i(0, 48), 8.f / 60.f);
+  question_block.pushFrame("smb3_tile_atlas", Vec2i(16, 48), 8.f / 60.f);
+  question_block.pushFrame("smb3_tile_atlas", Vec2i(32, 48), 8.f / 60.f);
+  question_block.pushFrame("smb3_tile_atlas", Vec2i(48, 48), 8.f / 60.f);
+  level_tile_data.registerTileDef("QuestionBlock", std::move(question_block));
 
   TileDef bush;
   bush.setCollisionType(TileDef::CollisionType::NONE);
   bush.pushFrame("smb3_tile_atlas", Vec2i(400, 0), 0.f);
-  level_tile_data.registerTileDef("bush", std::move(bush));
+  level_tile_data.registerTileDef("Bush", std::move(bush));
 
-  TileDef hills1[4];
-  hills1[0].pushFrame("smb3_tile_atlas", Vec2i(64, 0), 0.f);
-  hills1[1].pushFrame("smb3_tile_atlas", Vec2i(80, 0), 0.f);
-  hills1[2].pushFrame("smb3_tile_atlas", Vec2i(64, 16), 0.f);
-  hills1[3].pushFrame("smb3_tile_atlas", Vec2i(80, 16), 0.f);
-  for (std::size_t i = 0; i < 4; ++i) {
+  TileDef hills[10];
+  hills[0].pushFrame("smb3_tile_atlas", Vec2i(64, 0), 0.f);
+  hills[1].pushFrame("smb3_tile_atlas", Vec2i(80, 0), 0.f);
+  hills[2].pushFrame("smb3_tile_atlas", Vec2i(64, 16), 0.f);
+  hills[3].pushFrame("smb3_tile_atlas", Vec2i(80, 16), 0.f);
+  hills[4].pushFrame("smb3_tile_atlas", Vec2i(96, 0), 0.f);
+  hills[5].pushFrame("smb3_tile_atlas", Vec2i(112, 0), 0.f);
+  hills[6].pushFrame("smb3_tile_atlas", Vec2i(96, 16), 0.f);
+  hills[7].pushFrame("smb3_tile_atlas", Vec2i(112, 16), 0.f);
+  hills[8].pushFrame("smb3_tile_atlas", Vec2i(80, 32), 0.f);
+  hills[9].pushFrame("smb3_tile_atlas", Vec2i(96, 32), 0.f);
+  for (std::size_t i = 0; i < 10; ++i) {
     std::stringstream ss;
-    ss << "hills1_" << i;
-    hills1[i].setCollisionType(TileDef::CollisionType::NONE);
-    level_tile_data.registerTileDef(ss.str(), std::move(hills1[i]));
-  }
-
-  TileDef hills2[4];
-  hills2[0].pushFrame("smb3_tile_atlas", Vec2i(96, 0), 0.f);
-  hills2[1].pushFrame("smb3_tile_atlas", Vec2i(112, 0), 0.f);
-  hills2[2].pushFrame("smb3_tile_atlas", Vec2i(96, 16), 0.f);
-  hills2[3].pushFrame("smb3_tile_atlas", Vec2i(112, 16), 0.f);
-  for (std::size_t i = 0; i < 4; ++i) {
-    std::stringstream ss;
-    ss << "hills2_" << i;
-    hills2[i].setCollisionType(TileDef::CollisionType::NONE);
-    level_tile_data.registerTileDef(ss.str(), std::move(hills2[i]));
-  }
-
-  TileDef hills3[2];
-  hills3[0].pushFrame("smb3_tile_atlas", Vec2i(80, 32), 0.f);
-  hills3[1].pushFrame("smb3_tile_atlas", Vec2i(96, 32), 0.f);
-  for (std::size_t i = 0; i < 2; ++i) {
-    std::stringstream ss;
-    ss << "hills3_" << i;
-    hills3[i].setCollisionType(TileDef::CollisionType::NONE);
-    level_tile_data.registerTileDef(ss.str(), std::move(hills3[i]));
+    ss << "Hills_" << i;
+    hills[i].setCollisionType(TileDef::CollisionType::NONE);
+    level_tile_data.registerTileDef(ss.str(), std::move(hills[i]));
   }
 
   TileDef wood_floors[6];
@@ -85,18 +69,18 @@ void BaseGame::enter() {
   wood_floors[5].pushFrame("smb3_tile_atlas", Vec2i(112, 64), 0.f);
   for (std::size_t i = 0; i < 6; ++i) {
     std::stringstream ss;
-    ss << "wood_floor_" << i;
+    ss << "WoodFloor_" << i;
     level_tile_data.registerTileDef(ss.str(), std::move(wood_floors[i]));
   }
 
   TileDef wood_block;
   wood_block.pushFrame("smb3_tile_atlas", Vec2i(64, 64), 0.f);
-  level_tile_data.registerTileDef("wood_block", std::move(wood_block));
+  level_tile_data.registerTileDef("WoodBlock", std::move(wood_block));
 
   TileDef cloud_platform;
   cloud_platform.setCollisionType(TileDef::CollisionType::PLATFORM);
   cloud_platform.pushFrame("smb3_tile_atlas", Vec2i(368, 0), 0.f);
-  level_tile_data.registerTileDef("cloud_platform", std::move(cloud_platform));
+  level_tile_data.registerTileDef("Cloud", std::move(cloud_platform));
 
   TileDef green_pipes[4];
   green_pipes[0].pushFrame("smb3_tile_atlas", Vec2i(64, 112), 0.f);
@@ -105,7 +89,7 @@ void BaseGame::enter() {
   green_pipes[3].pushFrame("smb3_tile_atlas", Vec2i(80, 128), 0.f);
   for (std::size_t i = 0; i < 4; ++i) {
     std::stringstream ss;
-    ss << "green_pipe_" << i;
+    ss << "PipeGreen_" << i;
     level_tile_data.registerTileDef(ss.str(), std::move(green_pipes[i]));
   }
 
@@ -124,7 +108,7 @@ void BaseGame::enter() {
   orange_platforms[11].pushFrame("smb3_tile_atlas", Vec2i(176, 32), 0.f);
   for (std::size_t i = 0; i < 12; ++i) {
     std::stringstream ss;
-    ss << "orange_platform_" << i;
+    ss << "PlatformOrange_" << i;
     orange_platforms[i].setCollisionType(
       i < 3 ? TileDef::CollisionType::PLATFORM : TileDef::CollisionType::NONE
     );
@@ -146,7 +130,7 @@ void BaseGame::enter() {
   green_platforms[11].pushFrame("smb3_tile_atlas", Vec2i(240, 32), 0.f);
   for (std::size_t i = 0; i < 12; ++i) {
     std::stringstream ss;
-    ss << "green_platform_" << i;
+    ss << "PlatformGreen_" << i;
     green_platforms[i].setCollisionType(
       i < 3 ? TileDef::CollisionType::PLATFORM : TileDef::CollisionType::NONE
     );
@@ -168,7 +152,7 @@ void BaseGame::enter() {
   blue_platforms[11].pushFrame("smb3_tile_atlas", Vec2i(176, 80), 0.f);
   for (std::size_t i = 0; i < 12; ++i) {
     std::stringstream ss;
-    ss << "blue_platform_" << i;
+    ss << "PlatformBlue_" << i;
     blue_platforms[i].setCollisionType(
       i < 3 ? TileDef::CollisionType::PLATFORM : TileDef::CollisionType::NONE
     );
@@ -190,7 +174,7 @@ void BaseGame::enter() {
   gray_platforms[11].pushFrame("smb3_tile_atlas", Vec2i(240, 80), 0.f);
   for (std::size_t i = 0; i < 12; ++i) {
     std::stringstream ss;
-    ss << "gray_platform_" << i;
+    ss << "PlatformGray_" << i;
     gray_platforms[i].setCollisionType(
       i < 3 ? TileDef::CollisionType::PLATFORM : TileDef::CollisionType::NONE
     );
