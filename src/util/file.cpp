@@ -1,14 +1,43 @@
 #include "file.hpp"
 
+#include "../types.hpp"
+#include "string.hpp"
+
 #include <stdexcept>
 
 namespace kme::util {
+// remove occurrences of "." and collapse occurrences of "*/.." from a path
+// NOTE: this is slow and ignores some edge cases
+StringList sanitize(const StringList& path) {
+  StringList result;
+  result.reserve(path.size());
+  for (auto it = path.rbegin(); it < path.rend(); ++it) {
+    if (*it != ".") {
+      std::size_t discard = 0;
+      while (*it == "..") {
+        ++discard;
+        ++it;
+      }
+      while (discard > 0) {
+        --discard;
+        ++it;
+      }
+      result.insert(result.begin(), *it);
+    }
+  }
+  return result;
+}
+
+std::string sanitize(const std::string& path) {
+  return util::join(sanitize(util::split(path, "/")), "/");
+}
+
 std::vector<char> readFile(std::string path) {
   if (PHYSFS_isInit() == 0) {
     throw std::runtime_error(PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode()));
   }
 
-  PHYSFS_File* file = PHYSFS_openRead(path.c_str());
+  PHYSFS_File* file = PHYSFS_openRead(sanitize(path).c_str());
   if (file == nullptr) {
     throw std::runtime_error(PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode()));
   }

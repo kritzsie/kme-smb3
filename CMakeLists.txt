@@ -20,6 +20,7 @@ add_executable(
   src/states/intro.cpp
   src/util/base64.cpp
   src/util/file.cpp
+  src/util/string.cpp
   src/util/util.cpp
   src/assetmanager.cpp
   src/engine.cpp

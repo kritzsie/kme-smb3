@@ -1,5 +1,7 @@
 #pragma once
 
+#include "../types.hpp"
+
 #include <physfs.h>
 
 #include <SFML/System.hpp>
@@ -8,6 +10,9 @@
 #include <vector>
 
 namespace kme::util {
+StringList sanitize(const StringList& path);
+std::string sanitize(const std::string& path);
+
 std::vector<char> readFile(std::string path);
 
 class FileInputStream : public sf::FileInputStream {
