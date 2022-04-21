@@ -358,6 +358,43 @@ void Subworld::update(float delta) {
 
     render.time += std::clamp(std::abs(vel.x) / 4.f, 1.f, 4.f) * delta;
   }
+
+  if (entities.valid(camera)) {
+    auto& info = entities.get<CInfo>(camera);
+
+    if (entities.valid(info.parent)) {
+      Vec2f& parent_pos = entities.get<CPosition>(info.parent);
+      Vec2f& pos = entities.get<CPosition>(camera);
+      auto& bbox = entities.get<CCollision>(camera);
+
+      // position camera relative to world
+      if (parent_pos.x - 1.f > pos.x) {
+        pos.x = parent_pos.x - 1.f;
+      }
+      else if (parent_pos.x + 1.f < pos.x) {
+        pos.x = parent_pos.x + 1.f;
+      }
+
+      if (parent_pos.y - 1.5f > pos.y) {
+        pos.y = parent_pos.y - 1.5f;
+      }
+      else if (parent_pos.y + 3.f < pos.y) {
+        pos.y = parent_pos.y + 3.f;
+      }
+
+      // restrict camera to world boundaries
+      pos.x = std::clamp(
+        pos.x,
+        bbox.radius + size.x,
+        size.width - bbox.radius + size.x
+      );
+      pos.y = std::clamp(
+        pos.y,
+        0.f + size.y,
+        size.height - bbox.height / 2 + size.y
+      );
+    }
+  }
 }
 // end Subworld
 

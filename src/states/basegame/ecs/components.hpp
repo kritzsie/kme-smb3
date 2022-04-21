@@ -8,6 +8,8 @@
 #include "../../../sound.hpp"
 #include "../../../util.hpp"
 
+#include <entt/entt.hpp>
+
 #include <string>
 
 #include <cstddef>
@@ -18,6 +20,7 @@ struct CDirection : Component<Sign> {};
 struct CInfo {
   bool valid = true;
   std::string type;
+  Entity parent = entt::null;
 };
 
 struct CPosition : Component<Vec2f> {};

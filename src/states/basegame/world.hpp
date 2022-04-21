@@ -33,7 +33,7 @@ public:
   void update(float delta);
 
   Entity player;
-  Entity camera_target;
+  Entity camera;
 
 private:
   const BaseGame* basegame;

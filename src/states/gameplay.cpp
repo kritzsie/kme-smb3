@@ -123,7 +123,7 @@ void Gameplay::enter() {
   // entities
   auto& entities = subworld.getEntities();
 
-  auto player = subworld.player = subworld.camera_target = entities.create();
+  auto player = entities.create();
   entities.emplace<CInfo>(player, true, "PlayerMario");
   entities.emplace<CPosition>(player, Vec2f(2.f, 1.f));
   entities.emplace<CCollision>(player, 7.f / 16.f, 25.f / 16.f);
@@ -134,6 +134,13 @@ void Gameplay::enter() {
   entities.emplace<CDirection>(player);
   entities.emplace<CRender>(player);
   entities.emplace<CAudio>(player);
+  subworld.player = player;
+
+  auto camera = entities.create();
+  entities.emplace<CInfo>(camera, true, "Camera", player);
+  entities.emplace<CPosition>(camera, Vec2f(15.f, 8.4375f));
+  entities.emplace<CCollision>(camera, 15.f, 16.875f);
+  subworld.camera = camera;
 
   MapLoader loader = MapLoader("smb3_1-1/0");
 
@@ -234,8 +241,9 @@ void Gameplay::pause() {}
 void Gameplay::resume() {}
 
 void Gameplay::update(float delta) {
-  for (auto& input : inputs)
+  for (auto& input : inputs) {
     input.second.update();
+  }
 
   Subworld& subworld = level.getSubworld(current_subworld);
 
@@ -250,32 +258,17 @@ void Gameplay::draw(float delta) {
   if (window != nullptr) {
     const Subworld& subworld = level.getSubworld(current_subworld);
     const EntityRegistry& entities = subworld.getEntities();
-    const Vec2f& pos = entities.get<CPosition>(subworld.camera_target);
+    const Vec2f& pos = entities.get<CPosition>(subworld.camera);
     Rect size = subworld.getSize();
-
-    // position camera relative to world
-    if (pos.x - 1.f > camera_pos.x) {
-      camera_pos.x = pos.x - 1.f;
-    }
-    else if (pos.x + 1.f < camera_pos.x) {
-      camera_pos.x = pos.x + 1.f;
-    }
-
-    if (pos.y - 1.5f > camera_pos.y) {
-      camera_pos.y = pos.y - 1.5f;
-    }
-    else if (pos.y + 3.f < camera_pos.y) {
-      camera_pos.y = pos.y + 3.f;
-    }
 
     // restrict camera to world boundaries
     camera_pos.x = std::clamp(
-      camera_pos.x,
+      pos.x,
       camera_radius.x + size.x,
       size.width - camera_radius.x + size.x
     );
     camera_pos.y = std::clamp(
-      camera_pos.y,
+      pos.y,
       camera_radius.y + size.y,
       size.height - camera_radius.y + size.y
     );
