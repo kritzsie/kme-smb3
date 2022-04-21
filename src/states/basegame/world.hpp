@@ -1,8 +1,9 @@
 #pragma once
 
-#include "ecs/ecs.hpp"
-#include "tilemap.hpp"
 #include "../basegame.hpp"
+#include "ecs/ecs.hpp"
+#include "style.hpp"
+#include "tilemap.hpp"
 
 #include <unordered_map>
 

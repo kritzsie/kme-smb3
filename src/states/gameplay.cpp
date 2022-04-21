@@ -142,8 +142,7 @@ void Gameplay::enter() {
   entities.emplace<CCollision>(camera, 15.f, 16.875f);
   subworld.camera = camera;
 
-  MapLoader loader = MapLoader("smb3_1-1/0");
-
+  MapLoader loader = MapLoader("1-1/0");
   subworld.setBounds(loader.getBounds());
   loader.loadTiles(subworld.getTiles());
 }

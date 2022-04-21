@@ -37,6 +37,10 @@ void BaseGame::enter() {
   question_block.pushFrame("smb3_tile_atlas", Vec2i(48, 48), 8.f / 60.f);
   level_tile_data.registerTileDef("QuestionBlock", std::move(question_block));
 
+  TileDef empty_block;
+  empty_block.pushFrame("smb3_tile_atlas", Vec2i(64, 48), 0.f);
+  level_tile_data.registerTileDef("EmptyBlock", std::move(empty_block));
+
   TileDef bush;
   bush.setCollisionType(TileDef::CollisionType::NONE);
   bush.pushFrame("smb3_tile_atlas", Vec2i(400, 0), 0.f);
