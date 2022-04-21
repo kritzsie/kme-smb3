@@ -181,6 +181,40 @@ void BaseGame::enter() {
     level_tile_data.registerTileDef(ss.str(), std::move(gray_platforms[i]));
   }
 
+  TileDef goalbg[10];
+  goalbg[0].pushFrame("smb3_tile_atlas", Vec2i(432, 176), 0.f);
+  goalbg[1].pushFrame("smb3_tile_atlas", Vec2i(400, 208), 0.f);
+  goalbg[2].pushFrame("smb3_tile_atlas", Vec2i(416, 208), 0.f);
+  goalbg[3].pushFrame("smb3_tile_atlas", Vec2i(432, 208), 0.f);
+  goalbg[4].pushFrame("smb3_tile_atlas", Vec2i(400, 224), 0.f);
+  goalbg[5].pushFrame("smb3_tile_atlas", Vec2i(432, 192), 0.f);
+  goalbg[6].pushFrame("smb3_tile_atlas", Vec2i(432, 224), 0.f);
+  goalbg[7].pushFrame("smb3_tile_atlas", Vec2i(400, 240), 0.f);
+  goalbg[8].pushFrame("smb3_tile_atlas", Vec2i(416, 240), 0.f);
+  goalbg[9].pushFrame("smb3_tile_atlas", Vec2i(432, 240), 0.f);
+  for (std::size_t i = 0; i < 10; ++i) {
+    std::stringstream ss;
+    ss << "GoalBG_" << i;
+    goalbg[i].setCollisionType(TileDef::CollisionType::NONE);
+    level_tile_data.registerTileDef(ss.str(), std::move(goalbg[i]));
+  }
+
+  TileDef goalhills[8];
+  goalhills[0].pushFrame("smb3_tile_atlas", Vec2i(256, 112), 0.f);
+  goalhills[1].pushFrame("smb3_tile_atlas", Vec2i(272, 112), 0.f);
+  goalhills[2].pushFrame("smb3_tile_atlas", Vec2i(256, 128), 0.f);
+  goalhills[3].pushFrame("smb3_tile_atlas", Vec2i(272, 128), 0.f);
+  goalhills[4].pushFrame("smb3_tile_atlas", Vec2i(256, 144), 0.f);
+  goalhills[5].pushFrame("smb3_tile_atlas", Vec2i(272, 144), 0.f);
+  goalhills[6].pushFrame("smb3_tile_atlas", Vec2i(256, 160), 0.f);
+  goalhills[7].pushFrame("smb3_tile_atlas", Vec2i(272, 160), 0.f);
+  for (std::size_t i = 0; i < 8; ++i) {
+    std::stringstream ss;
+    ss << "GoalHills_" << i;
+    goalhills[i].setCollisionType(TileDef::CollisionType::NONE);
+    level_tile_data.registerTileDef(ss.str(), std::move(goalhills[i]));
+  }
+
   CCollision mario_collision;
   mario_collision.radius = 4.f / 16.f;
   mario_collision.height = 25.f / 16.f;
