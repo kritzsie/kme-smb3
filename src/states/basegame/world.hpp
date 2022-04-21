@@ -22,10 +22,10 @@ public:
   const Tilemap& getTiles() const;
   Tilemap& getTiles();
 
-  Rect<int> getSize() const;
-  void setSize(int width, int height);
-  void setSize(int x, int y, int width, int height);
-  void setSize(Rect<int> size);
+  Rect<int> getBounds() const;
+  void setBounds(int width, int height);
+  void setBounds(int x, int y, int width, int height);
+  void setBounds(Rect<int> size);
 
   float getGravity() const;
   void setGravity(float value);
@@ -42,7 +42,7 @@ private:
   EntityRegistry entities;
   Tilemap tiles;
 
-  Rect<int> size;
+  Rect<int> bounds;
   float gravity = -60.f;
 };
 // end Subworld

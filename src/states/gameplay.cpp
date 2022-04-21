@@ -230,7 +230,7 @@ void Gameplay::enter() {
   tile_index[261] = "green_pipe_2";
   tile_index[262] = "green_pipe_3";
 
-  subworld.setSize(loader.getBounds());
+  subworld.setBounds(loader.getBounds());
   loader.loadTiles(subworld.getTiles(), tile_index);
 }
 
@@ -259,18 +259,18 @@ void Gameplay::draw(float delta) {
     const Subworld& subworld = level.getSubworld(current_subworld);
     const EntityRegistry& entities = subworld.getEntities();
     const Vec2f& pos = entities.get<CPosition>(subworld.camera);
-    Rect size = subworld.getSize();
+    Rect bounds = subworld.getBounds();
 
     // restrict camera to world boundaries
     camera_pos.x = std::clamp(
       pos.x,
-      camera_radius.x + size.x,
-      size.width - camera_radius.x + size.x
+      camera_radius.x + bounds.x,
+      bounds.width - camera_radius.x + bounds.x
     );
     camera_pos.y = std::clamp(
       pos.y,
-      camera_radius.y + size.y,
-      size.height - camera_radius.y + size.y
+      camera_radius.y + bounds.y,
+      bounds.height - camera_radius.y + bounds.y
     );
 
     // snap camera to integer coordinates on screen

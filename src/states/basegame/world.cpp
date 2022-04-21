@@ -36,20 +36,20 @@ Tilemap& Subworld::getTiles() {
   return const_cast<Tilemap&>(static_cast<const Subworld*>(this)->getTiles());
 }
 
-Rect<int> Subworld::getSize() const {
-  return size;
+Rect<int> Subworld::getBounds() const {
+  return bounds;
 }
 
-void Subworld::setSize(Rect<int> size_new) {
-  size = size_new;
+void Subworld::setBounds(Rect<int> size_new) {
+  bounds = size_new;
 }
 
-void Subworld::setSize(int x, int y, int width, int height) {
-  setSize(Rect<int>(x, y, width, height));
+void Subworld::setBounds(int x, int y, int width, int height) {
+  setBounds(Rect<int>(x, y, width, height));
 }
 
-void Subworld::setSize(int width, int height) {
-  setSize(0, 0, width, height);
+void Subworld::setBounds(int width, int height) {
+  setBounds(0, 0, width, height);
 }
 
 float Subworld::getGravity() const {
@@ -324,6 +324,60 @@ void Subworld::update(float delta) {
     else        flags |=  EFlags::AIRBORNE;
   }
 
+  if (entities.valid(camera)) {
+    auto& info = entities.get<CInfo>(camera);
+
+    if (entities.valid(info.parent)) {
+      Vec2f& parent_pos = entities.get<CPosition>(info.parent);
+      Vec2f& pos = entities.get<CPosition>(camera);
+      auto& bbox = entities.get<CCollision>(camera);
+
+      // position camera relative to world
+      if (parent_pos.x - 1.f > pos.x) {
+        pos.x = parent_pos.x - 1.f;
+      }
+      else if (parent_pos.x + 1.f < pos.x) {
+        pos.x = parent_pos.x + 1.f;
+      }
+
+      if (parent_pos.y - 1.5f > pos.y) {
+        pos.y = parent_pos.y - 1.5f;
+      }
+      else if (parent_pos.y + 3.f < pos.y) {
+        pos.y = parent_pos.y + 3.f;
+      }
+
+      // restrict camera to world boundaries
+      pos.x = std::clamp(
+        pos.x,
+        bbox.radius + bounds.x,
+        bounds.width - bbox.radius + bounds.x
+      );
+      pos.y = std::clamp(
+        pos.y,
+        0.f + bounds.y,
+        bounds.height - bbox.height / 2 + bounds.y
+      );
+    }
+
+    if (entities.valid(player)) {
+      Vec2f& player_pos = entities.get<CPosition>(player);
+      Vec2f& player_vel = entities.get<CVelocity>(player);
+      auto& player_bbox = entities.get<CCollision>(player);
+      Vec2f& pos = entities.get<CPosition>(camera);
+      auto& bbox = entities.get<CCollision>(camera);
+
+      if (player_pos.x < pos.x - bbox.radius + player_bbox.radius) {
+        player_pos.x = pos.x - bbox.radius + player_bbox.radius;
+        player_vel.x = 0.f;
+      }
+      else if (player_pos.x > pos.x + bbox.radius - player_bbox.radius) {
+        player_pos.x = pos.x + bbox.radius - player_bbox.radius;
+        player_vel.x = 0.f;
+      }
+    }
+  }
+
   // drawable entities
   auto render_view = entities.view<CInfo, CVelocity, CState, CRender>();
   for (auto entity : render_view) {
@@ -357,43 +411,6 @@ void Subworld::update(float delta) {
     }
 
     render.time += std::clamp(std::abs(vel.x) / 4.f, 1.f, 4.f) * delta;
-  }
-
-  if (entities.valid(camera)) {
-    auto& info = entities.get<CInfo>(camera);
-
-    if (entities.valid(info.parent)) {
-      Vec2f& parent_pos = entities.get<CPosition>(info.parent);
-      Vec2f& pos = entities.get<CPosition>(camera);
-      auto& bbox = entities.get<CCollision>(camera);
-
-      // position camera relative to world
-      if (parent_pos.x - 1.f > pos.x) {
-        pos.x = parent_pos.x - 1.f;
-      }
-      else if (parent_pos.x + 1.f < pos.x) {
-        pos.x = parent_pos.x + 1.f;
-      }
-
-      if (parent_pos.y - 1.5f > pos.y) {
-        pos.y = parent_pos.y - 1.5f;
-      }
-      else if (parent_pos.y + 3.f < pos.y) {
-        pos.y = parent_pos.y + 3.f;
-      }
-
-      // restrict camera to world boundaries
-      pos.x = std::clamp(
-        pos.x,
-        bbox.radius + size.x,
-        size.width - bbox.radius + size.x
-      );
-      pos.y = std::clamp(
-        pos.y,
-        0.f + size.y,
-        size.height - bbox.height / 2 + size.y
-      );
-    }
   }
 }
 // end Subworld

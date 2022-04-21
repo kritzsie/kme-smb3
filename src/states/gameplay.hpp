@@ -7,8 +7,6 @@
 #include "../input.hpp"
 #include "../types.hpp"
 
-#include <entt/entt.hpp>
-
 #include <SFML/Graphics.hpp>
 #include <SFML/Window/Event.hpp>
 #include <SFML/Window/Keyboard.hpp>
