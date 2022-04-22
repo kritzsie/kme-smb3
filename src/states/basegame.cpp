@@ -269,6 +269,51 @@ void BaseGame::enter() {
   };
   overworld_blocks->music = "overworld.spc";
   styles["overworld_blocks"] = std::move(overworld_blocks);
+
+  auto athletic_hills = std::make_unique<Style>();
+  athletic_hills->background = sf::Color(0x6898F8FF);
+  athletic_hills->layers[-1] = {
+    .texture = "athletichills",
+    .offset = Vec2f(128.f, -11.f),
+    .parallax = Vec2f(0.375f, 0.25f),
+    .repeat_y = false
+  };
+  athletic_hills->layers[0] = {
+    .texture = "cloudlayer",
+    .offset = Vec2f(0.f, 224.f),
+    .parallax = Vec2f(0.75f, 0.125f),
+    .repeat_y = false
+  };
+  athletic_hills->music = "athletic.spc";
+  styles["athletic_hills"] = std::move(athletic_hills);
+
+  auto overworld_cave = std::make_unique<Style>();
+  overworld_cave->background = sf::Color(0x6898F8FF);
+  overworld_cave->layers[-1] = {
+    .texture = "overworldcaveback",
+    .offset = Vec2f(0.f, -68.f),
+    .parallax = Vec2f(0.75f, 0.f),
+    .repeat_y = false
+  };
+  overworld_cave->layers[0] = {
+    .texture = "overworldcavefront",
+    .offset = Vec2f(0.f, -5.f),
+    .parallax = Vec2f(0.375f, 0.f),
+    .repeat_y = false
+  };
+  overworld_cave->music = "underworld.spc";
+  styles["overworld_cave"] = std::move(overworld_cave);
+
+  auto waterworld = std::make_unique<Style>();
+  waterworld->background = sf::Color(0x080060FF);
+  waterworld->layers[0] = {
+    .texture = "waterworld",
+    .offset = Vec2f(0.f, -11.f),
+    .parallax = Vec2f(0.375f, 0.f),
+    .repeat_y = false
+  };
+  waterworld->music = "swimming.spc";
+  styles["waterworld"] = std::move(waterworld);
 }
 
 void BaseGame::exit() {}
