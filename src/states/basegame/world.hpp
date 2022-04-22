@@ -85,6 +85,9 @@ private:
   std::size_t count = 0;
 
   Map subworld;
+
+public:
+  float timer = 300.f;
 };
 // end Level
 }

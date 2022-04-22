@@ -164,8 +164,11 @@ void Gameplay::update(float delta) {
     input.second.update();
   }
 
-  Subworld& subworld = level.getSubworld(current_subworld);
+  if (level.timer > 0.f) {
+    level.timer = std::max(level.timer - delta, 0.f);
+  }
 
+  Subworld& subworld = level.getSubworld(current_subworld);
   subworld.update(delta);
 
   ticktime += delta;
@@ -355,11 +358,9 @@ void Gameplay::drawEntities() {
 }
 
 void Gameplay::drawHUD() {
+  hud->clear(sf::Color::Transparent);
+
   auto player_p_meter = 0;
-  auto basegame_coins = 0;
-  auto basegame_lives = 5;
-  auto basegame_score = 0;
-  auto world_timer = 300;
 
   std::stringstream worldnum;
   worldnum << util::highASCII("abcd") << '\0' << '-' << 1;
@@ -377,22 +378,22 @@ void Gameplay::drawHUD() {
   }
 
   std::stringstream coins;
-  coins << "$" << std::setw(2) << basegame_coins;
+  coins << "$" << std::setw(2) << getBaseGame()->getCoins();
 
   std::stringstream mario;
-  mario << util::highASCII("ABx") << std::setw(2) << basegame_lives;
+  mario << util::highASCII("ABx") << std::setw(2) << getBaseGame()->getLives();
 
   std::stringstream score;
-  score << std::internal << std::setw(7) << std::setfill('0') << basegame_score;
+  score << std::internal << std::setw(7) << std::setfill('0') << getBaseGame()->getScore();
 
   std::stringstream timerstr;
   timerstr << "@" << std::fixed << std::internal
            << std::setprecision(0) << std::setw(3) << std::setfill('0')
-           << int(std::ceil(world_timer));
+           << int(std::ceil(level.timer));
 
-  //TextStyle align_left;
-  drawText(hud, worldnum.str(), Vec2f(16, 16), TextStyle("smb3_sbfont"));
-  drawText(hud, mario.str(), Vec2f(16, 24), TextStyle("smb3_sbfont"));
+  TextStyle align_left("smb3_sbfont");
+  drawText(hud, worldnum.str(), Vec2f(16, 16), align_left);
+  drawText(hud, mario.str(), Vec2f(16, 24), align_left);
 
   TextStyle align_right("smb3_sbfont", TextStyle::Flags::ALIGN_RIGHT);
   drawText(hud, timerstr.str(), Vec2f(48, 16), align_right);

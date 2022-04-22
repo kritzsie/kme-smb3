@@ -335,5 +335,37 @@ void BaseGame::update(float delta) {
 
 void BaseGame::draw(float delta) {}
 
+UInt BaseGame::getCoins() const {
+  return coins;
+}
+
+UInt BaseGame::getLives() const {
+  return lives;
+}
+
+ULong BaseGame::getScore() const {
+  return score;
+}
+
+void BaseGame::addCoins(int count) {
+  coins = util::absmod(coins + count, 100);
+}
+
+void BaseGame::addLives(int count) {
+  lives = std::max(0, std::min(lives + count, 99));
+}
+
+void BaseGame::addScore(int count) {
+  score += count;
+}
+
+void BaseGame::addScore(long count) {
+  score += count;
+}
+
+void BaseGame::addScore(ULong count) {
+  score += count;
+}
+
 BaseGame::BaseGame(BaseState* parent, Engine* engine) : BaseState(parent, engine) {}
 }

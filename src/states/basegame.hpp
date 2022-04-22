@@ -2,6 +2,7 @@
 
 #include "basestate.hpp"
 
+#include "../types.hpp"
 #include "basegame/ecs/entitydata.hpp"
 #include "basegame/theme.hpp"
 #include "basegame/tiledefs.hpp"
@@ -29,6 +30,16 @@ public:
   void update(float delta) final;
   void draw(float delta) final;
 
+  UInt getCoins() const;
+  UInt getLives() const;
+  ULong getScore() const;
+
+  void addCoins(int count);
+  void addLives(int count);
+  void addScore(int count);
+  void addScore(long count);
+  void addScore(ULong count);
+
 private:
   bool paused = false;
 
@@ -37,5 +48,10 @@ public:
   TileDefs level_tile_data;
 
   std::unordered_map<std::string, std::shared_ptr<Theme>> themes;
+
+private:
+  UByte coins = 0;
+  UByte lives = 5;
+  ULong score = 0;
 };
 }

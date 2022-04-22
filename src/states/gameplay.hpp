@@ -61,6 +61,13 @@ public:
 private:
   BaseGame* getBaseGame();
 
+public:
+  KeyMap keybinds;
+  ButtonMap buttonbinds;
+  AxisMap axisbinds;
+  InputMap inputs;
+
+private:
   void drawBackground(sf::Color color);
   // parallax here is a factor from 0.0 to 1.0, not distance
   void drawBackground(std::string texture, Vec2f offset, Vec2f parallax,
@@ -87,11 +94,5 @@ private:
 
   std::size_t current_subworld = 0;
   Level level;
-
-public:
-  KeyMap keybinds;
-  ButtonMap buttonbinds;
-  AxisMap axisbinds;
-  InputMap inputs;
 };
 }
