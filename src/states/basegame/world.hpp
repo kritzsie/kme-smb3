@@ -31,6 +31,9 @@ public:
   float getGravity() const;
   void setGravity(float value);
 
+  std::string getStyle() const;
+  void setStyle(std::string style);
+
   void update(float delta);
 
   Entity player;
@@ -45,6 +48,8 @@ private:
 
   Rect<int> bounds;
   float gravity = -60.f;
+
+  std::string style;
 };
 // end Subworld
 

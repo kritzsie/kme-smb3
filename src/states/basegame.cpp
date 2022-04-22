@@ -1,8 +1,11 @@
 #include "basegame.hpp"
 
 #include "basegame/ecs/components.hpp"
+#include "basegame/style.hpp"
 #include "gameplay.hpp"
 #include "../engine.hpp"
+
+#include <SFML/Graphics.hpp>
 
 #include <sstream>
 #include <utility>
@@ -249,6 +252,23 @@ void BaseGame::enter() {
 
   mario_rs.pushFrame("DEATH", "mariodeath", Rect<int>(0, 0, 16, 16), Vec2f(7, -1), 0.f);
   entity_data.registerRenderStates("PlayerMario", std::move(mario_rs));
+
+  auto overworld_blocks = std::make_unique<Style>();
+  overworld_blocks->background = sf::Color(0x6898F8FF);
+  overworld_blocks->layers[0] = {
+    .texture = "overworldblockstop",
+    .offset = Vec2f(128.f, -11.f),
+    .parallax = Vec2f(0.375f, 0.25f),
+    .repeat_y = false
+  };
+  overworld_blocks->layers[1] = {
+    .texture = "cloudlayer",
+    .offset = Vec2f(0.f, 224.f),
+    .parallax = Vec2f(0.75f, 0.125f),
+    .repeat_y = false
+  };
+  overworld_blocks->music = "overworld.spc";
+  styles["overworld_blocks"] = std::move(overworld_blocks);
 }
 
 void BaseGame::exit() {}

@@ -60,6 +60,16 @@ void Subworld::setGravity(float value) {
   gravity = value;
 }
 
+std::string Subworld::getStyle() const {
+  return style;
+}
+
+void Subworld::setStyle(std::string style_new) {
+  style = style_new;
+  auto style_ptr = basegame->styles.at(style);
+  gameplay->playMusic(style_ptr->music);
+}
+
 // begin ugly
 static Rect<float> toAABB(Vec2f pos, CCollision box) {
   return Rect<float>(pos.x - box.radius, pos.y, box.radius * 2.f, box.height);

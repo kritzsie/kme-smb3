@@ -65,8 +65,6 @@ Gameplay::Gameplay(BaseState* parent, Engine* engine)
   buttonbinds[std::tuple(0, 3)] = Action::RUN;
   buttonbinds[std::tuple(0, 6)] = Action::SELECT;
   buttonbinds[std::tuple(0, 7)] = Action::PAUSE;
-
-  playMusic("overworld.spc");
 }
 
 Gameplay::~Gameplay() {
@@ -120,6 +118,11 @@ bool Gameplay::handleInput(sf::Event::EventType type, const sf::Event& event) {
 void Gameplay::enter() {
   Subworld& subworld = level.getSubworld(current_subworld);
 
+  MapLoader loader = MapLoader("1-1/0");
+  subworld.setBounds(loader.getBounds());
+  subworld.setStyle(loader.getStyle());
+  loader.loadTiles(subworld.getTiles());
+
   // entities
   auto& entities = subworld.getEntities();
 
@@ -141,10 +144,6 @@ void Gameplay::enter() {
   entities.emplace<CPosition>(camera, Vec2f(15.f, 8.4375f));
   entities.emplace<CCollision>(camera, 15.f, 16.875f);
   subworld.camera = camera;
-
-  MapLoader loader = MapLoader("1-1/0");
-  subworld.setBounds(loader.getBounds());
-  loader.loadTiles(subworld.getTiles());
 }
 
 void Gameplay::exit() {}
@@ -197,9 +196,13 @@ void Gameplay::draw(float delta) {
     view.setCenter(toScreen(camera_pos));
     framebuffer->setView(view);
 
-    drawBackground(sf::Color(0x6898F8FF));
-    drawBackground("overworldblockstop", Vec2f(128.f, 11.f), Vec2f(0.375f, 0.25f));
-    drawBackground("cloudlayer", Vec2f(0.f, -224.f), Vec2f(0.75f, 0.125f));
+    std::string style = subworld.getStyle();
+    auto style_ptr = getBaseGame()->styles.at(style);
+    drawBackground(style_ptr->background);
+    for (auto it : style_ptr->layers) {
+      const auto& layer = it.second;
+      drawBackground(layer.texture, layer.offset, layer.parallax, layer.repeat_y);
+    }
 
     drawTiles();
 
@@ -253,8 +256,7 @@ void Gameplay::drawBackground(std::string texture, Vec2f offset, Vec2f parallax,
       sf::Sprite sprite(sf_texture);
       Vec2f pos = Vec2f((start.x * parallax.x * 16.f) + x * size.x,
                       -((start.y * parallax.y * 16.f) + y * size.y + size.y));
-      pos.x -= offset.x;
-      pos.y += offset.y;
+      pos -= offset;
       sprite.setPosition(pos);
       framebuffer->draw(sprite);
     }
@@ -264,8 +266,7 @@ void Gameplay::drawBackground(std::string texture, Vec2f offset, Vec2f parallax,
       sf::Sprite sprite(sf_texture);
       Vec2f pos = Vec2f((start.x * parallax.x * 16.f) + x * size.x,
                       -((start.y * parallax.y * 16.f) + size.y));
-      pos.x -= offset.x;
-      pos.y += offset.y;
+      pos -= offset;
       sprite.setPosition(pos);
       framebuffer->draw(sprite);
     }

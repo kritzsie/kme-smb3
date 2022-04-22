@@ -1,9 +1,13 @@
 #pragma once
 
 #include "basestate.hpp"
-//#include "basegame/entitydata.hpp"
+
 #include "basegame/ecs/entitydata.hpp"
+#include "basegame/style.hpp"
 #include "basegame/tiledefs.hpp"
+
+#include <memory>
+#include <unordered_map>
 
 namespace kme {
 class BaseGame final : public BaseState {
@@ -31,5 +35,7 @@ private:
 public:
   EntityData entity_data;
   TileDefs level_tile_data;
+
+  std::unordered_map<std::string, std::shared_ptr<Style>> styles;
 };
 }

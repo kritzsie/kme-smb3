@@ -25,7 +25,7 @@ MapLoader::MapLoader(std::string name) {
       std::string source = it["source"].asString();
       StringList path = util::split(ss.str(), "/");
       path.pop_back();
-      for (const auto& node : util::split(source, "/")) {
+      for (std::string node : util::split(source, "/")) {
         path.push_back(node);
       }
       loadTileIDs(util::join(path, "/"), firstgid);
@@ -39,6 +39,15 @@ MapLoader::MapLoader(std::string name) {
 
 Rect<int> MapLoader::getBounds() const {
   return bounds;
+}
+
+std::string MapLoader::getStyle() const {
+  for (const auto& it : root["properties"]) {
+    if (it["name"].asString() == "style") {
+      return it["value"].asString();
+    }
+  }
+  return "overworld_blocks";
 }
 
 void MapLoader::loadTiles(Tilemap& tilemap) {
