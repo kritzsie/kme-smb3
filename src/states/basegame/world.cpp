@@ -113,29 +113,60 @@ void Subworld::update(float delta) {
 
     float max_x = run ? 12.f : 6.f;
 
-    if (~flags & EFlags::AIRBORNE) {
-      flags &= ~EFlags::DUCKING;
-      bbox.height = 25.f / 16.f;
-    }
-
-    if (not jump) {
-      flags &= ~EFlags::NOGRAVITY;
-    }
-
     if (x != 0) {
-      flags |= EFlags::NOFRICTION;
       direction = toSign(x);
-      if (direction * vel.x < 0) {
-        vel.x += direction * 16.f * delta;
-      }
-      vel.x = vel.x + direction * 16.f * delta;
-      vel.x = std::clamp(vel.x, -max_x, max_x);
     }
-    else {
-      flags &= ~EFlags::NOFRICTION;
-      if (duck and ~flags & EFlags::AIRBORNE) {
+
+    if (flags & EFlags::AIRBORNE) {
+      flags |= EFlags::NOFRICTION;
+      if (x > 0) {
+        if (vel.x <= max_x) {
+          if (vel.x < 0) {
+            vel.x += 16.f * delta;
+          }
+          vel.x += 16.f * delta;
+          vel.x = std::min(vel.x, max_x);
+        }
+      }
+      else if (x < 0) {
+        if (vel.x >= -max_x) {
+          if (vel.x > 0) {
+            vel.x -= 16.f * delta;
+          }
+          vel.x -= 16.f * delta;
+          vel.x = std::max(vel.x, -max_x);
+        }
+      }
+    }
+    else if (x != 0) {
+      if (x > 0) {
+        if (vel.x <= max_x) {
+          flags |= EFlags::NOFRICTION;
+          vel.x += (vel.x < 0 ? 32.f : 16.f) * delta;
+          vel.x = std::min(vel.x, max_x);
+        }
+      }
+      else if (x < 0) {
+        if (vel.x >= -max_x) {
+          flags |= EFlags::NOFRICTION;
+          vel.x -= (vel.x > 0 ? 32.f : 16.f) * delta;
+          vel.x = std::max(vel.x, -max_x);
+        }
+      }
+    }
+
+    if (~flags & EFlags::AIRBORNE) {
+      if (x == 0 or std::abs(vel.x) > max_x) {
+        flags &= ~EFlags::NOFRICTION;
+      }
+
+      if (duck and x == 0) {
         flags |= EFlags::DUCKING;
         bbox.height = 15.f / 16.f;
+      }
+      else {
+        flags &= ~EFlags::DUCKING;
+        bbox.height = 25.f / 16.f;
       }
     }
 
@@ -156,6 +187,7 @@ void Subworld::update(float delta) {
       }
     }
     else {
+      flags &= ~EFlags::NOGRAVITY;
       timer.jump = 0.f;
     }
 
