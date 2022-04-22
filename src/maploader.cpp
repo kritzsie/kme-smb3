@@ -41,9 +41,9 @@ Rect<int> MapLoader::getBounds() const {
   return bounds;
 }
 
-std::string MapLoader::getStyle() const {
+std::string MapLoader::getTheme() const {
   for (const auto& it : root["properties"]) {
-    if (it["name"].asString() == "style") {
+    if (it["name"].asString() == "theme") {
       return it["value"].asString();
     }
   }

@@ -1,7 +1,7 @@
 #include "basegame.hpp"
 
 #include "basegame/ecs/components.hpp"
-#include "basegame/style.hpp"
+#include "basegame/theme.hpp"
 #include "gameplay.hpp"
 #include "../engine.hpp"
 
@@ -253,7 +253,7 @@ void BaseGame::enter() {
   mario_rs.pushFrame("DEATH", "mariodeath", Rect<int>(0, 0, 16, 16), Vec2f(7, -1), 0.f);
   entity_data.registerRenderStates("PlayerMario", std::move(mario_rs));
 
-  auto overworld_blocks = std::make_unique<Style>();
+  auto overworld_blocks = std::make_unique<Theme>();
   overworld_blocks->background = sf::Color(0x6898F8FF);
   overworld_blocks->layers[0] = {
     .texture = "overworldblockstop",
@@ -268,9 +268,9 @@ void BaseGame::enter() {
     .repeat_y = false
   };
   overworld_blocks->music = "overworld.spc";
-  styles["overworld_blocks"] = std::move(overworld_blocks);
+  themes["overworld_blocks"] = std::move(overworld_blocks);
 
-  auto athletic_hills = std::make_unique<Style>();
+  auto athletic_hills = std::make_unique<Theme>();
   athletic_hills->background = sf::Color(0x6898F8FF);
   athletic_hills->layers[-1] = {
     .texture = "athletichills",
@@ -285,9 +285,9 @@ void BaseGame::enter() {
     .repeat_y = false
   };
   athletic_hills->music = "athletic.spc";
-  styles["athletic_hills"] = std::move(athletic_hills);
+  themes["athletic_hills"] = std::move(athletic_hills);
 
-  auto overworld_cave = std::make_unique<Style>();
+  auto overworld_cave = std::make_unique<Theme>();
   overworld_cave->background = sf::Color(0x6898F8FF);
   overworld_cave->layers[-1] = {
     .texture = "overworldcaveback",
@@ -302,9 +302,9 @@ void BaseGame::enter() {
     .repeat_y = false
   };
   overworld_cave->music = "underworld.spc";
-  styles["overworld_cave"] = std::move(overworld_cave);
+  themes["overworld_cave"] = std::move(overworld_cave);
 
-  auto waterworld = std::make_unique<Style>();
+  auto waterworld = std::make_unique<Theme>();
   waterworld->background = sf::Color(0x080060FF);
   waterworld->layers[0] = {
     .texture = "waterworld",
@@ -313,7 +313,7 @@ void BaseGame::enter() {
     .repeat_y = false
   };
   waterworld->music = "swimming.spc";
-  styles["waterworld"] = std::move(waterworld);
+  themes["waterworld"] = std::move(waterworld);
 }
 
 void BaseGame::exit() {}

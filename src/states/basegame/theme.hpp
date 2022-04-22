@@ -14,7 +14,7 @@ struct Layer {
   bool repeat_y;
 };
 
-struct Style {
+struct Theme {
   sf::Color background;
   std::map<int, Layer> layers;
   std::string music;

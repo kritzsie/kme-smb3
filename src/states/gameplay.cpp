@@ -120,7 +120,7 @@ void Gameplay::enter() {
 
   MapLoader loader = MapLoader("1-1/0");
   subworld.setBounds(loader.getBounds());
-  subworld.setStyle(loader.getStyle());
+  subworld.setTheme(loader.getTheme());
   loader.loadTiles(subworld.getTiles());
 
   // entities
@@ -196,10 +196,10 @@ void Gameplay::draw(float delta) {
     view.setCenter(toScreen(camera_pos));
     framebuffer->setView(view);
 
-    std::string style = subworld.getStyle();
-    auto style_ptr = getBaseGame()->styles.at(style);
-    drawBackground(style_ptr->background);
-    for (auto it : style_ptr->layers) {
+    std::string theme = subworld.getTheme();
+    auto theme_ptr = getBaseGame()->themes.at(theme);
+    drawBackground(theme_ptr->background);
+    for (auto it : theme_ptr->layers) {
       const auto& layer = it.second;
       drawBackground(layer.texture, layer.offset, layer.parallax, layer.repeat_y);
     }

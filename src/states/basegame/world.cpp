@@ -60,14 +60,14 @@ void Subworld::setGravity(float value) {
   gravity = value;
 }
 
-std::string Subworld::getStyle() const {
-  return style;
+std::string Subworld::getTheme() const {
+  return theme;
 }
 
-void Subworld::setStyle(std::string style_new) {
-  style = style_new;
-  auto style_ptr = basegame->styles.at(style);
-  gameplay->playMusic(style_ptr->music);
+void Subworld::setTheme(std::string theme_new) {
+  theme = theme_new;
+  auto theme_ptr = basegame->themes.at(theme);
+  gameplay->playMusic(theme_ptr->music);
 }
 
 // begin ugly

@@ -16,7 +16,7 @@ public:
   MapLoader(std::string name);
 
   Rect<int> getBounds() const;
-  std::string getStyle() const;
+  std::string getTheme() const;
   void loadTiles(Tilemap& tilemap);
 
 private:

@@ -2,7 +2,7 @@
 
 #include "../basegame.hpp"
 #include "ecs/ecs.hpp"
-#include "style.hpp"
+#include "theme.hpp"
 #include "tilemap.hpp"
 
 #include <unordered_map>
@@ -31,8 +31,8 @@ public:
   float getGravity() const;
   void setGravity(float value);
 
-  std::string getStyle() const;
-  void setStyle(std::string style);
+  std::string getTheme() const;
+  void setTheme(std::string theme);
 
   void update(float delta);
 
@@ -49,7 +49,7 @@ private:
   Rect<int> bounds;
   float gravity = -60.f;
 
-  std::string style;
+  std::string theme;
 };
 // end Subworld
 
