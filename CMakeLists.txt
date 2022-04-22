@@ -26,6 +26,7 @@ add_executable(
   src/engine.cpp
   src/maploader.cpp
   src/music.cpp
+  src/renderer.cpp
   src/sound.cpp
   src/renderstates.cpp
   src/main.cpp

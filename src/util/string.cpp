@@ -7,6 +7,17 @@
 #include <string>
 
 namespace kme::util {
+char highASCII(char c) {
+  return c |= 128;
+}
+
+std::string highASCII(std::string str) {
+  for (auto& c : str) {
+    c = highASCII(c);
+  }
+  return str;
+}
+
 std::string trim(const std::string& str, const std::string& pattern) {
   std::string result = str;
   std::regex front("^" + pattern);

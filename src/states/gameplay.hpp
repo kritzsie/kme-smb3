@@ -67,6 +67,7 @@ private:
                       bool vertical_tiling = false);
   void drawTiles();
   void drawEntities();
+  void drawHUD();
 
   Vec2f fromScreen(Vec2f pos);
   Vec2f toScreen(Vec2f pos);
@@ -78,6 +79,8 @@ private:
   float rendertime = 0.f;
 
   sf::RenderTexture* framebuffer = nullptr;
+  sf::RenderTexture* scene = nullptr;
+  sf::RenderTexture* hud = nullptr;
 
   Vec2f camera_pos;
   Vec2f camera_radius;

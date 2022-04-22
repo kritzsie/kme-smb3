@@ -27,6 +27,7 @@ using Int64 = SInt64;
 
 // Less common types
 using Byte = signed char;
+using UByte = unsigned char;
 using UShort = unsigned short;
 using UInt = unsigned int;
 using ULong = unsigned long;

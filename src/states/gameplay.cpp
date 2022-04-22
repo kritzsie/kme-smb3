@@ -5,8 +5,10 @@
 #include "../assetmanager.hpp"
 #include "../engine.hpp"
 #include "../maploader.hpp"
+#include "../renderer.hpp"
 #include "../util.hpp"
 
+#include <iomanip>
 #include <map>
 #include <vector>
 
@@ -23,7 +25,12 @@ Gameplay::Gameplay(BaseState* parent, Engine* engine)
 : BaseState(parent, engine)
 , level(getBaseGame(), this) {
   framebuffer = new sf::RenderTexture;
+  scene = new sf::RenderTexture;
+  hud = new sf::RenderTexture;
+
   framebuffer->create(480, 270);
+  scene->create(480, 270);
+  hud->create(480, 270);
 
   camera_pos = Vec2f(15.f, 8.4375f);
   camera_radius = Vec2f(15.f, 8.4375f);
@@ -68,8 +75,8 @@ Gameplay::Gameplay(BaseState* parent, Engine* engine)
 }
 
 Gameplay::~Gameplay() {
-  if (framebuffer != nullptr) {
-    delete framebuffer;
+  if (scene != nullptr) {
+    delete scene;
   }
 }
 
@@ -81,7 +88,7 @@ bool Gameplay::handleInput(sf::Event::EventType type, const sf::Event& event) {
   switch (type) {
   case sf::Event::KeyPressed:
   case sf::Event::KeyReleased: {
-    const auto& it = keybinds.find(event.key.code);
+    auto it = keybinds.find(event.key.code);
     if (it != keybinds.end()) {
       inputs[it->second] = sf::Keyboard::isKeyPressed(event.key.code);
     }
@@ -91,11 +98,11 @@ bool Gameplay::handleInput(sf::Event::EventType type, const sf::Event& event) {
     const auto& js = event.joystickMove;
     Sign sign = toSign(js.position);
     float pos = std::abs(js.position / 100.f);
-    const auto& it_pos = axisbinds.find(std::tuple(js.joystickId, js.axis, Sign::PLUS));
+    auto it_pos = axisbinds.find(std::tuple(js.joystickId, js.axis, Sign::PLUS));
     if (it_pos != axisbinds.end()) {
       inputs[it_pos->second] = sign == Sign::PLUS ? pos : 0;
     }
-    const auto& it_neg = axisbinds.find(std::tuple(js.joystickId, js.axis, Sign::MINUS));
+    auto it_neg = axisbinds.find(std::tuple(js.joystickId, js.axis, Sign::MINUS));
     if (it_neg != axisbinds.end()) {
       inputs[it_neg->second] = sign == Sign::MINUS ? pos : 0;
     }
@@ -103,7 +110,7 @@ bool Gameplay::handleInput(sf::Event::EventType type, const sf::Event& event) {
   case sf::Event::JoystickButtonPressed:
   case sf::Event::JoystickButtonReleased: {
     const auto& js = event.joystickButton;
-    const auto& it = buttonbinds.find(std::tuple(js.joystickId, js.button));
+    auto it = buttonbinds.find(std::tuple(js.joystickId, js.button));
     if (it != buttonbinds.end()) {
       inputs[it->second] = sf::Joystick::isButtonPressed(js.joystickId, js.button);
     }
@@ -192,9 +199,9 @@ void Gameplay::draw(float delta) {
     camera_pos = fromScreen(camera_pos);
 
     // set view to camera
-    sf::View view = framebuffer->getView();
+    sf::View view = scene->getView();
     view.setCenter(toScreen(camera_pos));
-    framebuffer->setView(view);
+    scene->setView(view);
 
     std::string theme = subworld.getTheme();
     auto theme_ptr = getBaseGame()->themes.at(theme);
@@ -208,6 +215,8 @@ void Gameplay::draw(float delta) {
 
     drawEntities();
 
+    drawHUD();
+
     // trusty debug rectangle (draws a rectangle around the camera viewport)
     /*
     sf::RectangleShape rect;
@@ -220,6 +229,11 @@ void Gameplay::draw(float delta) {
     framebuffer->draw(rect);
     */
 
+    scene->display();
+    hud->display();
+
+    framebuffer->draw(sf::Sprite(scene->getTexture()));
+    framebuffer->draw(sf::Sprite(hud->getTexture()));
     framebuffer->display();
 
     window->getFramebuffer()->draw(sf::Sprite(framebuffer->getTexture()));
@@ -229,7 +243,7 @@ void Gameplay::draw(float delta) {
 }
 
 void Gameplay::drawBackground(sf::Color color) {
-  framebuffer->clear(color);
+  scene->clear(color);
 }
 
 // NOTE: this function could use a few improvements
@@ -258,7 +272,7 @@ void Gameplay::drawBackground(std::string texture, Vec2f offset, Vec2f parallax,
                       -((start.y * parallax.y * 16.f) + y * size.y + size.y));
       pos -= offset;
       sprite.setPosition(pos);
-      framebuffer->draw(sprite);
+      scene->draw(sprite);
     }
   }
   else {
@@ -268,7 +282,7 @@ void Gameplay::drawBackground(std::string texture, Vec2f offset, Vec2f parallax,
                       -((start.y * parallax.y * 16.f) + size.y));
       pos -= offset;
       sprite.setPosition(pos);
-      framebuffer->draw(sprite);
+      scene->draw(sprite);
     }
   }
 }
@@ -302,7 +316,7 @@ void Gameplay::drawTiles() {
         Vec2<int> pos = tile.getPos();
         sf::Sprite sprite(gfx.getTile(texture), tiledef.getFrame(frame).cliprect);
         sprite.setPosition(sf::Vector2f(pos.x * 16.f, -(pos.y * 16.f + 16.f)));
-        framebuffer->draw(sprite);
+        scene->draw(sprite);
       }
     }
   }
@@ -335,9 +349,58 @@ void Gameplay::drawEntities() {
       pos_render.y = std::floor(pos_render.y + 0.5f);
       sprite.setPosition(pos_render);
       sprite.setScale(scale);
-      framebuffer->draw(sprite);
+      scene->draw(sprite);
     }
   }
+}
+
+void Gameplay::drawHUD() {
+  auto player_p_meter = 0;
+  auto basegame_coins = 0;
+  auto basegame_lives = 5;
+  auto basegame_score = 0;
+  auto world_timer = 300;
+
+  std::stringstream worldnum;
+  worldnum << util::highASCII("abcd") << '\0' << '-' << 1;
+
+  std::stringstream p_meter;
+  for (std::size_t i = 0; i < 6; ++i) {
+    p_meter << (player_p_meter >= (i + 1) ? util::highASCII('>') : '>');
+  }
+  if (player_p_meter >= 7.f
+  and std::fmod(rendertime, 0.25f) > 0.125f) {
+    p_meter << util::highASCII("()");
+  }
+  else {
+    p_meter << "()";
+  }
+
+  std::stringstream coins;
+  coins << "$" << std::setw(2) << basegame_coins;
+
+  std::stringstream mario;
+  mario << util::highASCII("ABx") << std::setw(2) << basegame_lives;
+
+  std::stringstream score;
+  score << std::internal << std::setw(7) << std::setfill('0') << basegame_score;
+
+  std::stringstream timerstr;
+  timerstr << "@" << std::fixed << std::internal
+           << std::setprecision(0) << std::setw(3) << std::setfill('0')
+           << int(std::ceil(world_timer));
+
+  //TextStyle align_left;
+  drawText(hud, worldnum.str(), Vec2f(16, 16), TextStyle("smb3_sbfont"));
+  drawText(hud, mario.str(), Vec2f(16, 24), TextStyle("smb3_sbfont"));
+
+  TextStyle align_right("smb3_sbfont", TextStyle::Flags::ALIGN_RIGHT);
+  drawText(hud, timerstr.str(), Vec2f(48, 16), align_right);
+  drawText(hud, coins.str(), Vec2f(16, 16), align_right);
+  drawText(hud, score.str(), Vec2f(16, 24), align_right);
+
+  TextStyle align_bottom("smb3_sbfont", TextStyle::Flags::ALIGN_BOTTOM);
+  drawText(hud, p_meter.str(), Vec2f(64, 6), align_bottom);
 }
 
 Vec2f Gameplay::fromScreen(Vec2f pos) {

@@ -6,6 +6,9 @@
 #include <vector>
 
 namespace kme::util {
+char highASCII(char str);
+std::string highASCII(std::string str);
+
 std::string trim(const std::string& str, const std::string& pattern);
 std::string trim(const std::string& str);
 
