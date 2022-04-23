@@ -136,7 +136,7 @@ void Gameplay::enter() {
   auto player = entities.create();
   entities.emplace<CInfo>(player, true, "PlayerMario");
   entities.emplace<CPosition>(player, Vec2f(2.f, 1.f));
-  entities.emplace<CCollision>(player, 7.f / 16.f, 25.f / 16.f);
+  entities.emplace<CCollision>(player, 4.f / 16.f, 25.f / 16.f);
   entities.emplace<CFlags>(player);
   entities.emplace<CState>(player);
   entities.emplace<CCounters>(player);

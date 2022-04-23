@@ -304,16 +304,27 @@ void BaseGame::enter() {
   overworld_cave->music = "underworld.spc";
   themes["overworld_cave"] = std::move(overworld_cave);
 
-  auto waterworld = std::make_unique<Theme>();
-  waterworld->background = sf::Color(0x080060FF);
-  waterworld->layers[0] = {
+  auto water = std::make_unique<Theme>();
+  water->background = sf::Color(0x080060FF);
+  water->layers[0] = {
     .texture = "waterworld",
     .offset = Vec2f(0.f, -11.f),
     .parallax = Vec2f(0.375f, 0.f),
     .repeat_y = false
   };
-  waterworld->music = "swimming.spc";
-  themes["waterworld"] = std::move(waterworld);
+  water->music = "swimming.spc";
+  themes["water"] = std::move(water);
+
+  auto bonus_room = std::make_unique<Theme>();
+  bonus_room->background = sf::Color::Black;
+  bonus_room->layers[0] = {
+    .texture = "bonusquestion",
+    .offset = Vec2f(0.f, 0.f),
+    .parallax = Vec2f(0.f, 0.f),
+    .repeat_y = true
+  };
+  bonus_room->music = "underworld.spc";
+  themes["bonus_room"] = std::move(bonus_room);
 }
 
 void BaseGame::exit() {}

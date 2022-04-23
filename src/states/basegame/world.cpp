@@ -238,7 +238,7 @@ void Subworld::update(float delta) {
           audio.channels.slip = gameplay->playSoundLoop("slip");
         }
       }
-      else if (counters.p_meter >= 6.25f) {
+      else if (std::abs(vel.x) >= 13.f) {
         state = EState::RUN;
       }
       else if (vel.x != 0) {
