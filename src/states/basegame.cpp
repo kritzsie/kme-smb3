@@ -235,8 +235,8 @@ void BaseGame::enter() {
   RenderStates mario_rs;
   mario_rs.pushFrame("IDLE", "smallmariowalk_0", Rect<int>(0, 0, 12, 15), Vec2f(6, -1), 0.f);
 
-  mario_rs.pushFrame("WALK", "smallmariowalk_1", Rect<int>(0, 0, 15, 16), Vec2f(8, -1), 0.125f);
-  mario_rs.pushFrame("WALK", "smallmariowalk_0", Rect<int>(0, 0, 12, 15), Vec2f(6, -1), 0.125f);
+  mario_rs.pushFrame("WALK", "smallmariowalk_1", Rect<int>(0, 0, 15, 16), Vec2f(8, -1), 8.f / 60.f);
+  mario_rs.pushFrame("WALK", "smallmariowalk_0", Rect<int>(0, 0, 12, 15), Vec2f(6, -1), 8.f / 60.f);
 
   mario_rs.pushFrame("RUN", "smallmariorun_1", Rect<int>(0, 0, 16, 16), Vec2f(8, -1), 1.f / 60.f);
   mario_rs.pushFrame("RUN", "smallmariorun_0", Rect<int>(0, 0, 16, 16), Vec2f(8, -1), 1.f / 60.f);
@@ -251,10 +251,10 @@ void BaseGame::enter() {
 
   mario_rs.pushFrame("IDLE.BIG", "bigmariowalk_0", Rect<int>(0, 0, 14, 27), Vec2f(6, -1), 0.f);
 
-  mario_rs.pushFrame("WALK.BIG", "bigmariowalk_1", Rect<int>(0, 0, 16, 27), Vec2f(8, -1), 0.125f);
-  mario_rs.pushFrame("WALK.BIG", "bigmariowalk_2", Rect<int>(0, 0, 16, 26), Vec2f(8, 0), 0.125f);
-  mario_rs.pushFrame("WALK.BIG", "bigmariowalk_1", Rect<int>(0, 0, 16, 27), Vec2f(8, -1), 0.125f);
-  mario_rs.pushFrame("WALK.BIG", "bigmariowalk_0", Rect<int>(0, 0, 14, 27), Vec2f(6, -1), 0.125f);
+  mario_rs.pushFrame("WALK.BIG", "bigmariowalk_1", Rect<int>(0, 0, 16, 27), Vec2f(8, -1), 8.f / 60.f);
+  mario_rs.pushFrame("WALK.BIG", "bigmariowalk_2", Rect<int>(0, 0, 16, 26), Vec2f(8, 0), 8.f / 60.f);
+  mario_rs.pushFrame("WALK.BIG", "bigmariowalk_1", Rect<int>(0, 0, 16, 27), Vec2f(8, -1), 8.f / 60.f);
+  mario_rs.pushFrame("WALK.BIG", "bigmariowalk_0", Rect<int>(0, 0, 14, 27), Vec2f(6, -1), 8.f / 60.f);
 
   mario_rs.pushFrame("RUN.BIG", "bigmariorun_1", Rect<int>(0, 0, 19, 27), Vec2f(10, -1), 1.f / 60.f);
   mario_rs.pushFrame("RUN.BIG", "bigmariorun_2", Rect<int>(0, 0, 19, 26), Vec2f(10, 0), 1.f / 60.f);
@@ -269,6 +269,17 @@ void BaseGame::enter() {
 
   mario_rs.pushFrame("DUCK.BIG", "bigmarioduck", Rect<int>(0, 0, 14, 18), Vec2f(6, -1), 0.f);
   entity_data.registerRenderStates("PlayerMario", std::move(mario_rs));
+
+  RenderStates mushroom_rs;
+  mushroom_rs.pushFrame("IDLE", "redmushroom", Rect<int>(0, 0, 16, 16), Vec2f(8, -1), 0.f);
+  entity_data.registerRenderStates("Mushroom", std::move(mushroom_rs));
+
+  RenderStates pswitch_rs;
+  pswitch_rs.pushFrame("IDLE", "pswitch_0", Rect<int>(0, 0, 16, 16), Vec2f(8, -1), 8.f / 60.f);
+  pswitch_rs.pushFrame("IDLE", "pswitch_1", Rect<int>(0, 0, 16, 16), Vec2f(8, -1), 8.f / 60.f);
+  pswitch_rs.pushFrame("IDLE", "pswitch_0", Rect<int>(0, 0, 16, 16), Vec2f(8, -1), 8.f / 60.f);
+  pswitch_rs.pushFrame("IDLE", "pswitch_2", Rect<int>(0, 0, 16, 16), Vec2f(8, -1), 8.f / 60.f);
+  entity_data.registerRenderStates("PSwitch", std::move(pswitch_rs));
 
   auto overworld_blocks = std::make_unique<Theme>();
   overworld_blocks->background = sf::Color(0x6898F8FF);

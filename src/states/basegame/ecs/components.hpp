@@ -40,8 +40,11 @@ struct EFlags {
     NOGRAVITY  = 1 << 5,
     NOFRICTION = 1 << 6,
 
-    AIRBORNE   = 1 << 16,
-    LANDED     = 1 << 17
+    AIRBORNE   = 1 << 8,
+    LANDED     = 1 << 9,
+
+    ENEMY      = 1 << 16,
+    POWERUP    = 1 << 17
   };
 };
 

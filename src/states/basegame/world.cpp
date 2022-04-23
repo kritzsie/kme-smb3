@@ -86,6 +86,21 @@ void Subworld::update(float delta) {
     }
   }
 
+  // update render timer
+  auto render_view = entities.view<CRender>();
+  for (auto entity : render_view) {
+    auto& render = render_view.get<CRender>(entity);
+
+    auto vel_view = entities.view<CVelocity>();
+    if (vel_view.contains(entity)) {
+      Vec2f& vel = vel_view.get<CVelocity>(entity);
+      render.time += std::clamp(std::abs(vel.x) / 4.f, 1.f, 4.f) * delta;
+    }
+    else {
+      render.time += delta;
+    }
+  }
+
   // player entity
   if (entities.valid(player)) {
     auto& info = entities.get<CInfo>(player);
@@ -465,12 +480,11 @@ void Subworld::update(float delta) {
   }
 
   // drawable entities
-  auto render_view = entities.view<CInfo, CVelocity, CState, CRender>();
-  for (auto entity : render_view) {
-    auto& info = render_view.get<CInfo>(entity);
-    Vec2f& vel = render_view.get<CVelocity>(entity);
-    EState& state = render_view.get<CState>(entity);
-    auto& render = render_view.get<CRender>(entity);
+  auto renderstate_view = entities.view<CInfo, CState, CRender>();
+  for (auto entity : renderstate_view) {
+    auto& info = renderstate_view.get<CInfo>(entity);
+    EState& state = renderstate_view.get<CState>(entity);
+    auto& render = renderstate_view.get<CRender>(entity);
 
     auto states = basegame->entity_data.getRenderStates(info.type);
 
@@ -482,8 +496,6 @@ void Subworld::update(float delta) {
 
     std::string label = getRenderStateLabel(powerup, state);
     render.state.setState(label, states->getFrameOffset(label, render.time));
-
-    render.time += std::clamp(std::abs(vel.x) / 4.f, 1.f, 4.f) * delta;
   }
 }
 // end Subworld

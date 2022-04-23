@@ -158,6 +158,25 @@ void Gameplay::enter() {
   entities.emplace<CPosition>(camera, Vec2f(15.f, 8.4375f));
   entities.emplace<CCollision>(camera, Hitbox(15.f, 16.875f));
   subworld.camera = camera;
+
+  /*
+  auto mushroom = entities.create();
+  entities.emplace<CInfo>(mushroom, "Mushroom");
+  entities.emplace<CPosition>(mushroom, Vec2f(9.f, 1.f));
+  entities.emplace<CCollision>(mushroom, Hitbox(16.f, 16.f));
+  entities.emplace<CFlags>(mushroom, EFlags::POWERUP);
+  entities.emplace<CState>(mushroom);
+  entities.emplace<CRender>(mushroom);
+
+  auto pswitch = entities.create();
+  entities.emplace<CInfo>(pswitch, "PSwitch");
+  entities.emplace<CPosition>(pswitch, Vec2f(6.f, 1.f));
+  entities.emplace<CCollision>(pswitch, Hitbox(16.f, 16.f));
+  entities.emplace<CPowerup>(pswitch, player_powerup);
+  entities.emplace<CFlags>(pswitch);
+  entities.emplace<CState>(pswitch);
+  entities.emplace<CRender>(pswitch);
+  */
 }
 
 void Gameplay::exit() {}
@@ -226,18 +245,6 @@ void Gameplay::draw(float delta) {
     drawEntities();
 
     drawHUD();
-
-    // trusty debug rectangle (draws a rectangle around the camera viewport)
-    /*
-    sf::RectangleShape rect;
-    Vec2f pos_rect = (camera_pos - camera_radius) * 16.f + Vec2f(1.f, 269.f);
-    rect.setPosition(Vec2f(pos_rect.x, -pos_rect.y));
-    rect.setSize(Vec2f(478.f, 268.f));
-    rect.setFillColor(sf::Color(0));
-    rect.setOutlineColor(sf::Color::Red);
-    rect.setOutlineThickness(2.f);
-    framebuffer->draw(rect);
-    */
 
     scene->display();
     hud->display();
@@ -337,14 +344,19 @@ void Gameplay::drawEntities() {
   const EntityData& entity_data = getBaseGame()->entity_data;
   const EntityRegistry& entities = subworld.getEntities();
 
-  auto view = entities.view<CInfo, CPosition, CRender, CDirection>();
+  auto view = entities.view<CInfo, CPosition, CRender>();
   for (auto entity : view) {
     const auto& info = view.get<const CInfo>(entity);
     const Vec2f& pos = view.get<const CPosition>(entity);
     const auto& render = view.get<const CRender>(entity);
-    const Sign& direction = view.get<const CDirection>(entity);
 
-    const RenderFrame& frame = entity_data.getRenderStates(info.type)->getFrame(render.state);
+    const auto& frame = entity_data.getRenderStates(info.type)->getFrame(render.state);
+
+    Sign direction = Sign::PLUS;
+    auto direction_view = entities.view<CDirection>();
+    if (direction_view.contains(entity)) {
+      direction = direction_view.get<const CDirection>(entity);
+    }
 
     std::string spritename = frame.texture;
     if (spritename != "") {
