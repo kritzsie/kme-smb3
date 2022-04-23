@@ -97,7 +97,8 @@ void Subworld::update(float delta) {
     Sign& direction = entities.get<CDirection>(player);
     EState& state = entities.get<CState>(player);
     auto& bbox = entities.get<CCollision>(player);
-    auto& timer = entities.get<CTimer>(player);
+    auto& counters = entities.get<CCounters>(player);
+    auto& timers = entities.get<CTimers>(player);
     auto& render = entities.get<CRender>(player);
     auto& audio = entities.get<CAudio>(player);
 
@@ -111,7 +112,7 @@ void Subworld::update(float delta) {
     bool run  = gameplay->inputs.at(Gameplay::Action::RUN) > 0.25f;
     bool duck = gameplay->inputs.at(Gameplay::Action::DOWN) > 0.25f;
 
-    float max_x = run ? 12.f : 6.f;
+    float max_x = run ? (flags & EFlags::RUNNING ? 14.f : 12.f) : 6.f;
 
     if (x != 0) {
       direction = toSign(x);
@@ -170,17 +171,41 @@ void Subworld::update(float delta) {
       }
     }
 
+    if (~flags & EFlags::AIRBORNE and x != 0 and std::abs(vel.x) > 10.f) {
+      counters.p_meter = std::min(counters.p_meter + 6.f * delta, 6.5f);
+    }
+    else if (counters.p_meter > 0.f) {
+      if (~flags & EFlags::AIRBORNE
+      or  ~flags & EFlags::RUNNING) {
+        counters.p_meter = std::max(counters.p_meter - 2.5f * delta, 0.f);
+      }
+    }
+
+    if (counters.p_meter >= 6.f) {
+      flags |= EFlags::RUNNING;
+      if (audio.channels.speed == Sound::MAX_VOICES) {
+        audio.channels.speed = gameplay->playSoundLoop("running");
+      }
+    }
+    else {
+      flags &= ~EFlags::RUNNING;
+      if (audio.channels.speed != Sound::MAX_VOICES) {
+        gameplay->stopSoundLoop(audio.channels.speed);
+        audio.channels.speed = Sound::MAX_VOICES;
+      }
+    }
+
     if (jump) {
       if (~jump_input > 0 and ~flags & EFlags::AIRBORNE) {
         flags |= EFlags::AIRBORNE;
-        timer.jump = 0.275f + std::min(std::abs(vel.x) / 12.f / 10.f, 0.125f);
+        timers.jump = 0.275f + std::min(std::abs(vel.x) / 12.f / 10.f, 0.125f);
         gameplay->playSound("jump");
       }
 
-      if (flags & EFlags::AIRBORNE and timer.jump > 0.f) {
+      if (flags & EFlags::AIRBORNE and timers.jump > 0.f) {
         flags |= EFlags::NOGRAVITY;
         vel.y = 12.f;
-        timer.jump = std::max(timer.jump - 1.f * delta, 0.f);
+        timers.jump = std::max(timers.jump - 1.f * delta, 0.f);
       }
       else {
         flags &= ~EFlags::NOGRAVITY;
@@ -188,11 +213,8 @@ void Subworld::update(float delta) {
     }
     else {
       flags &= ~EFlags::NOGRAVITY;
-      timer.jump = 0.f;
+      timers.jump = 0.f;
     }
-
-    // TODO: implement p-speed
-    float p_meter = 0.f;
 
     EState state_prev = state;
     if (flags & EFlags::DEAD) {
@@ -202,15 +224,12 @@ void Subworld::update(float delta) {
       state = EState::DUCK;
     }
     else if (flags & EFlags::AIRBORNE) {
-      if (p_meter < 7.f) {
+      if (~flags & EFlags::RUNNING) {
         state = EState::AIRBORNE;
       }
       else {
         state = EState::RUNJUMP;
       }
-    }
-    else if (flags & EFlags::RUNNING) {
-      state = EState::RUN;
     }
     else if (~flags & EFlags::AIRBORNE) {
       if (x != 0 and direction * vel.x < 0) {
@@ -218,6 +237,9 @@ void Subworld::update(float delta) {
         if (audio.channels.slip == Sound::MAX_VOICES) {
           audio.channels.slip = gameplay->playSoundLoop("slip");
         }
+      }
+      else if (counters.p_meter >= 6.25f) {
+        state = EState::RUN;
       }
       else if (vel.x != 0) {
         state = EState::WALK;
@@ -277,12 +299,12 @@ void Subworld::update(float delta) {
 
   // collision code
   auto collide_view = entities.view<
-    CFlags, CTimer,
+    CFlags, CTimers,
     CPosition, CVelocity, CCollision
   >();
   for (auto entity : collide_view) {
     UInt32& flags = collide_view.get<CFlags>(entity);
-    auto& timer = collide_view.get<CTimer>(entity);
+    auto& timer = collide_view.get<CTimers>(entity);
     Vec2f& pos = collide_view.get<CPosition>(entity);
     Vec2f& vel = collide_view.get<CVelocity>(entity);
     auto& bbox = collide_view.get<CCollision>(entity);
@@ -428,7 +450,7 @@ void Subworld::update(float delta) {
     const EState& state = render_view.get<CState>(entity);
     auto& render = render_view.get<CRender>(entity);
 
-    auto& states = basegame->entity_data.getRenderStates(info.type);
+    auto states = basegame->entity_data.getRenderStates(info.type);
 
     switch (state) {
     case EState::AIRBORNE:
@@ -442,6 +464,12 @@ void Subworld::update(float delta) {
       break;
     case EState::WALK:
       render.state.setState("WALK", states->getFrameOffset("WALK", render.time));
+      break;
+    case EState::RUN:
+      render.state.setState("RUN", states->getFrameOffset("RUN", render.time));
+      break;
+    case EState::RUNJUMP:
+      render.state.setState("RUNJUMP", states->getFrameOffset("RUNJUMP", render.time));
       break;
     case EState::DEAD:
       render.state.setState("DEAD", states->getFrameOffset("DEAD", render.time));

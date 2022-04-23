@@ -48,8 +48,13 @@ struct CCollision {
   float height = 16.f;
 };
 
-struct CTimer {
+struct CCounters {
+  float p_meter = 0.f;
+};
+
+struct CTimers {
   float jump = 0.f;
+  float p_speed = 0.f;
 };
 
 enum class EState {

@@ -139,7 +139,8 @@ void Gameplay::enter() {
   entities.emplace<CCollision>(player, 7.f / 16.f, 25.f / 16.f);
   entities.emplace<CFlags>(player);
   entities.emplace<CState>(player);
-  entities.emplace<CTimer>(player);
+  entities.emplace<CCounters>(player);
+  entities.emplace<CTimers>(player);
   entities.emplace<CVelocity>(player);
   entities.emplace<CDirection>(player);
   entities.emplace<CRender>(player);
@@ -360,16 +361,18 @@ void Gameplay::drawEntities() {
 void Gameplay::drawHUD() {
   hud->clear(sf::Color::Transparent);
 
-  auto player_p_meter = 0;
+  const auto& subworld = level.getSubworld(current_subworld);
+  const auto& entities = subworld.getEntities();
+  const auto& counters = entities.get<CCounters>(subworld.player);
 
   std::stringstream worldnum;
   worldnum << util::highASCII("abcd") << '\0' << '-' << 1;
 
   std::stringstream p_meter;
   for (std::size_t i = 0; i < 6; ++i) {
-    p_meter << (player_p_meter >= (i + 1) ? util::highASCII('>') : '>');
+    p_meter << (counters.p_meter > i ? util::highASCII('>') : '>');
   }
-  if (player_p_meter >= 7.f
+  if (counters.p_meter >= 6.f
   and std::fmod(rendertime, 0.25f) > 0.125f) {
     p_meter << util::highASCII("()");
   }
