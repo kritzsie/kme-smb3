@@ -13,6 +13,7 @@ add_executable(
   src/states/basestate.cpp
   src/states/basegame/ecs/entitydata.cpp
   src/states/basegame/hitbox.cpp
+  src/states/basegame/powerup.cpp
   src/states/basegame/tiledefs.cpp
   src/states/basegame/tilemap.cpp
   src/states/basegame/world.cpp

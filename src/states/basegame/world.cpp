@@ -88,15 +88,20 @@ void Subworld::update(float delta) {
 
   // player entity
   if (entities.valid(player)) {
+    auto& info = entities.get<CInfo>(player);
     UInt32& flags = entities.get<CFlags>(player);
     Vec2f& vel = entities.get<CVelocity>(player);
     Sign& direction = entities.get<CDirection>(player);
     EState& state = entities.get<CState>(player);
+    auto& powerup = entities.get<CPowerup>(player);
     auto& coll = entities.get<CCollision>(player);
     auto& counters = entities.get<CCounters>(player);
     auto& timers = entities.get<CTimers>(player);
     auto& render = entities.get<CRender>(player);
     auto& audio = entities.get<CAudio>(player);
+
+    auto hitboxes = basegame->entity_data.getHitboxes(info.type);
+    auto hitbox_states = hitboxes->at(powerup.state);
 
     float x = 0.f;
     x += gameplay->inputs.at(Gameplay::Action::RIGHT) > 0.25f;
@@ -157,13 +162,11 @@ void Subworld::update(float delta) {
         flags &= ~EFlags::NOFRICTION;
       }
 
-      if (duck and x == 0) {
+      if (duck and x == 0 and hitbox_states.find(EState::DUCK) != hitbox_states.end()) {
         flags |= EFlags::DUCKING;
-        coll.hitbox.height = 15.f / 16.f;
       }
       else {
         flags &= ~EFlags::DUCKING;
-        coll.hitbox.height = 25.f / 16.f;
       }
     }
 
@@ -247,6 +250,10 @@ void Subworld::update(float delta) {
 
     if (state != state_prev) {
       render.time = 0.f;
+
+      if (hitbox_states.find(state) != hitbox_states.end()) {
+        coll.hitbox = hitbox_states[state];
+      }
 
       if (state_prev == EState::SLIP) {
         gameplay->stopSoundLoop(audio.channels.slip);

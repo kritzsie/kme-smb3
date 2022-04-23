@@ -1,12 +1,16 @@
 #include "basegame.hpp"
 
+#include "../engine.hpp"
 #include "basegame/ecs/components.hpp"
+#include "basegame/hitbox.hpp"
+#include "basegame/powerup.hpp"
 #include "basegame/theme.hpp"
 #include "gameplay.hpp"
-#include "../engine.hpp"
 
 #include <SFML/Graphics.hpp>
 
+#include <map>
+#include <memory>
 #include <sstream>
 #include <utility>
 
@@ -221,6 +225,12 @@ void BaseGame::enter() {
     goalhills[i].setCollisionType(TileDef::CollisionType::NONE);
     level_tile_data.registerTileDef(ss.str(), std::move(goalhills[i]));
   }
+
+  auto mario_hitboxes = std::make_unique<EntityData::Hitboxes>();
+  (*mario_hitboxes)[Powerup::NONE][EState::IDLE] = Hitbox(4.f / 16.f, 15.f / 16.f);
+  (*mario_hitboxes)[Powerup::MUSHROOM][EState::IDLE] = Hitbox(4.f / 16.f, 25.f / 16.f);
+  (*mario_hitboxes)[Powerup::MUSHROOM][EState::DUCK] = Hitbox(4.f / 16.f, 15.f / 16.f);
+  entity_data.registerHitboxes("PlayerMario", std::move(mario_hitboxes));
 
   RenderStates mario_rs;
   mario_rs.pushFrame("IDLE", "smallmariowalk_0", Rect<int>(0, 0, 12, 15), Vec2f(6, -1), 0.f);

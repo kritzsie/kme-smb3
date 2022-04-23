@@ -134,11 +134,17 @@ void Gameplay::enter() {
   auto& entities = subworld.getEntities();
 
   auto player = entities.create();
+  auto player_powerup = Powerup::NONE;
+  auto player_state = EState::IDLE;
+  auto player_hitbox = getBaseGame() \
+    ->entity_data.getHitboxes("PlayerMario") \
+    ->at(player_powerup).at(player_state);
   entities.emplace<CInfo>(player, true, "PlayerMario");
   entities.emplace<CPosition>(player, Vec2f(2.f, 1.f));
-  entities.emplace<CCollision>(player, Hitbox(4.f / 16.f, 25.f / 16.f));
+  entities.emplace<CPowerup>(player, player_powerup);
+  entities.emplace<CState>(player, player_state);
+  entities.emplace<CCollision>(player, player_hitbox);
   entities.emplace<CFlags>(player);
-  entities.emplace<CState>(player);
   entities.emplace<CCounters>(player);
   entities.emplace<CTimers>(player);
   entities.emplace<CVelocity>(player);

@@ -7,6 +7,7 @@
 #include "../../../renderstates.hpp"
 #include "../../../sound.hpp"
 #include "../../../util.hpp"
+#include "../powerup.hpp"
 #include "../hitbox.hpp"
 
 #include <entt/entt.hpp>
@@ -43,6 +44,10 @@ struct EFlags {
 };
 
 struct CFlags : Component<UInt32> {};
+
+struct CPowerup {
+  Powerup state;
+};
 
 struct CCollision {
   Hitbox hitbox;
