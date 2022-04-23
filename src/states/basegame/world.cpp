@@ -71,10 +71,6 @@ void Subworld::setTheme(std::string theme_new) {
 }
 
 // begin ugly
-static Rect<float> toAABB(Vec2f pos, CCollision box) {
-  return Rect<float>(pos.x - box.radius, pos.y, box.radius * 2.f, box.height);
-}
-
 static Rect<int> toRange(Rect<float> aabb) {
   return Rect<int>(
     std::floor(aabb.x), std::floor(aabb.y),
@@ -96,7 +92,7 @@ void Subworld::update(float delta) {
     Vec2f& vel = entities.get<CVelocity>(player);
     Sign& direction = entities.get<CDirection>(player);
     EState& state = entities.get<CState>(player);
-    auto& bbox = entities.get<CCollision>(player);
+    auto& coll = entities.get<CCollision>(player);
     auto& counters = entities.get<CCounters>(player);
     auto& timers = entities.get<CTimers>(player);
     auto& render = entities.get<CRender>(player);
@@ -163,11 +159,11 @@ void Subworld::update(float delta) {
 
       if (duck and x == 0) {
         flags |= EFlags::DUCKING;
-        bbox.height = 15.f / 16.f;
+        coll.hitbox.height = 15.f / 16.f;
       }
       else {
         flags &= ~EFlags::DUCKING;
-        bbox.height = 25.f / 16.f;
+        coll.hitbox.height = 25.f / 16.f;
       }
     }
 
@@ -307,25 +303,25 @@ void Subworld::update(float delta) {
     auto& timer = collide_view.get<CTimers>(entity);
     Vec2f& pos = collide_view.get<CPosition>(entity);
     Vec2f& vel = collide_view.get<CVelocity>(entity);
-    auto& bbox = collide_view.get<CCollision>(entity);
+    auto& coll = collide_view.get<CCollision>(entity);
 
-    Rect<float> entity_aabb;
+    Rect<float> ent_aabb;
     Rect<int> range;
 
     bool landed = false;
 
     pos.y += vel.y * delta;
 
-    entity_aabb = toAABB(pos, bbox);
-    range = toRange(entity_aabb);
+    ent_aabb = coll.hitbox.toAABB(pos);
+    range = toRange(ent_aabb);
     for (int y = range.y; y < range.y + range.height; ++y)
     for (int x = range.x; x < range.x + range.width;  ++x) {
       Rect<float> tile_aabb = Rect<float>(x, y, 1.f, 1.f);
-      if (entity_aabb.intersects(tile_aabb)) {
+      if (ent_aabb.intersects(tile_aabb)) {
         switch (basegame->level_tile_data.getTileDef(tiles[x][y]).getCollisionType()) {
         case TileDef::CollisionType::SOLID: {
-          Rect<float> collision = entity_aabb.intersection(tile_aabb);
-          if (entity_aabb.y >= y + 0.5f) {
+          Rect<float> collision = ent_aabb.intersection(tile_aabb);
+          if (ent_aabb.y >= y + 0.5f) {
             landed = true;
             pos.y += collision.height;
           }
@@ -335,17 +331,17 @@ void Subworld::update(float delta) {
             gameplay->playSound("bump");
           }
           vel.y = 0.f;
-          entity_aabb = toAABB(pos, bbox);
+          ent_aabb = coll.hitbox.toAABB(pos);
           break;
         }
         case TileDef::CollisionType::PLATFORM: {
-          Rect<float> collision = entity_aabb.intersection(tile_aabb);
-          if (entity_aabb.y > y + 0.5f
+          Rect<float> collision = ent_aabb.intersection(tile_aabb);
+          if (ent_aabb.y > y + 0.5f
           and pos.y - vel.y * delta >= y + 14.f / 16.f) {
             landed = true;
             pos.y += collision.height;
             vel.y = 0.f;
-            entity_aabb = toAABB(pos, bbox);
+            ent_aabb = coll.hitbox.toAABB(pos);
           }
           break;
         }
@@ -358,23 +354,23 @@ void Subworld::update(float delta) {
 
     pos.x += vel.x * delta;
 
-    entity_aabb = toAABB(pos, bbox);
-    range = toRange(entity_aabb);
+    ent_aabb = coll.hitbox.toAABB(pos);
+    range = toRange(ent_aabb);
     for (int y = range.y; y < range.y + range.height; ++y)
     for (int x = range.x; x < range.x + range.width;  ++x) {
       Rect<float> tile_aabb = Rect<float>(x, y, 1.f, 1.f);
-      if (entity_aabb.intersects(tile_aabb)) {
+      if (ent_aabb.intersects(tile_aabb)) {
         switch (basegame->level_tile_data.getTileDef(tiles[x][y]).getCollisionType()) {
         case TileDef::CollisionType::SOLID: {
-          Rect<float> collision = entity_aabb.intersection(tile_aabb);
-          if (entity_aabb.x >= x + 0.5f) {
+          Rect<float> collision = ent_aabb.intersection(tile_aabb);
+          if (ent_aabb.x >= x + 0.5f) {
             pos.x += collision.width;
           }
           else {
             pos.x -= collision.width;
           }
           vel.x = 0.f;
-          entity_aabb = toAABB(pos, bbox);
+          ent_aabb = coll.hitbox.toAABB(pos);
           break;
         }
         case TileDef::CollisionType::NONE:
@@ -394,7 +390,7 @@ void Subworld::update(float delta) {
     if (entities.valid(info.parent)) {
       Vec2f& parent_pos = entities.get<CPosition>(info.parent);
       Vec2f& pos = entities.get<CPosition>(camera);
-      auto& bbox = entities.get<CCollision>(camera);
+      auto& coll = entities.get<CCollision>(camera);
 
       // position camera relative to world
       if (parent_pos.x - 1.f > pos.x) {
@@ -414,29 +410,29 @@ void Subworld::update(float delta) {
       // restrict camera to world boundaries
       pos.x = std::clamp(
         pos.x,
-        bbox.radius + bounds.x,
-        bounds.width - bbox.radius + bounds.x
+        coll.hitbox.radius + bounds.x,
+        bounds.width - coll.hitbox.radius + bounds.x
       );
       pos.y = std::clamp(
         pos.y,
         0.f + bounds.y,
-        bounds.height - bbox.height / 2 + bounds.y
+        bounds.height - coll.hitbox.height / 2 + bounds.y
       );
     }
 
     if (entities.valid(player)) {
       Vec2f& player_pos = entities.get<CPosition>(player);
       Vec2f& player_vel = entities.get<CVelocity>(player);
-      auto& player_bbox = entities.get<CCollision>(player);
+      auto& player_coll = entities.get<CCollision>(player);
       Vec2f& pos = entities.get<CPosition>(camera);
-      auto& bbox = entities.get<CCollision>(camera);
+      auto& coll = entities.get<CCollision>(camera);
 
-      if (player_pos.x < pos.x - bbox.radius + player_bbox.radius) {
-        player_pos.x = pos.x - bbox.radius + player_bbox.radius;
+      if (player_pos.x < pos.x - coll.hitbox.radius + player_coll.hitbox.radius) {
+        player_pos.x = pos.x - coll.hitbox.radius + player_coll.hitbox.radius;
         player_vel.x = 0.f;
       }
-      else if (player_pos.x > pos.x + bbox.radius - player_bbox.radius) {
-        player_pos.x = pos.x + bbox.radius - player_bbox.radius;
+      else if (player_pos.x > pos.x + coll.hitbox.radius - player_coll.hitbox.radius) {
+        player_pos.x = pos.x + coll.hitbox.radius - player_coll.hitbox.radius;
         player_vel.x = 0.f;
       }
     }

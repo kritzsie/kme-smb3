@@ -136,7 +136,7 @@ void Gameplay::enter() {
   auto player = entities.create();
   entities.emplace<CInfo>(player, true, "PlayerMario");
   entities.emplace<CPosition>(player, Vec2f(2.f, 1.f));
-  entities.emplace<CCollision>(player, 4.f / 16.f, 25.f / 16.f);
+  entities.emplace<CCollision>(player, Hitbox(4.f / 16.f, 25.f / 16.f));
   entities.emplace<CFlags>(player);
   entities.emplace<CState>(player);
   entities.emplace<CCounters>(player);
@@ -150,7 +150,7 @@ void Gameplay::enter() {
   auto camera = entities.create();
   entities.emplace<CInfo>(camera, true, "Camera", player);
   entities.emplace<CPosition>(camera, Vec2f(15.f, 8.4375f));
-  entities.emplace<CCollision>(camera, 15.f, 16.875f);
+  entities.emplace<CCollision>(camera, Hitbox(15.f, 16.875f));
   subworld.camera = camera;
 }
 

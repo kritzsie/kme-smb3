@@ -7,6 +7,7 @@
 #include "../../../renderstates.hpp"
 #include "../../../sound.hpp"
 #include "../../../util.hpp"
+#include "../hitbox.hpp"
 
 #include <entt/entt.hpp>
 
@@ -44,8 +45,7 @@ struct EFlags {
 struct CFlags : Component<UInt32> {};
 
 struct CCollision {
-  float radius = 8.f;
-  float height = 16.f;
+  Hitbox hitbox;
 };
 
 struct CCounters {

@@ -222,13 +222,6 @@ void BaseGame::enter() {
     level_tile_data.registerTileDef(ss.str(), std::move(goalhills[i]));
   }
 
-  CCollision mario_collision;
-  mario_collision.radius = 4.f / 16.f;
-  mario_collision.height = 25.f / 16.f;
-  //entity_data.setDefault<CollisionComponent>("PlayerMario", std::move(mario_collision));
-
-  //entity_data.setDefault<FlagsComponent>("PlayerMario", FlagsComponent::GRAVITY);
-
   RenderStates mario_rs;
   mario_rs.pushFrame("IDLE", "smallmariowalk_0", Rect<int>(0, 0, 12, 15), Vec2f(6, -1), 0.f);
 
