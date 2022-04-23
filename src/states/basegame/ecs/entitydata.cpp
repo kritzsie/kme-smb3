@@ -37,4 +37,13 @@ void EntityData::registerRenderStates(EntityType type, std::shared_ptr<RenderSta
 std::shared_ptr<const RenderStates> EntityData::getRenderStates(EntityType type) const {
   return render_states.at(type);
 }
+
+std::string getRenderStateLabel(Powerup powerup, EState state) {
+  auto state_name = getStateName(state);
+  auto powerup_name = getPowerupName(powerup);
+  if (powerup_name.size()) {
+    return util::join({state_name, powerup_name}, ".");
+  }
+  return state_name;
+}
 }

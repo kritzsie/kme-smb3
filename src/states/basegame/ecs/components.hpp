@@ -8,6 +8,7 @@
 #include "../../../sound.hpp"
 #include "../../../util.hpp"
 #include "../powerup.hpp"
+#include "../states.hpp"
 #include "../hitbox.hpp"
 
 #include <entt/entt.hpp>
@@ -20,9 +21,9 @@ namespace kme {
 struct CDirection : Component<Sign> {};
 
 struct CInfo {
-  bool valid = true;
   std::string type;
   Entity parent = entt::null;
+  bool valid = true;
 };
 
 struct CPosition : Component<Vec2f> {};
@@ -45,9 +46,7 @@ struct EFlags {
 
 struct CFlags : Component<UInt32> {};
 
-struct CPowerup {
-  Powerup state;
-};
+struct CPowerup : Component<Powerup> {};
 
 struct CCollision {
   Hitbox hitbox;
@@ -60,12 +59,6 @@ struct CCounters {
 struct CTimers {
   float jump = 0.f;
   float p_speed = 0.f;
-};
-
-enum class EState {
-  IDLE, DEAD, DOOR, PIPE,
-  WALK, RUN, SLIP, DUCK,
-  AIRBORNE, RUNJUMP, UNDERWATER, SWIM
 };
 
 struct CState : Component<EState> {};

@@ -139,7 +139,7 @@ void Gameplay::enter() {
   auto player_hitbox = getBaseGame() \
     ->entity_data.getHitboxes("PlayerMario") \
     ->at(player_powerup).at(player_state);
-  entities.emplace<CInfo>(player, true, "PlayerMario");
+  entities.emplace<CInfo>(player, "PlayerMario");
   entities.emplace<CPosition>(player, Vec2f(2.f, 1.f));
   entities.emplace<CPowerup>(player, player_powerup);
   entities.emplace<CState>(player, player_state);
@@ -154,7 +154,7 @@ void Gameplay::enter() {
   subworld.player = player;
 
   auto camera = entities.create();
-  entities.emplace<CInfo>(camera, true, "Camera", player);
+  entities.emplace<CInfo>(camera, "Camera", player);
   entities.emplace<CPosition>(camera, Vec2f(15.f, 8.4375f));
   entities.emplace<CCollision>(camera, Hitbox(15.f, 16.875f));
   subworld.camera = camera;

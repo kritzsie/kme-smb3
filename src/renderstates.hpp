@@ -22,16 +22,16 @@ struct RenderFrame {
 class RenderState {
 public:
   RenderState();
-  RenderState(std::string state);
+  RenderState(std::string label);
 
-  void setState(std::string state);
-  void setState(std::string state, std::size_t offset);
+  void setState(std::string label);
+  void setState(std::string label, std::size_t offset);
 
-  const std::string& getState() const;
+  std::string getLabel() const;
   std::size_t getOffset() const;
 
 private:
-  std::string state;
+  std::string label;
   std::size_t offset;
 };
 
@@ -46,10 +46,10 @@ public:
   StringList getStateList() const;
 
   std::size_t getFrameCount(std::string state_arg) const;
-  std::size_t getFrameOffset(std::string state, float time) const;
+  std::size_t getFrameOffset(std::string label, float time) const;
 
-  const RenderFrame& getFrame(const RenderState& state) const;
-  const RenderFrame& getFrame(std::string state, std::size_t offset) const;
+  const RenderFrame& getFrame(const RenderState& label) const;
+  const RenderFrame& getFrame(std::string label, std::size_t offset) const;
 
 private:
   StringTable<RenderFrames> states;

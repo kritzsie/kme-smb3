@@ -93,7 +93,7 @@ void Subworld::update(float delta) {
     Vec2f& vel = entities.get<CVelocity>(player);
     Sign& direction = entities.get<CDirection>(player);
     EState& state = entities.get<CState>(player);
-    auto& powerup = entities.get<CPowerup>(player);
+    Powerup& powerup = entities.get<CPowerup>(player);
     auto& coll = entities.get<CCollision>(player);
     auto& counters = entities.get<CCounters>(player);
     auto& timers = entities.get<CTimers>(player);
@@ -101,7 +101,7 @@ void Subworld::update(float delta) {
     auto& audio = entities.get<CAudio>(player);
 
     auto hitboxes = basegame->entity_data.getHitboxes(info.type);
-    auto hitbox_states = hitboxes->at(powerup.state);
+    auto hitbox_states = hitboxes->at(powerup);
 
     float x = 0.f;
     x += gameplay->inputs.at(Gameplay::Action::RIGHT) > 0.25f;
@@ -253,6 +253,9 @@ void Subworld::update(float delta) {
 
       if (hitbox_states.find(state) != hitbox_states.end()) {
         coll.hitbox = hitbox_states[state];
+      }
+      else {
+        coll.hitbox = hitbox_states[EState::IDLE];
       }
 
       if (state_prev == EState::SLIP) {
@@ -450,38 +453,19 @@ void Subworld::update(float delta) {
   for (auto entity : render_view) {
     auto& info = render_view.get<CInfo>(entity);
     Vec2f& vel = render_view.get<CVelocity>(entity);
-    const EState& state = render_view.get<CState>(entity);
+    EState& state = render_view.get<CState>(entity);
     auto& render = render_view.get<CRender>(entity);
 
     auto states = basegame->entity_data.getRenderStates(info.type);
 
-    switch (state) {
-    case EState::AIRBORNE:
-      render.state.setState("JUMP", states->getFrameOffset("JUMP", render.time));
-      break;
-    case EState::DUCK:
-      render.state.setState("DUCK", states->getFrameOffset("DUCK", render.time));
-      break;
-    case EState::SLIP:
-      render.state.setState("SLIP", states->getFrameOffset("SLIP", render.time));
-      break;
-    case EState::WALK:
-      render.state.setState("WALK", states->getFrameOffset("WALK", render.time));
-      break;
-    case EState::RUN:
-      render.state.setState("RUN", states->getFrameOffset("RUN", render.time));
-      break;
-    case EState::RUNJUMP:
-      render.state.setState("RUNJUMP", states->getFrameOffset("RUNJUMP", render.time));
-      break;
-    case EState::DEAD:
-      render.state.setState("DEAD", states->getFrameOffset("DEAD", render.time));
-      break;
-    case EState::IDLE:
-    default:
-      render.state.setState("IDLE", states->getFrameOffset("IDLE", render.time));
-      break;
+    auto powerup = Powerup::NONE;
+    auto powerup_view = entities.view<CPowerup>();
+    if (powerup_view.contains(entity)) {
+      powerup = powerup_view.get<CPowerup>(entity);
     }
+
+    std::string label = getRenderStateLabel(powerup, state);
+    render.state.setState(label, states->getFrameOffset(label, render.time));
 
     render.time += std::clamp(std::abs(vel.x) / 4.f, 1.f, 4.f) * delta;
   }
