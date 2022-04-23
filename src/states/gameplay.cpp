@@ -378,7 +378,7 @@ void Gameplay::drawHUD() {
   for (std::size_t i = 0; i < 6; ++i) {
     p_meter << (counters.p_meter > i ? util::highASCII('>') : '>');
   }
-  if (counters.p_meter >= 6.f
+  if (counters.p_meter > 6.f
   and std::fmod(rendertime, 0.25f) > 0.125f) {
     p_meter << util::highASCII("()");
   }

@@ -40,13 +40,16 @@ struct EFlags {
     NOGRAVITY  = 1 << 5,
     NOFRICTION = 1 << 6,
 
-    AIRBORNE   = 1 << 16
+    AIRBORNE   = 1 << 16,
+    LANDED     = 1 << 17
   };
 };
 
 struct CFlags : Component<UInt32> {};
 
 struct CPowerup : Component<Powerup> {};
+
+struct CState : Component<EState> {};
 
 struct CCollision {
   Hitbox hitbox;
@@ -60,8 +63,6 @@ struct CTimers {
   float jump = 0.f;
   float p_speed = 0.f;
 };
-
-struct CState : Component<EState> {};
 
 struct CRender {
   Vec2f scale = Vec2f(1.f, 1.f);

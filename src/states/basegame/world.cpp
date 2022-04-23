@@ -170,7 +170,10 @@ void Subworld::update(float delta) {
       }
     }
 
-    if (~flags & EFlags::AIRBORNE and x != 0 and std::abs(vel.x) > 10.f) {
+    if (flags & EFlags::LANDED and counters.p_meter > 6.0f and std::abs(vel.x) < 11.f) {
+      counters.p_meter = std::max(counters.p_meter - 0.25f, 6.f);
+    }
+    else if (~flags & EFlags::AIRBORNE and x != 0 and std::abs(vel.x) >= 11.f) {
       counters.p_meter = std::min(counters.p_meter + 6.f * delta, 6.5f);
     }
     else if (counters.p_meter > 0.f) {
@@ -180,7 +183,7 @@ void Subworld::update(float delta) {
       }
     }
 
-    if (counters.p_meter >= 6.f) {
+    if (counters.p_meter > 6.f) {
       flags |= EFlags::RUNNING;
       if (audio.channels.speed == Sound::MAX_VOICES) {
         audio.channels.speed = gameplay->playSoundLoop("running");
@@ -390,8 +393,21 @@ void Subworld::update(float delta) {
       }
     }
 
-    if (landed) flags &= ~EFlags::AIRBORNE;
-    else        flags |=  EFlags::AIRBORNE;
+    if (landed) {
+      if (flags & EFlags::AIRBORNE) {
+        flags |= EFlags::LANDED;
+      }
+      else {
+        flags &= ~EFlags::LANDED;
+      }
+      flags &= ~EFlags::AIRBORNE;
+    }
+    else {
+      flags |= EFlags::AIRBORNE;
+    }
+  }
+
+  if (entities.valid(player)) {
   }
 
   if (entities.valid(camera)) {
