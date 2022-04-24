@@ -500,12 +500,14 @@ void Subworld::update(float delta) {
 
     auto states = basegame->entity_data.getRenderStates(info.type);
 
-    auto powerup = Powerup::NONE;
+    std::string label = getStateName(state).data();
     if (powerup_view.contains(entity)) {
-      powerup = powerup_view.get<CPowerup>(entity);
+      auto& powerup = powerup_view.get<CPowerup>(entity);
+      if (powerup != Powerup::NONE) {
+        label = util::join({label, getPowerupName(powerup).data()}, ".");
+      }
     }
 
-    std::string label = getRenderStateLabel(powerup, state);
     render.state.setState(label, states->getFrameOffset(label, render.time));
   }
 }

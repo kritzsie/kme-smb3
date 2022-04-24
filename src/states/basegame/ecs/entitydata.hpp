@@ -34,7 +34,4 @@ private:
   std::unordered_map<EntityType, std::shared_ptr<Hitboxes>> hitboxes;
   std::unordered_map<EntityType, std::shared_ptr<RenderStates>> render_states;
 };
-
-// fully-qualified renderstate label that takes powerup states into account
-std::string getRenderStateLabel(Powerup powerup, EState state);
 }
