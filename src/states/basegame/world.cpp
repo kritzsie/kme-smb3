@@ -203,7 +203,7 @@ void Subworld::update(float delta) {
     }
 
     if (timers.p_speed == 0.f) {
-      if (flags & EFlags::LANDED and counters.p_meter > 6.0f and vel.x == 0.f) {
+      if (flags & EFlags::LANDED and counters.p_meter > 6.0f and std::abs(vel.x) < 5.f) {
         counters.p_meter = std::clamp(counters.p_meter - 0.5f, 6.f, 7.f);
       }
       else if (~flags & EFlags::AIRBORNE and x != 0 and std::abs(vel.x) >= 10.f) {
