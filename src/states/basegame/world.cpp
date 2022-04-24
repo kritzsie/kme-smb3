@@ -395,10 +395,10 @@ void Subworld::update(float delta) {
               }
               else {
                 pos.y -= collision.height;
+                vel.y = 0.f;
                 timer.jump = 0.f;
                 gameplay->playSound("bump");
               }
-              vel.y = 0.f;
               ent_aabb = coll.hitbox.toAABB(pos);
               break;
             }
@@ -408,7 +408,6 @@ void Subworld::update(float delta) {
               and pos.y - vel.y * delta >= y + 14.f / 16.f) {
                 landed = true;
                 pos.y += collision.height;
-                vel.y = 0.f;
                 ent_aabb = coll.hitbox.toAABB(pos);
               }
               break;
@@ -428,6 +427,8 @@ void Subworld::update(float delta) {
             flags &= ~EFlags::LANDED;
           }
           flags &= ~EFlags::AIRBORNE;
+
+          vel.y = 0.f;
         }
         else {
           flags |= EFlags::AIRBORNE;
