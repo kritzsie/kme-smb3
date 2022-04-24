@@ -1,13 +1,5 @@
 #pragma once
 
-#include <string>
+#include "states-decl.hpp"
+#include "states-impl.hpp"
 
-namespace kme {
-enum class EState {
-  IDLE, DEAD, DOOR, PIPE,
-  WALK, RUN, SLIP, DUCK,
-  AIRBORNE, RUNJUMP, UNDERWATER, SWIM
-};
-
-std::string getStateName(EState state);
-}
