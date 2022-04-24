@@ -159,6 +159,7 @@ void Gameplay::enter() {
   entities.emplace<CCollision>(camera, Hitbox(15.f, 16.875f));
   subworld.camera = camera;
 
+  /*
   auto mushroom = entities.create();
   entities.emplace<CInfo>(mushroom, "Mushroom");
   entities.emplace<CPosition>(mushroom, Vec2f(9.f, 1.f));
@@ -176,6 +177,7 @@ void Gameplay::enter() {
   entities.emplace<CFlags>(pswitch);
   entities.emplace<CState>(pswitch);
   entities.emplace<CRender>(pswitch);
+  */
 }
 
 void Gameplay::exit() {}
