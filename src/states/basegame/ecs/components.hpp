@@ -43,8 +43,9 @@ struct EFlags {
     AIRBORNE   = 1 << 8,
     LANDED     = 1 << 9,
 
-    ENEMY      = 1 << 16,
-    POWERUP    = 1 << 17
+    SOLID      = 1 << 16,
+    ENEMY      = 1 << 17,
+    POWERUP    = 1 << 18
   };
 };
 

@@ -128,7 +128,7 @@ void Subworld::update(float delta) {
     bool run  = gameplay->inputs.at(Gameplay::Action::RUN) > 0.25f;
     bool duck = gameplay->inputs.at(Gameplay::Action::DOWN) > 0.25f;
 
-    float max_x = run ? (flags & EFlags::RUNNING ? 14.f : 12.f) : 6.f;
+    float max_x = run ? (flags & EFlags::RUNNING ? 12.f : 10.f) : 5.f;
 
     if (x != 0) {
       direction = toSign(x);
@@ -138,19 +138,13 @@ void Subworld::update(float delta) {
       flags |= EFlags::NOFRICTION;
       if (x > 0) {
         if (vel.x <= max_x) {
-          if (vel.x < 0) {
-            vel.x += 16.f * delta;
-          }
-          vel.x += 16.f * delta;
+          vel.x += (vel.x < 0 ? 30.f : 15.f) * delta;
           vel.x = std::min(vel.x, max_x);
         }
       }
       else if (x < 0) {
         if (vel.x >= -max_x) {
-          if (vel.x > 0) {
-            vel.x -= 16.f * delta;
-          }
-          vel.x -= 16.f * delta;
+          vel.x -= (vel.x > 0 ? 30.f : 15.f) * delta;
           vel.x = std::max(vel.x, -max_x);
         }
       }
@@ -159,14 +153,14 @@ void Subworld::update(float delta) {
       if (x > 0) {
         if (vel.x <= max_x) {
           flags |= EFlags::NOFRICTION;
-          vel.x += (vel.x < 0 ? 32.f : 16.f) * delta;
+          vel.x += (vel.x < 0 ? 30.f : 15.f) * delta;
           vel.x = std::min(vel.x, max_x);
         }
       }
       else if (x < 0) {
         if (vel.x >= -max_x) {
           flags |= EFlags::NOFRICTION;
-          vel.x -= (vel.x > 0 ? 32.f : 16.f) * delta;
+          vel.x -= (vel.x > 0 ? 30.f : 15.f) * delta;
           vel.x = std::max(vel.x, -max_x);
         }
       }
@@ -185,16 +179,41 @@ void Subworld::update(float delta) {
       }
     }
 
-    if (flags & EFlags::LANDED and counters.p_meter > 6.0f and std::abs(vel.x) < 11.f) {
-      counters.p_meter = std::max(counters.p_meter - 0.25f, 6.f);
+    if (timers.p_speed > 0.f) {
+      bool reset_p_meter = false;
+
+      if (powerup == Powerup::LEAF
+      or  powerup == Powerup::TANUKI) {
+        timers.p_speed = std::max(timers.p_speed - delta, 0.f);
+        reset_p_meter = timers.p_speed == 0.f;
+      }
+      else {
+        if (~flags & EFlags::LANDED) {
+          timers.p_speed = std::max(timers.p_speed - delta, 0.f);
+          reset_p_meter = timers.p_speed == 0.f;
+        }
+        else {
+          timers.p_speed = 0.f;
+        }
+      }
+
+      if (reset_p_meter) {
+        counters.p_meter = 0.f;
+      }
     }
-    else if (~flags & EFlags::AIRBORNE and x != 0 and std::abs(vel.x) >= 11.f) {
-      counters.p_meter = std::min(counters.p_meter + 6.f * delta, 6.5f);
-    }
-    else if (counters.p_meter > 0.f) {
-      if (~flags & EFlags::AIRBORNE
-      or  ~flags & EFlags::RUNNING) {
-        counters.p_meter = std::max(counters.p_meter - 2.5f * delta, 0.f);
+
+    if (timers.p_speed == 0.f) {
+      if (flags & EFlags::LANDED and counters.p_meter > 6.0f and vel.x == 0.f) {
+        counters.p_meter = std::clamp(counters.p_meter - 0.5f, 6.f, 7.f);
+      }
+      else if (~flags & EFlags::AIRBORNE and x != 0 and std::abs(vel.x) >= 10.f) {
+        counters.p_meter = std::min(counters.p_meter + 6.f * delta, 6.5f);
+      }
+      else if (counters.p_meter > 0.f) {
+        if (~flags & EFlags::AIRBORNE
+        or  ~flags & EFlags::RUNNING) {
+          counters.p_meter = std::max(counters.p_meter - 2.5f * delta, 0.f);
+        }
       }
     }
 
@@ -215,7 +234,11 @@ void Subworld::update(float delta) {
     if (jump) {
       if (~jump_input > 0 and ~flags & EFlags::AIRBORNE) {
         flags |= EFlags::AIRBORNE;
-        timers.jump = 0.275f + std::min(std::abs(vel.x) / 12.f / 10.f, 0.125f);
+        timers.jump = 0.275f + std::min(std::abs(vel.x) / 10.f / 10.f, 0.125f);
+        if (counters.p_meter > 6.f and timers.p_speed == 0.f) {
+          counters.p_meter = 7.f;
+          timers.p_speed = 4.f;
+        }
         gameplay->playSound("jump");
       }
 
@@ -255,7 +278,7 @@ void Subworld::update(float delta) {
           audio.channels.slip = gameplay->playSoundLoop("slip");
         }
       }
-      else if (std::abs(vel.x) >= 13.f) {
+      else if (std::abs(vel.x) >= 11.f) {
         state = EState::RUN;
       }
       else if (vel.x != 0) {
@@ -302,10 +325,10 @@ void Subworld::update(float delta) {
     if (~flags & EFlags::NOFRICTION
     and ~flags & EFlags::AIRBORNE) {
       if (vel.x > 0.f) {
-        vel.x = std::max(vel.x - 12.f * delta, 0.f);
+        vel.x = std::max(vel.x - 10.f * delta, 0.f);
       }
       else if (vel.x < 0.f) {
-        vel.x = std::min(vel.x + 12.f * delta, 0.f);
+        vel.x = std::min(vel.x + 10.f * delta, 0.f);
       }
     }
   }

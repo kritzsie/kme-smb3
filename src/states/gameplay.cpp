@@ -380,7 +380,9 @@ void Gameplay::drawHUD() {
 
   const auto& subworld = level.getSubworld(current_subworld);
   const auto& entities = subworld.getEntities();
+
   const auto& counters = entities.get<CCounters>(subworld.player);
+  const auto& timers = entities.get<CTimers>(subworld.player);
 
   std::stringstream worldnum;
   worldnum << util::highASCII("abcd") << '\0' << '-' << 1;
