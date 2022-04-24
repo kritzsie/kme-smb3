@@ -361,6 +361,34 @@ void Subworld::update(float delta) {
 
     bool landed = false;
 
+    pos.x += vel.x * delta;
+
+    ent_aabb = coll.hitbox.toAABB(pos);
+    range = toRange(ent_aabb);
+    for (int y = range.y; y < range.y + range.height; ++y)
+    for (int x = range.x; x < range.x + range.width;  ++x) {
+      Rect<float> tile_aabb = Rect<float>(x, y, 1.f, 1.f);
+      if (ent_aabb.intersects(tile_aabb)) {
+        switch (basegame->level_tile_data.getTileDef(tiles[x][y]).getCollisionType()) {
+        case TileDef::CollisionType::SOLID: {
+          Rect<float> collision = ent_aabb.intersection(tile_aabb);
+          if (ent_aabb.x >= x + 0.5f) {
+            pos.x += collision.width;
+          }
+          else {
+            pos.x -= collision.width;
+          }
+          vel.x = 0.f;
+          ent_aabb = coll.hitbox.toAABB(pos);
+          break;
+        }
+        case TileDef::CollisionType::NONE:
+        default:
+          break;
+        }
+      }
+    }
+
     pos.y += vel.y * delta;
 
     ent_aabb = coll.hitbox.toAABB(pos);
@@ -394,34 +422,6 @@ void Subworld::update(float delta) {
             vel.y = 0.f;
             ent_aabb = coll.hitbox.toAABB(pos);
           }
-          break;
-        }
-        case TileDef::CollisionType::NONE:
-        default:
-          break;
-        }
-      }
-    }
-
-    pos.x += vel.x * delta;
-
-    ent_aabb = coll.hitbox.toAABB(pos);
-    range = toRange(ent_aabb);
-    for (int y = range.y; y < range.y + range.height; ++y)
-    for (int x = range.x; x < range.x + range.width;  ++x) {
-      Rect<float> tile_aabb = Rect<float>(x, y, 1.f, 1.f);
-      if (ent_aabb.intersects(tile_aabb)) {
-        switch (basegame->level_tile_data.getTileDef(tiles[x][y]).getCollisionType()) {
-        case TileDef::CollisionType::SOLID: {
-          Rect<float> collision = ent_aabb.intersection(tile_aabb);
-          if (ent_aabb.x >= x + 0.5f) {
-            pos.x += collision.width;
-          }
-          else {
-            pos.x -= collision.width;
-          }
-          vel.x = 0.f;
-          ent_aabb = coll.hitbox.toAABB(pos);
           break;
         }
         case TileDef::CollisionType::NONE:
@@ -488,12 +488,12 @@ void Subworld::update(float delta) {
       Vec2f& pos = entities.get<CPosition>(camera);
       auto& coll = entities.get<CCollision>(camera);
 
-      if (player_pos.x < pos.x - coll.hitbox.radius + player_coll.hitbox.radius) {
-        player_pos.x = pos.x - coll.hitbox.radius + player_coll.hitbox.radius;
+      if (player_pos.x < pos.x - coll.hitbox.radius + player_coll.hitbox.radius + 0.25f) {
+        player_pos.x = pos.x - coll.hitbox.radius + player_coll.hitbox.radius + 0.25f;
         player_vel.x = 0.f;
       }
-      else if (player_pos.x > pos.x + coll.hitbox.radius - player_coll.hitbox.radius) {
-        player_pos.x = pos.x + coll.hitbox.radius - player_coll.hitbox.radius;
+      else if (player_pos.x > pos.x + coll.hitbox.radius - player_coll.hitbox.radius - 0.25f) {
+        player_pos.x = pos.x + coll.hitbox.radius - player_coll.hitbox.radius - 0.25f;
         player_vel.x = 0.f;
       }
     }

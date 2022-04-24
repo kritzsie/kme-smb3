@@ -227,9 +227,9 @@ void BaseGame::enter() {
   }
 
   auto mario_hitboxes = std::make_unique<EntityData::Hitboxes>();
-  (*mario_hitboxes)[Powerup::NONE][EState::IDLE] = Hitbox(4.f / 16.f, 15.f / 16.f);
-  (*mario_hitboxes)[Powerup::MUSHROOM][EState::IDLE] = Hitbox(4.f / 16.f, 25.f / 16.f);
-  (*mario_hitboxes)[Powerup::MUSHROOM][EState::DUCK] = Hitbox(4.f / 16.f, 15.f / 16.f);
+  (*mario_hitboxes)[Powerup::NONE][EState::IDLE] = Hitbox(5.f / 16.f, 15.f / 16.f);
+  (*mario_hitboxes)[Powerup::MUSHROOM][EState::IDLE] = Hitbox(5.f / 16.f, 25.f / 16.f);
+  (*mario_hitboxes)[Powerup::MUSHROOM][EState::DUCK] = Hitbox(5.f / 16.f, 15.f / 16.f);
   entity_data.registerHitboxes("PlayerMario", std::move(mario_hitboxes));
 
   RenderStates mario_rs;
