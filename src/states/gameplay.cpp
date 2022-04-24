@@ -159,24 +159,23 @@ void Gameplay::enter() {
   entities.emplace<CCollision>(camera, Hitbox(15.f, 16.875f));
   subworld.camera = camera;
 
-  /*
   auto mushroom = entities.create();
   entities.emplace<CInfo>(mushroom, "Mushroom");
   entities.emplace<CPosition>(mushroom, Vec2f(9.f, 1.f));
-  entities.emplace<CCollision>(mushroom, Hitbox(16.f, 16.f));
+  entities.emplace<CCollision>(mushroom, Hitbox(1.f, 1.f));
   entities.emplace<CFlags>(mushroom, EFlags::POWERUP);
+  entities.emplace<CPowerup>(mushroom, Powerup::MUSHROOM);
   entities.emplace<CState>(mushroom);
   entities.emplace<CRender>(mushroom);
 
   auto pswitch = entities.create();
   entities.emplace<CInfo>(pswitch, "PSwitch");
   entities.emplace<CPosition>(pswitch, Vec2f(6.f, 1.f));
-  entities.emplace<CCollision>(pswitch, Hitbox(16.f, 16.f));
+  entities.emplace<CCollision>(pswitch, Hitbox(1.f, 1.f));
   entities.emplace<CPowerup>(pswitch, player_powerup);
   entities.emplace<CFlags>(pswitch);
   entities.emplace<CState>(pswitch);
   entities.emplace<CRender>(pswitch);
-  */
 }
 
 void Gameplay::exit() {}

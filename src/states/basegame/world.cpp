@@ -15,9 +15,9 @@
 
 namespace kme {
 // begin Subworld
-Subworld::Subworld(const BaseGame* basegame_new, Gameplay* gameplay_new) {
-  basegame = basegame_new;
-  gameplay = gameplay_new;
+Subworld::Subworld(const BaseGame* basegame_arg, Gameplay* gameplay_arg) {
+  basegame = basegame_arg;
+  gameplay = gameplay_arg;
 }
 
 const EntityRegistry& Subworld::getEntities() const {
@@ -40,8 +40,8 @@ Rect<int> Subworld::getBounds() const {
   return bounds;
 }
 
-void Subworld::setBounds(Rect<int> size_new) {
-  bounds = size_new;
+void Subworld::setBounds(Rect<int> size_arg) {
+  bounds = size_arg;
 }
 
 void Subworld::setBounds(int x, int y, int width, int height) {
@@ -64,8 +64,8 @@ std::string Subworld::getTheme() const {
   return theme;
 }
 
-void Subworld::setTheme(std::string theme_new) {
-  theme = theme_new;
+void Subworld::setTheme(std::string theme_arg) {
+  theme = theme_arg;
   auto theme_ptr = basegame->themes.at(theme);
   gameplay->playMusic(theme_ptr->music);
 }
@@ -323,15 +323,15 @@ void Subworld::update(float delta) {
 
   // collision code
   auto collide_view = entities.view<
-    CFlags, CTimers,
-    CPosition, CVelocity, CCollision
+    CPosition, CVelocity,
+    CFlags, CCollision, CTimers
   >();
   for (auto entity : collide_view) {
     UInt32& flags = collide_view.get<CFlags>(entity);
-    auto& timer = collide_view.get<CTimers>(entity);
     Vec2f& pos = collide_view.get<CPosition>(entity);
     Vec2f& vel = collide_view.get<CVelocity>(entity);
     auto& coll = collide_view.get<CCollision>(entity);
+    auto& timer = collide_view.get<CTimers>(entity);
 
     Rect<float> ent_aabb;
     Rect<int> range;
@@ -422,9 +422,6 @@ void Subworld::update(float delta) {
     }
   }
 
-  if (entities.valid(player)) {
-  }
-
   if (entities.valid(camera)) {
     auto& info = entities.get<CInfo>(camera);
 
@@ -501,9 +498,9 @@ void Subworld::update(float delta) {
 // end Subworld
 
 // begin Level
-Level::Level(const BaseGame* basegame_new, Gameplay* gameplay_new) {
-  basegame = basegame_new;
-  gameplay = gameplay_new;
+Level::Level(const BaseGame* basegame_arg, Gameplay* gameplay_arg) {
+  basegame = basegame_arg;
+  gameplay = gameplay_arg;
   createSubworld();
 }
 

@@ -271,7 +271,9 @@ void BaseGame::enter() {
   entity_data.registerRenderStates("PlayerMario", std::move(mario_rs));
 
   RenderStates mushroom_rs;
-  mushroom_rs.pushFrame("IDLE", "redmushroom", Rect<int>(0, 0, 16, 16), Vec2f(8, -1), 0.f);
+  mushroom_rs.pushFrame("IDLE.BIG", "redmushroom", Rect<int>(0, 0, 16, 16), Vec2f(8, -1), 0.f);
+  mushroom_rs.pushFrame("IDLE.FIRE", "fireflower", Rect<int>(0, 0, 16, 16), Vec2f(8, -1), 0.f);
+  mushroom_rs.pushFrame("IDLE.RACCOON", "raccoonleaf", Rect<int>(0, 0, 16, 16), Vec2f(8, -1), 0.f);
   entity_data.registerRenderStates("Mushroom", std::move(mushroom_rs));
 
   RenderStates pswitch_rs;
