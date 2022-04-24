@@ -2,10 +2,14 @@
 
 #include "../basegame.hpp"
 #include "ecs/ecs.hpp"
+#include "collision.hpp"
 #include "theme.hpp"
 #include "tilemap.hpp"
 
 #include <unordered_map>
+#include <utility>
+#include <variant>
+#include <vector>
 
 #include <cstdlib>
 
@@ -15,6 +19,12 @@ class Gameplay;
 // begin Subworld
 class Subworld {
 public:
+  enum class EventType {
+    COLLISION
+  };
+
+  using Event = std::variant<CollisionEvent>;
+
   Subworld(const BaseGame* basegame, Gameplay* gameplay);
 
   const EntityRegistry& getEntities() const;
@@ -34,8 +44,14 @@ public:
   std::string getTheme() const;
   void setTheme(std::string theme);
 
+  void genEvent(EventType type, Event event);
+
   void update(float delta);
 
+private:
+  void consumeCollisionEvents();
+
+public:
   Entity player;
   Entity camera;
 
@@ -45,6 +61,9 @@ private:
 
   EntityRegistry entities;
   Tilemap tiles;
+
+  std::vector<WorldCollision> world_collisions;
+  std::vector<EntityCollision> entity_collisions;
 
   Rect<int> bounds;
   float gravity = -60.f;

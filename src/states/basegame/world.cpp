@@ -348,7 +348,7 @@ void Subworld::update(float delta) {
         Rect<float> ent_aabb;
         Rect<int> range;
 
-        bool landed = false;
+        bool on_ground = false;
 
         pos.x += vel.x * delta;
 
@@ -359,6 +359,8 @@ void Subworld::update(float delta) {
           Rect<float> tile_aabb = Rect<float>(x, y, 1.f, 1.f);
           if (ent_aabb.intersects(tile_aabb)) {
             switch (basegame->level_tile_data.getTileDef(tiles[x][y]).getCollisionType()) {
+            default:
+              break;
             case TileDef::CollisionType::SOLID: {
               Rect<float> collision = ent_aabb.intersection(tile_aabb);
               if (ent_aabb.x >= x + 0.5f) {
@@ -371,9 +373,6 @@ void Subworld::update(float delta) {
               ent_aabb = coll.hitbox.toAABB(pos);
               break;
             }
-            case TileDef::CollisionType::NONE:
-            default:
-              break;
             }
           }
         }
@@ -387,13 +386,23 @@ void Subworld::update(float delta) {
           Rect<float> tile_aabb = Rect<float>(x, y, 1.f, 1.f);
           if (ent_aabb.intersects(tile_aabb)) {
             switch (basegame->level_tile_data.getTileDef(tiles[x][y]).getCollisionType()) {
+            default:
+              break;
             case TileDef::CollisionType::SOLID: {
               Rect<float> collision = ent_aabb.intersection(tile_aabb);
               if (ent_aabb.y >= y + 0.5f) {
-                landed = true;
+                on_ground = true;
                 pos.y += collision.height;
               }
               else {
+                Event event = CollisionEvent {
+                  .type = CollisionEvent::Type::WORLD,
+                  .collision = WorldCollision {
+                    .subject = entity,
+                    .tile = Vec2i(x, y)
+                  }
+                };
+                genEvent(EventType::COLLISION, event);
                 pos.y -= collision.height;
                 vel.y = 0.f;
                 timer.jump = 0.f;
@@ -406,20 +415,17 @@ void Subworld::update(float delta) {
               Rect<float> collision = ent_aabb.intersection(tile_aabb);
               if (ent_aabb.y > y + 0.5f
               and pos.y - vel.y * delta >= y + 14.f / 16.f) {
-                landed = true;
+                on_ground = true;
                 pos.y += collision.height;
                 ent_aabb = coll.hitbox.toAABB(pos);
               }
               break;
             }
-            case TileDef::CollisionType::NONE:
-            default:
-              break;
             }
           }
         }
 
-        if (landed) {
+        if (on_ground) {
           if (flags & EFlags::AIRBORNE) {
             flags |= EFlags::LANDED;
           }
@@ -436,6 +442,8 @@ void Subworld::update(float delta) {
       }
     }
   }
+
+  consumeCollisionEvents();
 
   if (entities.valid(camera)) {
     auto& info = entities.get<CInfo>(camera);
@@ -513,6 +521,34 @@ void Subworld::update(float delta) {
   }
 }
 // end Subworld
+
+void Subworld::genEvent(EventType type, Event event) {
+  switch (type) {
+  case EventType::COLLISION: {
+    CollisionEvent coll_event = std::get<CollisionEvent>(event);
+    switch (coll_event.type) {
+    case CollisionEvent::Type::WORLD:
+      world_collisions.push_back(std::get<WorldCollision>(coll_event.collision));
+      break;
+    case CollisionEvent::Type::ENTITY:
+      entity_collisions.push_back(std::get<EntityCollision>(coll_event.collision));
+      break;
+    }
+    break;
+  }
+  }
+}
+
+void Subworld::consumeCollisionEvents() {
+  for (const auto& event : world_collisions) {
+  }
+
+  for (const auto& event : entity_collisions) {
+  }
+
+  world_collisions.clear();
+  entity_collisions.clear();
+}
 
 // begin Level
 Level::Level(const BaseGame* basegame_arg, Gameplay* gameplay_arg) {
