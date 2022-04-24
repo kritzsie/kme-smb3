@@ -307,10 +307,12 @@ void Subworld::update(float delta) {
   }
 
   // movement code
-  auto move_view = entities.view<CFlags, CVelocity>();
-  for (auto entity : move_view) {
-    UInt32& flags = move_view.get<CFlags>(entity);
-    Vec2f& vel = move_view.get<CVelocity>(entity);
+  auto gravity_and_friction_view = entities.view<CFlags, CVelocity>();
+  auto move_view = entities.view<CPosition>();
+  auto collide_view = entities.view<CCollision, CTimers>();
+  for (auto entity : gravity_and_friction_view) {
+    UInt32& flags = gravity_and_friction_view.get<CFlags>(entity);
+    Vec2f& vel = gravity_and_friction_view.get<CVelocity>(entity);
 
     // apply gravity
     float gravity = getGravity();
@@ -331,117 +333,106 @@ void Subworld::update(float delta) {
         vel.x = std::min(vel.x + 10.f * delta, 0.f);
       }
     }
-  }
 
-  // non-collision movement
-  auto nocollide_view = entities.view<CFlags, CPosition, CVelocity>(entt::exclude<CCollision>);
-  for (auto entity : nocollide_view) {
-    UInt32& flags = nocollide_view.get<CFlags>(entity);
-    Vec2f& pos = nocollide_view.get<CPosition>(entity);
-    Vec2f& vel = nocollide_view.get<CVelocity>(entity);
+    if (move_view.contains(entity)) {
+      Vec2f& pos = move_view.get<CPosition>(entity);
 
-    flags |= EFlags::AIRBORNE;
-    pos += vel * delta;
-  }
-
-  // collision code
-  auto collide_view = entities.view<
-    CPosition, CVelocity,
-    CFlags, CCollision, CTimers
-  >();
-  for (auto entity : collide_view) {
-    UInt32& flags = collide_view.get<CFlags>(entity);
-    Vec2f& pos = collide_view.get<CPosition>(entity);
-    Vec2f& vel = collide_view.get<CVelocity>(entity);
-    auto& coll = collide_view.get<CCollision>(entity);
-    auto& timer = collide_view.get<CTimers>(entity);
-
-    Rect<float> ent_aabb;
-    Rect<int> range;
-
-    bool landed = false;
-
-    pos.x += vel.x * delta;
-
-    ent_aabb = coll.hitbox.toAABB(pos);
-    range = toRange(ent_aabb);
-    for (int y = range.y; y < range.y + range.height; ++y)
-    for (int x = range.x; x < range.x + range.width;  ++x) {
-      Rect<float> tile_aabb = Rect<float>(x, y, 1.f, 1.f);
-      if (ent_aabb.intersects(tile_aabb)) {
-        switch (basegame->level_tile_data.getTileDef(tiles[x][y]).getCollisionType()) {
-        case TileDef::CollisionType::SOLID: {
-          Rect<float> collision = ent_aabb.intersection(tile_aabb);
-          if (ent_aabb.x >= x + 0.5f) {
-            pos.x += collision.width;
-          }
-          else {
-            pos.x -= collision.width;
-          }
-          vel.x = 0.f;
-          ent_aabb = coll.hitbox.toAABB(pos);
-          break;
-        }
-        case TileDef::CollisionType::NONE:
-        default:
-          break;
-        }
-      }
-    }
-
-    pos.y += vel.y * delta;
-
-    ent_aabb = coll.hitbox.toAABB(pos);
-    range = toRange(ent_aabb);
-    for (int y = range.y; y < range.y + range.height; ++y)
-    for (int x = range.x; x < range.x + range.width;  ++x) {
-      Rect<float> tile_aabb = Rect<float>(x, y, 1.f, 1.f);
-      if (ent_aabb.intersects(tile_aabb)) {
-        switch (basegame->level_tile_data.getTileDef(tiles[x][y]).getCollisionType()) {
-        case TileDef::CollisionType::SOLID: {
-          Rect<float> collision = ent_aabb.intersection(tile_aabb);
-          if (ent_aabb.y >= y + 0.5f) {
-            landed = true;
-            pos.y += collision.height;
-          }
-          else {
-            pos.y -= collision.height;
-            timer.jump = 0.f;
-            gameplay->playSound("bump");
-          }
-          vel.y = 0.f;
-          ent_aabb = coll.hitbox.toAABB(pos);
-          break;
-        }
-        case TileDef::CollisionType::PLATFORM: {
-          Rect<float> collision = ent_aabb.intersection(tile_aabb);
-          if (ent_aabb.y > y + 0.5f
-          and pos.y - vel.y * delta >= y + 14.f / 16.f) {
-            landed = true;
-            pos.y += collision.height;
-            vel.y = 0.f;
-            ent_aabb = coll.hitbox.toAABB(pos);
-          }
-          break;
-        }
-        case TileDef::CollisionType::NONE:
-        default:
-          break;
-        }
-      }
-    }
-
-    if (landed) {
-      if (flags & EFlags::AIRBORNE) {
-        flags |= EFlags::LANDED;
+      if (not collide_view.contains(entity)) {
+        flags |= EFlags::AIRBORNE;
+        pos += vel * delta;
       }
       else {
-        flags &= ~EFlags::LANDED;
+        auto& coll = collide_view.get<CCollision>(entity);
+        auto& timer = collide_view.get<CTimers>(entity);
+
+        Rect<float> ent_aabb;
+        Rect<int> range;
+
+        bool landed = false;
+
+        pos.x += vel.x * delta;
+
+        ent_aabb = coll.hitbox.toAABB(pos);
+        range = toRange(ent_aabb);
+        for (int y = range.y; y < range.y + range.height; ++y)
+        for (int x = range.x; x < range.x + range.width;  ++x) {
+          Rect<float> tile_aabb = Rect<float>(x, y, 1.f, 1.f);
+          if (ent_aabb.intersects(tile_aabb)) {
+            switch (basegame->level_tile_data.getTileDef(tiles[x][y]).getCollisionType()) {
+            case TileDef::CollisionType::SOLID: {
+              Rect<float> collision = ent_aabb.intersection(tile_aabb);
+              if (ent_aabb.x >= x + 0.5f) {
+                pos.x += collision.width;
+              }
+              else {
+                pos.x -= collision.width;
+              }
+              vel.x = 0.f;
+              ent_aabb = coll.hitbox.toAABB(pos);
+              break;
+            }
+            case TileDef::CollisionType::NONE:
+            default:
+              break;
+            }
+          }
+        }
+
+        pos.y += vel.y * delta;
+
+        ent_aabb = coll.hitbox.toAABB(pos);
+        range = toRange(ent_aabb);
+        for (int y = range.y; y < range.y + range.height; ++y)
+        for (int x = range.x; x < range.x + range.width;  ++x) {
+          Rect<float> tile_aabb = Rect<float>(x, y, 1.f, 1.f);
+          if (ent_aabb.intersects(tile_aabb)) {
+            switch (basegame->level_tile_data.getTileDef(tiles[x][y]).getCollisionType()) {
+            case TileDef::CollisionType::SOLID: {
+              Rect<float> collision = ent_aabb.intersection(tile_aabb);
+              if (ent_aabb.y >= y + 0.5f) {
+                landed = true;
+                pos.y += collision.height;
+              }
+              else {
+                pos.y -= collision.height;
+                timer.jump = 0.f;
+                gameplay->playSound("bump");
+              }
+              vel.y = 0.f;
+              ent_aabb = coll.hitbox.toAABB(pos);
+              break;
+            }
+            case TileDef::CollisionType::PLATFORM: {
+              Rect<float> collision = ent_aabb.intersection(tile_aabb);
+              if (ent_aabb.y > y + 0.5f
+              and pos.y - vel.y * delta >= y + 14.f / 16.f) {
+                landed = true;
+                pos.y += collision.height;
+                vel.y = 0.f;
+                ent_aabb = coll.hitbox.toAABB(pos);
+              }
+              break;
+            }
+            case TileDef::CollisionType::NONE:
+            default:
+              break;
+            }
+          }
+        }
+
+        if (landed) {
+          if (flags & EFlags::AIRBORNE) {
+            flags |= EFlags::LANDED;
+          }
+          else {
+            flags &= ~EFlags::LANDED;
+          }
+          flags &= ~EFlags::AIRBORNE;
+        }
+        else {
+          flags |= EFlags::AIRBORNE;
+        }
       }
-      flags &= ~EFlags::AIRBORNE;
-    }
-    else {
-      flags |= EFlags::AIRBORNE;
     }
   }
 
@@ -501,6 +492,7 @@ void Subworld::update(float delta) {
 
   // drawable entities
   auto renderstate_view = entities.view<CInfo, CState, CRender>();
+  auto powerup_view = entities.view<CPowerup>();
   for (auto entity : renderstate_view) {
     auto& info = renderstate_view.get<CInfo>(entity);
     EState& state = renderstate_view.get<CState>(entity);
@@ -509,7 +501,6 @@ void Subworld::update(float delta) {
     auto states = basegame->entity_data.getRenderStates(info.type);
 
     auto powerup = Powerup::NONE;
-    auto powerup_view = entities.view<CPowerup>();
     if (powerup_view.contains(entity)) {
       powerup = powerup_view.get<CPowerup>(entity);
     }
