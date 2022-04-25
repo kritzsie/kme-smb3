@@ -8,6 +8,7 @@
 #include <SFML/Window/Keyboard.hpp>
 #include <SFML/Window/Joystick.hpp>
 
+#include <algorithm>
 #include <exception>
 #include <type_traits>
 
@@ -80,8 +81,9 @@ static Rect<int> toRange(Rect<float> aabb) {
 // end ugly
 
 void Subworld::update(float delta) {
-  for (auto entity : entities.view<CInfo>()) {
-    if (not entities.get<CInfo>(entity).valid) {
+  auto info_view = entities.view<CInfo>();
+  for (auto entity : info_view) {
+    if (not info_view.get<CInfo>(entity).valid) {
       entities.destroy(entity);
     }
   }
@@ -306,6 +308,12 @@ void Subworld::update(float delta) {
     }
   }
 
+  auto collision_view = entities.view<CCollision>();
+  for (auto entity : collision_view) {
+    auto& coll = collision_view.get<CCollision>(entity);
+    coll.tiles.clear();
+  }
+
   // movement code
   auto gravity_and_friction_view = entities.view<CFlags, CVelocity>();
   auto move_view = entities.view<CPosition>();
@@ -365,9 +373,25 @@ void Subworld::update(float delta) {
               Rect<float> collision = ent_aabb.intersection(tile_aabb);
               if (ent_aabb.x >= x + 0.5f) {
                 pos.x += collision.width;
+                Event event = CollisionEvent {
+                  .type = CollisionEvent::Type::WORLD,
+                  .collision = WorldCollision {
+                    .subject = entity,
+                    .tile = Vec2i(x, y)
+                  }
+                };
+                genEvent(EventType::COLLISION, event);
               }
               else {
                 pos.x -= collision.width;
+                Event event = CollisionEvent {
+                  .type = CollisionEvent::Type::WORLD,
+                  .collision = WorldCollision {
+                    .subject = entity,
+                    .tile = Vec2i(x, y)
+                  }
+                };
+                genEvent(EventType::COLLISION, event);
               }
               vel.x = 0.f;
               ent_aabb = coll.hitbox.toAABB(pos);
@@ -393,8 +417,6 @@ void Subworld::update(float delta) {
               if (ent_aabb.y >= y + 0.5f) {
                 on_ground = true;
                 pos.y += collision.height;
-              }
-              else {
                 Event event = CollisionEvent {
                   .type = CollisionEvent::Type::WORLD,
                   .collision = WorldCollision {
@@ -403,10 +425,20 @@ void Subworld::update(float delta) {
                   }
                 };
                 genEvent(EventType::COLLISION, event);
+              }
+              else {
                 pos.y -= collision.height;
                 vel.y = 0.f;
                 timer.jump = 0.f;
                 gameplay->playSound("bump");
+                Event event = CollisionEvent {
+                  .type = CollisionEvent::Type::WORLD,
+                  .collision = WorldCollision {
+                    .subject = entity,
+                    .tile = Vec2i(x, y)
+                  }
+                };
+                genEvent(EventType::COLLISION, event);
               }
               ent_aabb = coll.hitbox.toAABB(pos);
               break;
@@ -418,6 +450,14 @@ void Subworld::update(float delta) {
                 on_ground = true;
                 pos.y += collision.height;
                 ent_aabb = coll.hitbox.toAABB(pos);
+                Event event = CollisionEvent {
+                  .type = CollisionEvent::Type::WORLD,
+                  .collision = WorldCollision {
+                    .subject = entity,
+                    .tile = Vec2i(x, y)
+                  }
+                };
+                genEvent(EventType::COLLISION, event);
               }
               break;
             }
@@ -541,6 +581,12 @@ void Subworld::genEvent(EventType type, Event event) {
 
 void Subworld::consumeCollisionEvents() {
   for (const auto& event : world_collisions) {
+    auto entity = event.subject;
+    auto collision_view = entities.view<CCollision>();
+    if (collision_view.contains(entity)) {
+      auto& coll = collision_view.get<CCollision>(entity);
+      coll.tiles.insert(event.tile);
+    }
   }
 
   for (const auto& event : entity_collisions) {
@@ -548,6 +594,9 @@ void Subworld::consumeCollisionEvents() {
 
   world_collisions.clear();
   entity_collisions.clear();
+}
+
+void Subworld::resolveWorldCollisions(Entity entity) {
 }
 
 // begin Level

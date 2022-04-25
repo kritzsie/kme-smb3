@@ -14,6 +14,7 @@
 #include <entt/entt.hpp>
 
 #include <string>
+#include <unordered_set>
 
 #include <cstddef>
 
@@ -57,6 +58,7 @@ struct CState : Component<EState> {};
 
 struct CCollision {
   Hitbox hitbox;
+  std::unordered_set<Vec2i> tiles;
 };
 
 struct CCounters {

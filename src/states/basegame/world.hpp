@@ -51,6 +51,8 @@ public:
 private:
   void consumeCollisionEvents();
 
+  void resolveWorldCollisions(Entity entity);
+
 public:
   Entity player;
   Entity camera;

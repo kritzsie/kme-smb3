@@ -130,3 +130,19 @@ Vec2<T>::operator Vec2<U>() const {
   return Vec2<U>(x, y);
 }
 }
+
+template<>
+struct std::hash<kme::Vec2<short>> {
+  std::size_t operator()(const kme::Vec2<short>& key) const {
+    // size_t should be at least 32 bits.
+    static_assert(sizeof(size_t) >= 2 * sizeof(short), "platform unsupported, word size too small");
+    return key.x | key.y << 16;
+  }
+};
+
+template<>
+struct std::hash<kme::Vec2<int>> {
+  std::size_t operator()(const kme::Vec2<int>& key) const {
+    return key.x ^ (key.y << 16 | key.y >> 16);
+  }
+};

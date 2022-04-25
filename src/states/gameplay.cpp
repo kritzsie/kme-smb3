@@ -426,6 +426,13 @@ void Gameplay::drawHUD() {
 
   TextStyle align_bottom("smb3_sbfont", TextStyle::Flags::ALIGN_BOTTOM);
   drawText(hud, p_meter.str(), Vec2f(64, 6), align_bottom);
+
+  if ("This is only used for debugging tile collisions.") {
+    const auto& coll = entities.get<CCollision>(subworld.player);
+    std::stringstream collisions;
+    collisions << "Tile collisions: " << coll.tiles.size();
+    drawText(hud, collisions.str(), Vec2f(16, 40), align_left);
+  }
 }
 
 Vec2f Gameplay::fromScreen(Vec2f pos) {

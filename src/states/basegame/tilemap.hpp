@@ -8,17 +8,6 @@
 #include <string>
 #include <unordered_map>
 
-namespace std {
-  template<>
-  struct hash<kme::Vec2<short>> {
-    size_t operator()(const kme::Vec2<short>& key) const {
-      // size_t should be at least 32 bits.
-      static_assert(sizeof(size_t) >= 2 * sizeof(short), "platform unsupported, word size too small");
-      return key.x | key.y << 16;
-    }
-  };
-}
-
 namespace kme {
 using Chunk = std::array<std::array<TileID, 16>, 16>;
 using ChunkMap = std::unordered_map<Vec2<short>, Chunk>;
