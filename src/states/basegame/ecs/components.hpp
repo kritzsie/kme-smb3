@@ -40,13 +40,15 @@ struct EFlags {
     FROZEN     = 1 << 4,
     NOGRAVITY  = 1 << 5,
     NOFRICTION = 1 << 6,
+    NOCLIP     = 1 << 7,
 
     AIRBORNE   = 1 << 8,
     LANDED     = 1 << 9,
 
     SOLID      = 1 << 16,
-    ENEMY      = 1 << 17,
-    POWERUP    = 1 << 18
+    INTANGIBLE = 1 << 17,
+    ENEMY      = 1 << 18,
+    POWERUP    = 1 << 19
   };
 };
 

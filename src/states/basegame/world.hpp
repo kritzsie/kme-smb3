@@ -7,6 +7,7 @@
 #include "tilemap.hpp"
 
 #include <unordered_map>
+#include <unordered_set>
 #include <utility>
 #include <variant>
 #include <vector>
@@ -44,13 +45,17 @@ public:
   std::string getTheme() const;
   void setTheme(std::string theme);
 
-  void genEvent(EventType type, Event event);
-
   void update(float delta);
 
 private:
-  void consumeCollisionEvents();
+  void genEvent(EventType type, Event event);
 
+  void genCollisionEvent(Entity entity, Vec2i tile);
+  void genCollisionEvent(Entity entity1, Entity entity2);
+
+  void consumeEvents();
+
+  void checkWorldCollisions(Entity entity, float delta);
   void resolveWorldCollisions(Entity entity);
 
 public:
@@ -64,8 +69,8 @@ private:
   EntityRegistry entities;
   Tilemap tiles;
 
-  std::vector<WorldCollision> world_collisions;
-  std::vector<EntityCollision> entity_collisions;
+  std::unordered_set<WorldCollision> world_collisions;
+  std::unordered_set<EntityCollision> entity_collisions;
 
   Rect<int> bounds;
   float gravity = -60.f;

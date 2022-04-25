@@ -2,6 +2,8 @@
 
 #include "vec2-decl.hpp"
 
+#include <functional>
+
 namespace kme {
 template<typename T>
 Vec2<T>::Vec2() : x(), y() {}
