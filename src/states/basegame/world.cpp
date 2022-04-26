@@ -563,12 +563,12 @@ void Subworld::resolveWorldCollisions(Entity entity) {
   for (const auto& i : coll.tiles) {
     Vec2f pos_new = Vec2f(pos.x + best_move.x, pos.y);
     Tile tile = tiles[i.x][i.y];
-    TileDef tile_data = basegame->level_tile_data.getTileDef(tile);
+    TileDef tiledef = basegame->level_tile_data.getTileDef(tile);
     Rect<float> ent_aabb = coll.hitbox.toAABB(pos_new);
     Rect<float> tile_aabb = Rect<float>(i.x, i.y, 1.f, 1.f);
     if (ent_aabb.intersects(tile_aabb)) {
       auto collision = ent_aabb.intersection(tile_aabb);
-      switch (tile_data.getCollisionType()) {
+      switch (tiledef.getCollisionType()) {
       case TileDef::CollisionType::SOLID:
         if (pos_new.y < coll.pos_old.y)
           best_move.y = collision.height;

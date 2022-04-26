@@ -130,6 +130,18 @@ void Gameplay::enter() {
   subworld.setTheme(loader.getTheme());
   loader.loadTiles(subworld.getTiles());
 
+  int lowest_y = 1;
+  for (int x = 1; x < 3; ++x) {
+    for (int y = 1; y < subworld.getBounds().height; ++y) {
+      Tile tile = subworld.getTiles()[x][y];
+      const TileDef& tiledef = getBaseGame()->level_tile_data.getTileDef(tile);
+      if (tiledef.getCollisionType() == TileDef::CollisionType::NONE) {
+        lowest_y = std::max(lowest_y, tile.getPos().y);
+        break;
+      }
+    }
+  }
+
   // entities
   auto& entities = subworld.getEntities();
 
@@ -140,7 +152,7 @@ void Gameplay::enter() {
     ->entity_data.getHitboxes("PlayerMario") \
     ->at(player_powerup).at(player_state);
   entities.emplace<CInfo>(player, "PlayerMario");
-  entities.emplace<CPosition>(player, Vec2f(2.f, 1.f));
+  entities.emplace<CPosition>(player, Vec2f(2.f, lowest_y));
   entities.emplace<CPowerup>(player, player_powerup);
   entities.emplace<CState>(player, player_state);
   entities.emplace<CCollision>(player, player_hitbox);
