@@ -19,18 +19,6 @@
 #include <cstddef>
 
 namespace kme {
-struct CDirection : Component<Sign> {};
-
-struct CInfo {
-  std::string type;
-  Entity parent = entt::null;
-  bool valid = true;
-};
-
-struct CPosition : Component<Vec2f> {};
-
-struct CVelocity : Component<Vec2f> {};
-
 struct EFlags {
   enum : UInt32 {
     DEAD       = 1 << 0,
@@ -52,14 +40,39 @@ struct EFlags {
   };
 };
 
-struct CFlags : Component<UInt32> {};
+struct CInfo {
+  std::string type;
+  Entity parent = entt::null;
+  bool valid = true;
+};
 
-struct CPowerup : Component<Powerup> {};
+struct CPosition {
+  Vec2f value;
+};
 
-struct CState : Component<EState> {};
+struct CVelocity {
+  Vec2f value;
+};
+
+struct CDirection {
+  Sign value;
+};
+
+struct CFlags {
+  UInt32 value;
+};
+
+struct CPowerup {
+  Powerup value;
+};
+
+struct CState {
+  EState value;
+};
 
 struct CCollision {
   Hitbox hitbox;
+  Vec2f pos_old;
   std::unordered_set<Vec2i> tiles;
 };
 

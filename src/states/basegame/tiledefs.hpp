@@ -18,7 +18,16 @@ public:
 class TileDef {
 public:
   enum class CollisionType {
-    NONE, SOLID, PLATFORM
+    NONE, SOLID, PLATFORM, SLOPE
+  };
+
+  enum class SlopeType {
+    SLOPE_UP, SLOPE_DOWN,
+    CEIL_SLOPE_UP, CEIL_SLOPE_DOWN,
+    SLOPE_UP_GENTLE_BOTTOM, SLOPE_UP_GENTLE_TOP,
+    SLOPE_DOWN_GENTLE_TOP, SLOPE_DOWN_GENTLE_BOTTOM,
+    CEIL_SLOPE_UP_GENTLE_BOTTOM, CEIL_SLOPE_UP_GENTLE_TOP,
+    CEIL_SLOPE_DOWN_GENTLE_TOP, CEIL_SLOPE_DOWN_GENTLE_BOTTOM
   };
 
   TileDef();
@@ -34,6 +43,7 @@ public:
 
 private:
   CollisionType collision_type;
+  SlopeType slope_type;
 
   RenderFrames frames;
 };

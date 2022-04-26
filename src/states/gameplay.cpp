@@ -207,7 +207,7 @@ void Gameplay::draw(float delta) {
   if (window != nullptr) {
     const Subworld& subworld = level.getSubworld(current_subworld);
     const EntityRegistry& entities = subworld.getEntities();
-    const Vec2f& pos = entities.get<CPosition>(subworld.camera);
+    const auto& pos = entities.get<CPosition>(subworld.camera).value;
     Rect bounds = subworld.getBounds();
 
     // restrict camera to world boundaries
@@ -348,7 +348,7 @@ void Gameplay::drawEntities() {
   auto view = entities.view<CInfo, CPosition, CRender>();
   for (auto entity : view) {
     const auto& info = view.get<const CInfo>(entity);
-    const Vec2f& pos = view.get<const CPosition>(entity);
+    const auto& pos = view.get<const CPosition>(entity).value;
     const auto& render = view.get<const CRender>(entity);
 
     const auto& frame = entity_data.getRenderStates(info.type)->getFrame(render.state);
@@ -356,7 +356,7 @@ void Gameplay::drawEntities() {
     Sign direction = Sign::PLUS;
     auto direction_view = entities.view<CDirection>();
     if (direction_view.contains(entity)) {
-      direction = direction_view.get<const CDirection>(entity);
+      direction = direction_view.get<const CDirection>(entity).value;
     }
 
     std::string spritename = frame.texture;
@@ -384,7 +384,6 @@ void Gameplay::drawHUD() {
   const auto& entities = subworld.getEntities();
 
   const auto& counters = entities.get<CCounters>(subworld.player);
-  const auto& timers = entities.get<CTimers>(subworld.player);
 
   std::stringstream worldnum;
   worldnum << util::highASCII("abcd") << '\0' << '-' << 1;
@@ -426,13 +425,6 @@ void Gameplay::drawHUD() {
 
   TextStyle align_bottom("smb3_sbfont", TextStyle::Flags::ALIGN_BOTTOM);
   drawText(hud, p_meter.str(), Vec2f(64, 6), align_bottom);
-
-  if ("This is only used for debugging tile collisions.") {
-    const auto& coll = entities.get<CCollision>(subworld.player);
-    std::stringstream collisions;
-    collisions << "Tile collisions: " << coll.tiles.size();
-    drawText(hud, collisions.str(), Vec2f(16, 40), align_left);
-  }
 }
 
 Vec2f Gameplay::fromScreen(Vec2f pos) {

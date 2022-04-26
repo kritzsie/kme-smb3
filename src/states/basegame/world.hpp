@@ -55,7 +55,7 @@ private:
 
   void consumeEvents();
 
-  void checkWorldCollisions(Entity entity, float delta);
+  void checkWorldCollisions(Entity entity);
   void resolveWorldCollisions(Entity entity);
 
 public:
