@@ -99,16 +99,19 @@ void Subworld::update(float delta) {
   for (auto entity : render_view) {
     auto& render = render_view.get<CRender>(entity);
 
+    bool animate_faster = false;
+
     auto vel_view = entities.view<CVelocity, CState>();
     if (vel_view.contains(entity)) {
-      auto& vel = vel_view.get<CVelocity>(entity).value;
       auto& state = vel_view.get<CState>(entity).value;
       if (state == EState::WALK) {
-        render.time += std::clamp(std::abs(vel.x) / 3.f, 1.f, 4.f) * delta;
+        animate_faster = true;
       }
-      else {
-        render.time += delta;
-      }
+    }
+
+    if (animate_faster) {
+      auto& vel = vel_view.get<CVelocity>(entity).value;
+      render.time += std::clamp(std::abs(vel.x) / 3.f, 1.f, 4.f) * delta;
     }
     else {
       render.time += delta;
