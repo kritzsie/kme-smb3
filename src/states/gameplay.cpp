@@ -174,7 +174,7 @@ void Gameplay::enter() {
   /*
   auto mushroom = entities.create();
   entities.emplace<CInfo>(mushroom, "Mushroom");
-  entities.emplace<CPosition>(mushroom, Vec2f(9.f, 1.f));
+  entities.emplace<CPosition>(mushroom, Vec2f(9.f, 4.f));
   entities.emplace<CCollision>(mushroom, Hitbox(1.f, 1.f));
   entities.emplace<CFlags>(mushroom, EFlags::POWERUP);
   entities.emplace<CPowerup>(mushroom, Powerup::MUSHROOM);
@@ -183,7 +183,7 @@ void Gameplay::enter() {
 
   auto pswitch = entities.create();
   entities.emplace<CInfo>(pswitch, "PSwitch");
-  entities.emplace<CPosition>(pswitch, Vec2f(6.f, 1.f));
+  entities.emplace<CPosition>(pswitch, Vec2f(6.f, 3.f));
   entities.emplace<CCollision>(pswitch, Hitbox(1.f, 1.f));
   entities.emplace<CPowerup>(pswitch, player_powerup);
   entities.emplace<CFlags>(pswitch);

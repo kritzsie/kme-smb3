@@ -345,6 +345,23 @@ void BaseGame::enter() {
   water->music = "swimming.spc";
   themes["water"] = std::move(water);
 
+  auto fortress = std::make_unique<Theme>();
+  fortress->background = sf::Color::Black;
+  fortress->layers[-1] = {
+    .texture = "fortressback",
+    .offset = Vec2f(0.f, -62.f),
+    .parallax = Vec2f(0.75f, 0.f),
+    .repeat_y = false
+  };
+  fortress->layers[0] = {
+    .texture = "fortressfront",
+    .offset = Vec2f(0.f, 0.f),
+    .parallax = Vec2f(0.375f, 0.f),
+    .repeat_y = false
+  };
+  fortress->music = "fortress.spc";
+  themes["fortress"] = std::move(fortress);
+
   auto bonus_room = std::make_unique<Theme>();
   bonus_room->background = sf::Color::Black;
   bonus_room->layers[0] = {
