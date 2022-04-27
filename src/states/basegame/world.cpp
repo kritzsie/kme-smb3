@@ -502,7 +502,6 @@ void Subworld::consumeEvents() {
 
 void Subworld::checkWorldCollisions(Entity entity) {
   Vec2f& pos = entities.get<CPosition>(entity).value;
-  Vec2f& vel = entities.get<CVelocity>(entity).value;
   auto& coll = entities.get<CCollision>(entity);
 
   Rect<float> ent_aabb = coll.hitbox.toAABB(pos);
@@ -518,7 +517,7 @@ void Subworld::checkWorldCollisions(Entity entity) {
       break;
     }
     case TileDef::CollisionType::PLATFORM: {
-      if (coll.pos_old.y >= y + 14.f / 16.f) {
+      if (coll.pos_old.y >= y + 0.5f) {
         genCollisionEvent(entity, Vec2(x, y));
       }
       break;
@@ -547,7 +546,7 @@ void Subworld::resolveWorldCollisions(Entity entity) {
       auto collision = ent_aabb.intersection(tile_aabb);
       switch (tile_data.getCollisionType()) {
       case TileDef::CollisionType::SOLID:
-        if (pos_new.x < coll.pos_old.x)
+        if (coll.pos_old.x >= pos_new.x)
           best_move.x = collision.width;
         else
           best_move.x = -collision.width;
@@ -570,13 +569,14 @@ void Subworld::resolveWorldCollisions(Entity entity) {
       auto collision = ent_aabb.intersection(tile_aabb);
       switch (tiledef.getCollisionType()) {
       case TileDef::CollisionType::SOLID:
-        if (pos_new.y < coll.pos_old.y)
+        if (coll.pos_old.y >= pos_new.y)
           best_move.y = collision.height;
         else
           best_move.y = -collision.height;
         break;
       case TileDef::CollisionType::PLATFORM:
-        best_move.y = collision.height;
+        if (coll.pos_old.y >= pos_new.y)
+          best_move.y = collision.height;
         break;
       case TileDef::CollisionType::SLOPE:
         break;
