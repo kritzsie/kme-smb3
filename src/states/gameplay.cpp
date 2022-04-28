@@ -145,9 +145,9 @@ void Gameplay::enter() {
   auto player_powerup = Powerup::NONE;
   auto player_state = EState::IDLE;
   auto player_hitbox = getBaseGame() \
-    ->entity_data.getHitboxes("PlayerMario") \
+    ->entity_data.getHitboxes("Player") \
     ->at(player_powerup).at(player_state);
-  entities.emplace<CInfo>(player, "PlayerMario");
+  entities.emplace<CInfo>(player, "Player");
   entities.emplace<CPosition>(player, Vec2f(2.f, lowest_y));
   entities.emplace<CPowerup>(player, player_powerup);
   entities.emplace<CState>(player, player_state);

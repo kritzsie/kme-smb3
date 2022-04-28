@@ -230,7 +230,7 @@ void BaseGame::enter() {
   (*mario_hitboxes)[Powerup::NONE][EState::IDLE] = Hitbox(5.f / 16.f, 15.f / 16.f);
   (*mario_hitboxes)[Powerup::MUSHROOM][EState::IDLE] = Hitbox(5.f / 16.f, 25.f / 16.f);
   (*mario_hitboxes)[Powerup::MUSHROOM][EState::DUCK] = Hitbox(5.f / 16.f, 15.f / 16.f);
-  entity_data.registerHitboxes("PlayerMario", std::move(mario_hitboxes));
+  entity_data.registerHitboxes("Player", std::move(mario_hitboxes));
 
   RenderStates mario_rs;
   mario_rs.pushFrame("IDLE", "smallmariowalk_0", Rect<int>(0, 0, 12, 15), Vec2f(6, -1), 0.f);
@@ -268,7 +268,7 @@ void BaseGame::enter() {
   mario_rs.pushFrame("SLIP.BIG", "bigmarioslip", Rect<int>(0, 0, 16, 28), Vec2f(7, -1), 0.f);
 
   mario_rs.pushFrame("DUCK.BIG", "bigmarioduck", Rect<int>(0, 0, 14, 18), Vec2f(6, -1), 0.f);
-  entity_data.registerRenderStates("PlayerMario", std::move(mario_rs));
+  entity_data.registerRenderStates("Player", std::move(mario_rs));
 
   RenderStates mushroom_rs;
   mushroom_rs.pushFrame("IDLE.BIG", "redmushroom", Rect<int>(0, 0, 16, 16), Vec2f(8, -1), 0.f);

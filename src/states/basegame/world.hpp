@@ -57,7 +57,10 @@ private:
   void consumeEvents();
 
   void checkWorldCollisions(Entity entity);
-  void resolveWorldCollisions(Entity entity);
+  void handleWorldCollisions(Entity entity);
+
+  void checkEntityCollisions(Entity entity);
+  void handleEntityCollisions(Entity entity);
 
 public:
   Entity player;

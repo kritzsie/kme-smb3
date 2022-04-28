@@ -8,6 +8,7 @@
 #include <SFML/Window/Keyboard.hpp>
 #include <SFML/Window/Joystick.hpp>
 
+#include <algorithm>
 #include <exception>
 #include <type_traits>
 
@@ -84,7 +85,8 @@ static Rect<int> toRange(Rect<float> aabb) {
 void Subworld::update(float delta) {
   auto info_view = entities.view<CInfo>();
   for (auto entity : info_view) {
-    if (not info_view.get<CInfo>(entity).valid) {
+    auto& info = info_view.get<CInfo>(entity);
+    if (not info.valid) {
       entities.destroy(entity);
     }
   }
@@ -334,7 +336,7 @@ void Subworld::update(float delta) {
 
   // movement code
   auto move_view = entities.view<CFlags, CPosition, CVelocity>();
-  auto collide_view = entities.view<CCollision>();
+  //auto collision_view = entities.view<CCollision>();
   for (auto entity : move_view) {
     auto& flags = move_view.get<CFlags>(entity).value;
     auto& pos = move_view.get<CPosition>(entity).value;
@@ -360,16 +362,20 @@ void Subworld::update(float delta) {
       }
     }
 
-    if (~flags & EFlags::NOCLIP and collide_view.contains(entity)) {
+    if (collision_view.contains(entity)) {
       Vec2f pos_old = pos;
       pos.x = pos_old.x + vel.x * delta;
       checkWorldCollisions(entity);
+      checkEntityCollisions(entity);
       pos.y = pos_old.y + vel.y * delta;
       checkWorldCollisions(entity);
+      checkEntityCollisions(entity);
       pos = pos_old + vel * delta;
       checkWorldCollisions(entity);
+      checkEntityCollisions(entity);
 
-      resolveWorldCollisions(entity);
+      handleWorldCollisions(entity);
+      handleEntityCollisions(entity);
     }
     else {
       pos += vel * delta;
@@ -469,7 +475,10 @@ void Subworld::genEvent(EventType type, Event event) {
     }
     case CollisionEvent::Type::ENTITY:
       auto ent_coll = std::get<EntityCollision>(coll_event.collision);
+      auto ent_coll_reverse = ent_coll;
+      std::swap(ent_coll_reverse.entity1, ent_coll_reverse.entity2);
       entity_collisions.insert(ent_coll);
+      entity_collisions.insert(ent_coll_reverse);
       break;
     }
     break;
@@ -487,6 +496,16 @@ void Subworld::genCollisionEvent(Entity entity, Vec2i tile) {
   });
 }
 
+void Subworld::genCollisionEvent(Entity entity1, Entity entity2) {
+  genEvent(EventType::COLLISION, CollisionEvent {
+    .type = CollisionEvent::Type::ENTITY,
+    .collision = EntityCollision {
+      .entity1 = entity1,
+      .entity2 = entity2
+    }
+  });
+}
+
 void Subworld::consumeEvents() {
   for (const auto& event : world_collisions) {
   }
@@ -499,34 +518,37 @@ void Subworld::consumeEvents() {
 }
 
 void Subworld::checkWorldCollisions(Entity entity) {
-  Vec2f& pos = entities.get<CPosition>(entity).value;
+  auto& flags = entities.get<CFlags>(entity).value;
+  auto& pos = entities.get<CPosition>(entity).value;
   auto& coll = entities.get<CCollision>(entity);
 
-  Rect<float> ent_aabb = coll.hitbox.toAABB(pos);
-  Rect<int> range = toRange(ent_aabb);
-  for (int y = range.y; y < range.y + range.height; ++y)
-  for (int x = range.x; x < range.x + range.width;  ++x) {
-    Rect<float> tile_aabb = Rect<float>(x, y, 1.f, 1.f);
-    switch (basegame->level_tile_data.getTileDef(tiles[x][y]).getCollisionType()) {
-    case TileDef::CollisionType::SOLID: {
-      if (ent_aabb.intersects(tile_aabb)) {
-        genCollisionEvent(entity, Vec2(x, y));
+  if (~flags & EFlags::NOCLIP) {
+    Rect<float> ent_aabb = coll.hitbox.toAABB(pos);
+    Rect<int> range = toRange(ent_aabb);
+    for (int y = range.y; y < range.y + range.height; ++y)
+    for (int x = range.x; x < range.x + range.width;  ++x) {
+      Rect<float> tile_aabb = Rect<float>(x, y, 1.f, 1.f);
+      switch (basegame->level_tile_data.getTileDef(tiles[x][y]).getCollisionType()) {
+      case TileDef::CollisionType::SOLID: {
+        if (ent_aabb.intersects(tile_aabb)) {
+          genCollisionEvent(entity, Vec2(x, y));
+        }
+        break;
       }
-      break;
-    }
-    case TileDef::CollisionType::PLATFORM: {
-      if (coll.pos_old.y >= y + 0.5f) {
-        genCollisionEvent(entity, Vec2(x, y));
+      case TileDef::CollisionType::PLATFORM: {
+        if (coll.pos_old.y >= y + 0.5f) {
+          genCollisionEvent(entity, Vec2(x, y));
+        }
+        break;
       }
-      break;
-    }
-    default:
-      break;
+      default:
+        break;
+      }
     }
   }
 }
 
-void Subworld::resolveWorldCollisions(Entity entity) {
+void Subworld::handleWorldCollisions(Entity entity) {
   auto& flags = entities.get<CFlags>(entity).value;
   auto& pos = entities.get<CPosition>(entity).value;
   auto& vel = entities.get<CVelocity>(entity).value;
@@ -631,6 +653,60 @@ void Subworld::resolveWorldCollisions(Entity entity) {
         gameplay->playSound("bump");
       }
       vel.y = 0.f;
+    }
+  }
+}
+
+void Subworld::checkEntityCollisions(Entity entity1) {
+  auto& flags1 = entities.get<CFlags>(entity1).value;
+  auto& pos1 = entities.get<CPosition>(entity1).value;
+  auto& coll1 = entities.get<CCollision>(entity1);
+
+  auto collision_view = entities.view<CFlags, CPosition, CCollision>();
+  if (flags1 & EFlags::INTANGIBLE)
+    return; // Intangible entities don't collide with other entities
+
+  for (auto entity2 : collision_view) {
+    auto& flags2 = collision_view.get<CFlags>(entity2).value;
+    auto& pos2 = collision_view.get<CPosition>(entity2).value;
+    auto& coll2 = collision_view.get<CCollision>(entity2);
+
+    if (entity1 == entity2)
+      continue; // Don't collide with self!
+
+    if (flags2 & EFlags::INTANGIBLE)
+      continue;
+
+    Rect<float> entity1_aabb = coll1.hitbox.toAABB(pos1);
+    Rect<float> entity2_aabb = coll2.hitbox.toAABB(pos2);
+    if (entity1_aabb.intersects(entity2_aabb)) {
+      genCollisionEvent(entity1, entity2);
+    }
+  }
+}
+
+void Subworld::handleEntityCollisions(Entity entity) {
+  for (const auto& collision_event : entity_collisions) {
+    auto entity1 = collision_event.entity1;
+    auto entity2 = collision_event.entity2;
+
+    auto& info1 = entities.get<CInfo>(entity1);
+    auto& flags1 = entities.get<CFlags>(entity1).value;
+
+    auto& info2 = entities.get<CInfo>(entity2);
+    auto& flags2 = entities.get<CFlags>(entity2).value;
+
+    if (info1.type == "Player" and flags2 & EFlags::POWERUP) {
+      auto powerup_view = entities.view<CPowerup>();
+      if (powerup_view.contains(entity1) and powerup_view.contains(entity2)) {
+        auto& powerup1 = powerup_view.get<CPowerup>(entity1).value;
+        auto& powerup2 = powerup_view.get<CPowerup>(entity2).value;
+
+        powerup1 = powerup2;
+        gameplay->playSound("powerup");
+
+        info2.valid = false;
+      }
     }
   }
 }
