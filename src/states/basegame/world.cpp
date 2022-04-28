@@ -588,11 +588,24 @@ void Subworld::resolveWorldCollisions(Entity entity) {
 
   auto timers_view = entities.view<CTimers>();
 
-  if (best_move.x > 0.f) {
-    vel.x = 0.f;
+  if (flags & EFlags::ENEMY
+  or  flags & EFlags::POWERUP) {
+    if (best_move.x != 0.f) {
+      auto direction_view = entities.view<CDirection>();
+      if (direction_view.contains(entity)) {
+        auto& direction = direction_view.get<CDirection>(entity).value;
+        direction = -direction;
+      }
+      vel.x = -vel.x;
+    }
   }
-  else if (best_move.x < 0.f) {
-    vel.x = 0.f;
+  else {
+    if (best_move.x > 0.f) {
+      vel.x = 0.f;
+    }
+    else if (best_move.x < 0.f) {
+      vel.x = 0.f;
+    }
   }
 
   if (best_move.y > 0.f) {
