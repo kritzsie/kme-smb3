@@ -33,6 +33,7 @@ public:
 
   const Tilemap& getTiles() const;
   Tilemap& getTiles();
+  void setTiles(const Tilemap& tiles);
 
   Rect<int> getBounds() const;
   void setBounds(int width, int height);

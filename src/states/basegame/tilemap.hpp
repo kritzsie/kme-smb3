@@ -60,6 +60,9 @@ public:
   Proxy operator [](int x);
   Tile operator [](Vec2<int> pos);
 
+  const ChunkMap& getChunks() const;
+  ChunkMap& getChunks();
+
 private:
   ChunkMap chunks;
 };

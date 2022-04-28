@@ -13,7 +13,8 @@ namespace kme::util {
 StringList sanitize(const StringList& path);
 std::string sanitize(const std::string& path);
 
-std::vector<char> readFile(std::string path);
+StringList getFiles(const std::string& path);
+std::vector<char> readFile(const std::string& path);
 
 class FileInputStream : public sf::FileInputStream {
 public:

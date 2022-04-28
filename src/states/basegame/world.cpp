@@ -36,6 +36,10 @@ Tilemap& Subworld::getTiles() {
   return const_cast<Tilemap&>(static_cast<const Subworld*>(this)->getTiles());
 }
 
+void Subworld::setTiles(const Tilemap& tiles_arg) {
+  tiles = tiles_arg;
+}
+
 Rect<int> Subworld::getBounds() const {
   return bounds;
 }
@@ -66,8 +70,6 @@ std::string Subworld::getTheme() const {
 
 void Subworld::setTheme(std::string theme_arg) {
   theme = theme_arg;
-  auto theme_ptr = basegame->themes.at(theme);
-  gameplay->playMusic(theme_ptr->music);
 }
 
 // begin ugly
@@ -624,7 +626,6 @@ void Subworld::resolveWorldCollisions(Entity entity) {
 Level::Level(const BaseGame* basegame_arg, Gameplay* gameplay_arg) {
   basegame = basegame_arg;
   gameplay = gameplay_arg;
-  createSubworld();
 }
 
 std::size_t Level::createSubworld() {
@@ -651,7 +652,7 @@ std::size_t Level::createSubworld(std::size_t index_hint) {
 }
 
 bool Level::subworldExists(std::size_t index) {
-  return index == 0 or subworld.find(index) != subworld.end();
+  return subworld.find(index) != subworld.end();
 }
 
 bool Level::deleteSubworld(std::size_t index) {

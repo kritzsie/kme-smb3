@@ -72,5 +72,13 @@ Tilemap::Proxy Tilemap::operator [](int x) {
 Tile Tilemap::operator [](Vec2<int> pos) {
   return operator [](pos.x)[pos.y];
 }
+
+const ChunkMap& Tilemap::getChunks() const {
+  return chunks;
+}
+
+ChunkMap& Tilemap::getChunks() {
+  return const_cast<ChunkMap&>(static_cast<const Tilemap*>(this)->getChunks());
+}
 // end Tilemap
 }

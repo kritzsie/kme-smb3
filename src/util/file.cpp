@@ -32,7 +32,29 @@ std::string sanitize(const std::string& path) {
   return join(sanitize(split(path, "/")), "/");
 }
 
-std::vector<char> readFile(std::string path) {
+StringList getFiles(const std::string& path) {
+  if (PHYSFS_isInit() == 0) {
+    throw std::runtime_error(PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode()));
+  }
+
+  StringList files;
+
+  char** rc = PHYSFS_enumerateFiles(sanitize(path).c_str());
+  if (rc == nullptr) {
+    std::runtime_error ex(PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode()));
+    PHYSFS_freeList(rc);
+    throw ex;
+  }
+
+  for (char** i = rc; *i != nullptr; ++i) {
+    files.push_back(*i);
+  }
+
+  PHYSFS_freeList(rc);
+  return files;
+}
+
+std::vector<char> readFile(const std::string& path) {
   if (PHYSFS_isInit() == 0) {
     throw std::runtime_error(PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode()));
   }

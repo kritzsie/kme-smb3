@@ -14,6 +14,7 @@ add_executable(
   src/states/basegame/ecs/entitydata.cpp
   src/states/basegame/collision.cpp
   src/states/basegame/hitbox.cpp
+  src/states/basegame/levelloader.cpp
   src/states/basegame/tiledefs.cpp
   src/states/basegame/tilemap.cpp
   src/states/basegame/world.cpp
@@ -26,7 +27,6 @@ add_executable(
   src/util/util.cpp
   src/assetmanager.cpp
   src/engine.cpp
-  src/maploader.cpp
   src/music.cpp
   src/renderer.cpp
   src/sound.cpp

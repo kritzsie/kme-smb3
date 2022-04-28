@@ -1,10 +1,10 @@
 #include "gameplay.hpp"
 
 #include "basegame/ecs/components.hpp"
+#include "basegame/levelloader.hpp"
 
 #include "../assetmanager.hpp"
 #include "../engine.hpp"
-#include "../maploader.hpp"
 #include "../renderer.hpp"
 #include "../util.hpp"
 
@@ -34,8 +34,6 @@ Gameplay::Gameplay(BaseState* parent, Engine* engine)
 
   camera_pos = Vec2f(15.f, 8.4375f);
   camera_radius = Vec2f(15.f, 8.4375f);
-
-  current_subworld = 0;
 
   inputs[Action::UP]       = 0;
   inputs[Action::DOWN]     = 0;
@@ -123,12 +121,10 @@ bool Gameplay::handleInput(sf::Event::EventType type, const sf::Event& event) {
 }
 
 void Gameplay::enter() {
-  Subworld& subworld = level.getSubworld(current_subworld);
+  LevelLoader loader = LevelLoader(1, 1);
+  loader.load(level);
 
-  MapLoader loader = MapLoader("1-1/0");
-  subworld.setBounds(loader.getBounds());
-  subworld.setTheme(loader.getTheme());
-  loader.loadTiles(subworld.getTiles());
+  Subworld& subworld = level.getSubworld(current_subworld);
 
   int lowest_y = 1;
   for (int x = 1; x < 3; ++x) {
@@ -190,6 +186,9 @@ void Gameplay::enter() {
   entities.emplace<CState>(pswitch);
   entities.emplace<CRender>(pswitch);
   */
+
+  std::shared_ptr<Theme> theme_ptr = getBaseGame()->themes.at(subworld.getTheme());
+  playMusic(theme_ptr->music);
 }
 
 void Gameplay::exit() {}
@@ -245,10 +244,9 @@ void Gameplay::draw(float delta) {
     view.setCenter(toScreen(camera_pos));
     scene->setView(view);
 
-    std::string theme = subworld.getTheme();
-    auto theme_ptr = getBaseGame()->themes.at(theme);
+    std::shared_ptr<Theme> theme_ptr = getBaseGame()->themes.at(subworld.getTheme());
     drawBackground(theme_ptr->background);
-    for (auto it : theme_ptr->layers) {
+    for (std::pair<int, const Layer&> it : theme_ptr->layers) {
       const auto& layer = it.second;
       drawBackground(layer.texture, layer.offset, layer.parallax, layer.repeat_y);
     }
