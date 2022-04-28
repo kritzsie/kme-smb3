@@ -331,12 +331,12 @@ void Subworld::update(float delta) {
   }
 
   // movement code
-  auto gravity_and_friction_view = entities.view<CFlags, CVelocity>();
-  auto move_view = entities.view<CPosition>();
+  auto move_view = entities.view<CFlags, CPosition, CVelocity>();
   auto collide_view = entities.view<CCollision>();
-  for (auto entity : gravity_and_friction_view) {
-    auto& flags = gravity_and_friction_view.get<CFlags>(entity).value;
-    auto& vel = gravity_and_friction_view.get<CVelocity>(entity).value;
+  for (auto entity : move_view) {
+    auto& flags = move_view.get<CFlags>(entity).value;
+    auto& pos = move_view.get<CPosition>(entity).value;
+    auto& vel = move_view.get<CVelocity>(entity).value;
 
     // apply gravity
     float gravity = getGravity();
@@ -358,23 +358,19 @@ void Subworld::update(float delta) {
       }
     }
 
-    if (move_view.contains(entity)) {
-      auto& pos = move_view.get<CPosition>(entity).value;
+    if (~flags & EFlags::NOCLIP and collide_view.contains(entity)) {
+      Vec2f pos_old = pos;
+      pos.x = pos_old.x + vel.x * delta;
+      checkWorldCollisions(entity);
+      pos.y = pos_old.y + vel.y * delta;
+      checkWorldCollisions(entity);
+      pos = pos_old + vel * delta;
+      checkWorldCollisions(entity);
 
-      if (flags & EFlags::NOCLIP or not collide_view.contains(entity)) {
-        pos += vel * delta;
-      }
-      else {
-        Vec2f pos_old = pos;
-        pos.x = pos_old.x + vel.x * delta;
-        checkWorldCollisions(entity);
-        pos.y = pos_old.y + vel.y * delta;
-        checkWorldCollisions(entity);
-        pos = pos_old + vel * delta;
-        checkWorldCollisions(entity);
-
-        resolveWorldCollisions(entity);
-      }
+      resolveWorldCollisions(entity);
+    }
+    else {
+      pos += vel * delta;
     }
   }
 

@@ -100,8 +100,8 @@ public:
   const const_iterator cbegin() const;
   const const_iterator cend() const;
   const const_iterator begin() const;
-  iterator begin();
   const const_iterator end() const;
+  iterator begin();
   iterator end();
 
 private:
