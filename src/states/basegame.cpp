@@ -270,6 +270,13 @@ void BaseGame::enter() {
   mario_rs.pushFrame("DUCK.BIG", "bigmarioduck", Rect<int>(0, 0, 14, 18), Vec2f(6, -1), 0.f);
   entity_data.registerRenderStates("Player", std::move(mario_rs));
 
+  RenderStates goomba;
+  goomba.pushFrame("WALK", "goombawalk_0", Rect<int>(0, 0, 16, 16), Vec2f(8, -1), 8.f / 60.f);
+  goomba.pushFrame("WALK", "goombawalk_1", Rect<int>(0, 0, 16, 16), Vec2f(8, -1), 8.f / 60.f);
+
+  goomba.pushFrame("DEATH", "goombastomp", Rect<int>(0, 0, 16, 9), Vec2f(8, -1), 0.f);
+  entity_data.registerRenderStates("Goomba", std::move(goomba));
+
   RenderStates mushroom_rs;
   mushroom_rs.pushFrame("IDLE.BIG", "redmushroom", Rect<int>(0, 0, 16, 16), Vec2f(8, -1), 0.f);
   mushroom_rs.pushFrame("IDLE.FIRE", "fireflower", Rect<int>(0, 0, 16, 16), Vec2f(8, -1), 0.f);

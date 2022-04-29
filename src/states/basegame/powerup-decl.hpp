@@ -8,4 +8,5 @@ enum class Powerup {
 };
 
 constexpr std::string_view getPowerupName(Powerup powerup);
+constexpr std::size_t getPowerupTier(Powerup powerup);
 }

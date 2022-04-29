@@ -169,14 +169,24 @@ void Gameplay::enter() {
 
   auto mushroom = entities.create();
   entities.emplace<CInfo>(mushroom, "Mushroom");
+  entities.emplace<CFlags>(mushroom, EFlags::POWERUP | EFlags::NOFRICTION);
   entities.emplace<CPosition>(mushroom, Vec2f(15.5f, 7.f));
   entities.emplace<CVelocity>(mushroom, Vec2f(4.f, 0.f));
   entities.emplace<CCollision>(mushroom, Hitbox(0.5f, 1.f));
-  entities.emplace<CFlags>(mushroom, EFlags::POWERUP | EFlags::NOFRICTION);
   entities.emplace<CPowerup>(mushroom, Powerup::MUSHROOM);
   entities.emplace<CDirection>(mushroom);
   entities.emplace<CState>(mushroom);
   entities.emplace<CRender>(mushroom);
+
+  auto goomba = entities.create();
+  entities.emplace<CInfo>(goomba, "Goomba");
+  entities.emplace<CFlags>(goomba, EFlags::ENEMY | EFlags::NOFRICTION);
+  entities.emplace<CState>(goomba, EState::WALK);
+  entities.emplace<CPosition>(goomba, Vec2f(15.f, 1.f));
+  entities.emplace<CVelocity>(goomba, Vec2f(-2.f, 0.f));
+  entities.emplace<CCollision>(goomba, Hitbox(0.5f, 1.f));
+  entities.emplace<CDirection>(goomba);
+  entities.emplace<CRender>(goomba);
 
   /*
   auto pswitch = entities.create();
@@ -184,7 +194,7 @@ void Gameplay::enter() {
   entities.emplace<CPosition>(pswitch, Vec2f(6.f, 3.f));
   entities.emplace<CCollision>(pswitch, Hitbox(0.5f, 1.f));
   entities.emplace<CPowerup>(pswitch, player_powerup);
-  entities.emplace<CFlags>(pswitch);
+  entities.emplace<CFlags>(pswitch, EFlags::SOLID);
   entities.emplace<CState>(pswitch);
   entities.emplace<CRender>(pswitch);
   */
@@ -200,18 +210,39 @@ void Gameplay::pause() {}
 void Gameplay::resume() {}
 
 void Gameplay::update(float delta) {
+  suspended_previous = suspended;
+
   for (auto& input : inputs) {
     input.second.update();
   }
 
-  if (level.timer > 0.f) {
-    level.timer = std::max(level.timer - delta, 0.f);
+  Subworld& subworld = level.getSubworld(current_subworld);
+  if (not suspended) {
+    subworld.update(delta);
+
+    if (level.timer > 0.f) {
+      level.timer = std::max(level.timer - delta, 0.f);
+    }
+  }
+  else {
+    if (not suspended_previous) {
+      engine->sound->stop();
+    }
   }
 
-  Subworld& subworld = level.getSubworld(current_subworld);
-  subworld.update(delta);
-
   ticktime += delta;
+}
+
+void Gameplay::suspend() {
+  suspended = true;
+}
+
+void Gameplay::unsuspend() {
+  suspended = false;
+}
+
+bool Gameplay::isSuspended() const {
+  return suspended;
 }
 
 void Gameplay::draw(float delta) {
@@ -254,9 +285,7 @@ void Gameplay::draw(float delta) {
     }
 
     drawTiles();
-
     drawEntities();
-
     drawHUD();
 
     scene->display();
@@ -359,6 +388,15 @@ void Gameplay::drawEntities() {
 
   auto view = entities.view<CInfo, CPosition, CRender>();
   for (auto entity : view) {
+    auto timer_view = entities.view<CTimers>();
+    if (timer_view.contains(entity)) {
+      const auto& timers = timer_view.get<const CTimers>(entity);
+      if (timers.i_frames != 0.f
+      and std::fmod(rendertime, 0.125f) > 0.0625f) {
+        continue; // make player blink on i-frames
+      }
+    }
+
     const auto& info = view.get<const CInfo>(entity);
     const auto& pos = view.get<const CPosition>(entity).value;
     const auto& render = view.get<const CRender>(entity);

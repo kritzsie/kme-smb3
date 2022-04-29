@@ -1,9 +1,10 @@
 #include "world.hpp"
 
-#include "ecs/components.hpp"
-#include "../gameplay.hpp"
 #include "../../sound.hpp"
 #include "../../util.hpp"
+#include "../gameplay.hpp"
+#include "ecs/components.hpp"
+#include "powerup.hpp"
 
 #include <SFML/Window/Keyboard.hpp>
 #include <SFML/Window/Joystick.hpp>
@@ -91,11 +92,23 @@ void Subworld::update(float delta) {
     }
   }
 
-  auto collision_view = entities.view<CPosition, CCollision>();
+  // update collision component
+  auto collision_view = entities.view<CCollision>();
   for (auto entity : collision_view) {
-    auto& pos = collision_view.get<CPosition>(entity).value;
-    auto& coll = collision_view.get<CCollision>(entity);
-    coll.pos_old = pos;
+    auto position_view = entities.view<CPosition>();
+    if (position_view.contains(entity)) {
+      auto& pos = position_view.get<CPosition>(entity).value;
+      auto& coll = collision_view.get<CCollision>(entity);
+      coll.pos_old = pos;
+    }
+  }
+
+  auto timer_view = entities.view<CTimers>();
+  for (auto entity : timer_view) {
+    auto& timers = timer_view.get<CTimers>(entity);
+    if (timers.i_frames > 0.f) {
+      timers.i_frames = std::max(timers.i_frames - delta, 0.f);
+    }
   }
 
   // update render timer
@@ -425,6 +438,7 @@ void Subworld::update(float delta) {
       auto& pos = entities.get<CPosition>(camera).value;
       auto& coll = entities.get<CCollision>(camera);
 
+      // restrict player to camera view
       if (player_pos.x < pos.x - coll.hitbox.radius + player_coll.hitbox.radius + 0.25f) {
         player_pos.x = pos.x - coll.hitbox.radius + player_coll.hitbox.radius + 0.25f;
         player_vel.x = 0.f;
@@ -455,6 +469,13 @@ void Subworld::update(float delta) {
     }
 
     render.state.setState(label, states->getFrameOffset(label, render.time));
+  }
+
+  if (entities.valid(player)) {
+    auto& state = entities.get<CState>(player).value;
+    if (state == EState::DEAD) {
+      gameplay->suspend();
+    }
   }
 
   consumeEvents();
@@ -696,16 +717,44 @@ void Subworld::handleEntityCollisions(Entity entity) {
     auto& info2 = entities.get<CInfo>(entity2);
     auto& flags2 = entities.get<CFlags>(entity2).value;
 
-    if (info1.type == "Player" and flags2 & EFlags::POWERUP) {
-      auto powerup_view = entities.view<CPowerup>();
-      if (powerup_view.contains(entity1) and powerup_view.contains(entity2)) {
-        auto& powerup1 = powerup_view.get<CPowerup>(entity1).value;
-        auto& powerup2 = powerup_view.get<CPowerup>(entity2).value;
+    if (info1.type == "Player") {
+      if (flags2 & EFlags::POWERUP) {
+        auto powerup_view = entities.view<CPowerup>();
+        if (powerup_view.contains(entity2)) {
+          auto& powerup1 = entities.get<CPowerup>(entity1).value;
+          auto& powerup2 = entities.get<CPowerup>(entity2).value;
 
-        powerup1 = powerup2;
-        gameplay->playSound("powerup");
+          powerup1 = powerup2;
+          gameplay->playSound("powerup");
 
-        info2.valid = false;
+          info2.valid = false;
+        }
+      }
+      else if (flags2 & EFlags::ENEMY) {
+        auto& timers = entities.get<CTimers>(entity1);
+        if (timers.i_frames == 0.f) {
+          auto& powerup = entities.get<CPowerup>(entity1).value;
+          auto& state = entities.get<CState>(entity1).value;
+          auto& render = entities.get<CRender>(entity1);
+          switch (getPowerupTier(powerup)) {
+          case 0:
+            flags1 |= EFlags::DEAD;
+            state = EState::DEAD;
+            render.time = 0.f;
+            gameplay->playMusic("playerdown.spc");
+            break;
+          case 1:
+            powerup = Powerup::NONE;
+            timers.i_frames = 2.f;
+            gameplay->playSound("pipe");
+            break;
+          case 2:
+            powerup = Powerup::MUSHROOM;
+            timers.i_frames = 2.f;
+            gameplay->playSound("pipe");
+            break;
+          }
+        }
       }
     }
   }

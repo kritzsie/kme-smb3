@@ -14,4 +14,12 @@ constexpr std::string_view getPowerupName(Powerup powerup) {
     case Powerup::HAMMER:   return "HAMMER";
   }
 }
+
+constexpr std::size_t getPowerupTier(Powerup powerup) {
+  switch (powerup) {
+  case Powerup::NONE:     return 0;
+  case Powerup::MUSHROOM: return 1;
+  default:                return 2;
+  }
+}
 }

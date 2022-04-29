@@ -58,8 +58,20 @@ public:
   std::size_t playSoundLoop(std::string name);
   void stopSoundLoop(std::size_t index);
 
+  void suspend();
+  void unsuspend();
+  bool isSuspended() const;
+
 private:
   BaseGame* getBaseGame();
+
+  void drawBackground(sf::Color color);
+  // parallax here is a factor from 0.0 to 1.0, not distance
+  void drawBackground(std::string texture, Vec2f offset, Vec2f parallax,
+                      bool vertical_tiling = false);
+  void drawTiles();
+  void drawEntities();
+  void drawHUD();
 
 public:
   KeyMap keybinds;
@@ -68,13 +80,8 @@ public:
   InputMap inputs;
 
 private:
-  void drawBackground(sf::Color color);
-  // parallax here is a factor from 0.0 to 1.0, not distance
-  void drawBackground(std::string texture, Vec2f offset, Vec2f parallax,
-                      bool vertical_tiling = false);
-  void drawTiles();
-  void drawEntities();
-  void drawHUD();
+  bool suspended = false;
+  bool suspended_previous = false;
 
   Vec2f fromScreen(Vec2f pos);
   Vec2f toScreen(Vec2f pos);
