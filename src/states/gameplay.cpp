@@ -184,8 +184,9 @@ void Gameplay::enter() {
   entities.emplace<CState>(goomba, EState::WALK);
   entities.emplace<CPosition>(goomba, Vec2f(15.f, 1.f));
   entities.emplace<CVelocity>(goomba, Vec2f(-2.f, 0.f));
-  entities.emplace<CCollision>(goomba, Hitbox(0.5f, 1.f));
+  entities.emplace<CCollision>(goomba, Hitbox(0.5f, 0.75f));
   entities.emplace<CDirection>(goomba);
+  entities.emplace<CTimers>(goomba);
   entities.emplace<CRender>(goomba);
 
   /*
@@ -224,10 +225,9 @@ void Gameplay::update(float delta) {
       level.timer = std::max(level.timer - delta, 0.f);
     }
   }
-  else {
-    if (not suspended_previous) {
-      engine->sound->stop();
-    }
+
+  if (suspended != suspended_previous and not suspended_previous) {
+    engine->sound->stop();
   }
 
   ticktime += delta;

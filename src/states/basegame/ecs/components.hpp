@@ -81,6 +81,7 @@ struct CCounters {
 };
 
 struct CTimers {
+  float death = 0.f;
   float i_frames = 0.f;
   float jump = 0.f;
   float p_speed = 0.f;

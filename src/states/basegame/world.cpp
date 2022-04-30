@@ -84,6 +84,24 @@ static Rect<int> toRange(Rect<float> aabb) {
 // end ugly
 
 void Subworld::update(float delta) {
+  // update timers
+  auto timer_view = entities.view<CTimers>();
+  for (auto entity : timer_view) {
+    auto& timers = timer_view.get<CTimers>(entity);
+
+    if (timers.death > 0.f) {
+      timers.death = std::max(timers.death - delta, 0.f);
+      if (timers.death == 0.f) {
+        auto& info = entities.get<CInfo>(entity);
+        info.valid = false;
+      }
+    }
+
+    if (timers.i_frames > 0.f) {
+      timers.i_frames = std::max(timers.i_frames - delta, 0.f);
+    }
+  }
+
   auto info_view = entities.view<CInfo>();
   for (auto entity : info_view) {
     auto& info = info_view.get<CInfo>(entity);
@@ -92,7 +110,7 @@ void Subworld::update(float delta) {
     }
   }
 
-  // update collision component
+  // update last position
   auto collision_view = entities.view<CCollision>();
   for (auto entity : collision_view) {
     auto position_view = entities.view<CPosition>();
@@ -100,14 +118,6 @@ void Subworld::update(float delta) {
       auto& pos = position_view.get<CPosition>(entity).value;
       auto& coll = collision_view.get<CCollision>(entity);
       coll.pos_old = pos;
-    }
-  }
-
-  auto timer_view = entities.view<CTimers>();
-  for (auto entity : timer_view) {
-    auto& timers = timer_view.get<CTimers>(entity);
-    if (timers.i_frames > 0.f) {
-      timers.i_frames = std::max(timers.i_frames - delta, 0.f);
     }
   }
 
@@ -475,6 +485,7 @@ void Subworld::update(float delta) {
     auto& state = entities.get<CState>(player).value;
     if (state == EState::DEAD) {
       gameplay->suspend();
+      gameplay->playMusic("playerdown.spc");
     }
   }
 
@@ -730,29 +741,57 @@ void Subworld::handleEntityCollisions(Entity entity) {
           info2.valid = false;
         }
       }
-      else if (flags2 & EFlags::ENEMY) {
-        auto& timers = entities.get<CTimers>(entity1);
-        if (timers.i_frames == 0.f) {
-          auto& powerup = entities.get<CPowerup>(entity1).value;
-          auto& state = entities.get<CState>(entity1).value;
-          auto& render = entities.get<CRender>(entity1);
-          switch (getPowerupTier(powerup)) {
-          case 0:
-            flags1 |= EFlags::DEAD;
-            state = EState::DEAD;
-            render.time = 0.f;
-            gameplay->playMusic("playerdown.spc");
-            break;
-          case 1:
-            powerup = Powerup::NONE;
-            timers.i_frames = 2.f;
-            gameplay->playSound("pipe");
-            break;
-          case 2:
-            powerup = Powerup::MUSHROOM;
-            timers.i_frames = 2.f;
-            gameplay->playSound("pipe");
-            break;
+      else if (flags2 & EFlags::ENEMY and ~flags2 & EFlags::DEAD) {
+        auto& pos1 = entities.get<CPosition>(entity1).value;
+        auto& pos2 = entities.get<CPosition>(entity2).value;
+        auto& coll2 = entities.get<CCollision>(entity2);
+
+        if (pos1.y >= pos2.y + coll2.hitbox.height / 2) {
+          auto& vel1 = entities.get<CVelocity>(entity1).value;
+          auto& timers1 = entities.get<CTimers>(entity1);
+          auto& vel2 = entities.get<CVelocity>(entity2).value;
+          auto& timers2 = entities.get<CTimers>(entity2);
+          auto& state2 = entities.get<CState>(entity2).value;
+
+          vel1.y = 12.f;
+          timers1.jump = 0.275f + 0.125f;
+
+          vel2.x = 0.f;
+          timers2.death = 0.25f;
+          flags2 |= EFlags::DEAD;
+          state2 = EState::DEAD;
+
+          gameplay->playSound("stomp");
+        }
+        else {
+          auto& timers1 = entities.get<CTimers>(entity1);
+          if (timers1.i_frames == 0.f) {
+            auto& powerup1 = entities.get<CPowerup>(entity1).value;
+            auto& state1 = entities.get<CState>(entity1).value;
+            auto& render1 = entities.get<CRender>(entity1);
+            auto& vel2 = entities.get<CVelocity>(entity2).value;
+            auto& direction2 = entities.get<CDirection>(entity2).value;
+
+            switch (getPowerupTier(powerup1)) {
+            case 0:
+              flags1 |= EFlags::DEAD;
+              state1 = EState::DEAD;
+              render1.time = 0.f;
+              break;
+            case 1:
+              powerup1 = Powerup::NONE;
+              timers1.i_frames = 2.f;
+              gameplay->playSound("pipe");
+              break;
+            case 2:
+              powerup1 = Powerup::MUSHROOM;
+              timers1.i_frames = 2.f;
+              gameplay->playSound("pipe");
+              break;
+            }
+
+            direction2 = toSign(pos1.x - pos2.x);
+            vel2.x = 2.f * direction2;
           }
         }
       }
