@@ -14,20 +14,11 @@ MusicStream::MusicStream(std::size_t buffer_size, unsigned int channels, unsigne
 MusicStream::MusicStream() : MusicStream(2048, 2, 44100) {}
 
 MusicStream::~MusicStream() {
-  destroy();
-}
-
-void MusicStream::destroy() {
-  if (gme != nullptr) {
-    gme_delete(gme);
-    gme = nullptr;
-  }
+  gme_delete(gme);
 }
 
 bool MusicStream::openFromFile(std::string name) {
   using namespace std::literals;
-
-  destroy();
 
   std::string path = "/music/"s + name;
   std::vector<char> buffer = util::readFile(path);
@@ -66,10 +57,6 @@ void MusicStream::setTempo(double tempo) {
 }
 
 bool MusicStream::onGetData(Chunk& data) {
-  if (gme == nullptr) {
-    return false;
-  }
-
   if (gme_err_t error = gme_play(gme, buffer.size(), buffer.data())) {
     return false;
   }

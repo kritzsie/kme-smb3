@@ -24,10 +24,9 @@ protected:
 
 private:
   void onOpen();
-  void destroy();
 
 private:
-  Music_Emu* gme = nullptr;
+  Music_Emu* gme;
   double tempo = 1.0;
   std::vector<short> buffer;
 };
