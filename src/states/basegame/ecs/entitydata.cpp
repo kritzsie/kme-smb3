@@ -18,7 +18,7 @@ std::shared_ptr<const EntityData::Hitboxes> EntityData::getHitboxes(EntityType t
 }
 
 void EntityData::registerRenderStates(EntityType type, RenderStates rs) {
-  registerRenderStates(type, std::make_shared<RenderStates>(rs));
+  registerRenderStates(type, std::make_shared<RenderStates>(std::move(rs)));
 }
 
 void EntityData::registerRenderStates(EntityType type, std::unique_ptr<RenderStates> rs) {

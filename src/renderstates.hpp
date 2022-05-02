@@ -8,15 +8,28 @@
 #include <vector>
 
 namespace kme {
-using RenderFrames = std::vector<struct RenderFrame>;
-
 struct RenderFrame {
   std::string texture;
   Rect<int> cliprect;
   Vec2f offset;
   float duration;
+};
 
-  RenderFrame(std::string texture, Rect<int> cliprect, Vec2f offset, float duration);
+class RenderFrames {
+public:
+  using List = std::vector<RenderFrame>;
+
+  void pushFrame(RenderFrame frame);
+
+  std::size_t getFrameCount() const;
+  std::size_t getFrameOffset(float time) const;
+
+  const RenderFrame& getFrame(std::size_t offset) const;
+  float getDuration() const;
+
+private:
+  std::vector<RenderFrame> frames;
+  float duration = 0.f;
 };
 
 class RenderState {
@@ -39,9 +52,11 @@ class RenderStates {
 public:
   RenderStates();
 
-  void pushFrame(std::string, RenderFrame);
-  void pushFrame(std::string, std::string, Vec2i, Vec2f, float);
-  void pushFrame(std::string, std::string, Rect<int>, Vec2f, float);
+  void pushFrame(std::string label, RenderFrame frame);
+  void pushFrame(std::string label, std::string texture, Vec2i origin,
+                 Vec2f offset, float duration);
+  void pushFrame(std::string label, std::string texture, Rect<int> cliprect,
+                 Vec2f offset, float duration);
 
   StringList getStateList() const;
 

@@ -1,7 +1,7 @@
 #pragma once
 
-#include <map>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 #include <cmath>
@@ -36,5 +36,5 @@ using ULong = unsigned long;
 using StringList = std::vector<std::string>;
 
 template<typename T>
-using StringTable = std::map<std::string, T>;
+using StringTable = std::unordered_map<std::string, T>;
 }

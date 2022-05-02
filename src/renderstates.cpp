@@ -3,11 +3,38 @@
 #include <cmath>
 
 namespace kme {
-// begin RenderFrame
-RenderFrame::RenderFrame(
-  std::string texture, Rect<int> cliprect, Vec2f offset, float duration
-) : texture(texture), cliprect(cliprect), offset(offset), duration(duration) {}
-// end RenderFrame
+// begin RenderFrames
+void RenderFrames::pushFrame(RenderFrame frame) {
+  frames.push_back(frame);
+  duration += frame.duration;
+}
+
+std::size_t RenderFrames::getFrameCount() const {
+  return frames.size();
+}
+
+std::size_t RenderFrames::getFrameOffset(float time) const {
+  float time_max = 0.f;
+
+  for (const auto& frame : frames) {
+    time_max += frame.duration;
+  }
+
+  float time_mod = std::fmod(time, time_max);
+  float accumulator = 0.f;
+  std::size_t counter = 0;
+
+  while (time_mod >= accumulator) {
+    accumulator += frames[counter++].duration;
+  }
+
+  return (counter - 1) % frames.size();
+}
+
+const RenderFrame& RenderFrames::getFrame(std::size_t offset) const {
+  return frames.at(offset);
+}
+// end RenderFrames
 
 // begin RenderState
 RenderState::RenderState() : RenderState("IDLE") {}
@@ -39,14 +66,17 @@ std::size_t RenderState::getOffset() const {
 RenderStates::RenderStates() {}
 
 void RenderStates::pushFrame(std::string label, RenderFrame renderframe) {
-  states.at(label).push_back(renderframe);
+  states[label].pushFrame(renderframe);
 }
 
 void RenderStates::pushFrame(std::string label, std::string texture,
                              Rect<int> cliprect, Vec2f offset, float duration) {
-  states[label].push_back(
-    RenderFrame{texture, cliprect, offset, duration}
-  );
+  pushFrame(label, RenderFrame {
+    .texture = texture,
+    .cliprect = cliprect,
+    .offset = offset,
+    .duration = duration
+  });
 }
 
 void RenderStates::pushFrame(std::string label, std::string texture,
@@ -66,26 +96,11 @@ StringList RenderStates::getStateList() const {
 }
 
 std::size_t RenderStates::getFrameCount(std::string label) const {
-  return states.at(label).size();
+  return states.at(label).getFrameCount();
 }
 
 std::size_t RenderStates::getFrameOffset(std::string label, float time) const {
-  const RenderFrames& frames = states.at(label);
-  float time_max = 0.f;
-
-  for (auto frame : frames) {
-    time_max += frame.duration;
-  }
-
-  float time_mod = std::fmod(time, time_max);
-  float accumulator = 0.f;
-  std::size_t counter = 0;
-
-  while (time_mod >= accumulator) {
-    accumulator += frames[counter++].duration;
-  }
-
-  return (counter - 1) % frames.size();
+  return states.at(label).getFrameOffset(time);
 }
 
 const RenderFrame& RenderStates::getFrame(const RenderState& label) const {
@@ -93,7 +108,7 @@ const RenderFrame& RenderStates::getFrame(const RenderState& label) const {
 }
 
 const RenderFrame& RenderStates::getFrame(std::string label, std::size_t offset) const {
-  return states.at(label).at(offset);
+  return states.at(label).getFrame(offset);
 }
 // end RenderStates
 }

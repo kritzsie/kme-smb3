@@ -17,15 +17,23 @@ void TileDef::setCollisionType(CollisionType new_collision_type) {
 }
 
 void TileDef::pushFrame(std::string texture, Vec2i origin, float duration) {
-  frames.push_back(RenderFrame(texture, Rect<int>(origin, Vec2i(16, 16)), Vec2f(0.f, 0.f), duration));
+  frames.pushFrame(RenderFrame {
+    .texture = texture,
+    .cliprect = Rect<int>(origin, Vec2i(16, 16)),
+    .offset = Vec2f(0.f, 0.f),
+    .duration = duration
+  });
 }
 
 std::size_t TileDef::getFrameCount() const {
-  return frames.size();
+  return frames.getFrameCount();
 }
 
 // NOTE: this function has potential for optimization
 std::size_t TileDef::getFrameOffset(float time) const {
+  return frames.getFrameOffset(time);
+
+  /*
   float time_max = 0.f;
 
   for (auto& frame : frames) {
@@ -41,10 +49,11 @@ std::size_t TileDef::getFrameOffset(float time) const {
   }
 
   return (counter - 1) % frames.size();
+  */
 }
 
 const RenderFrame& TileDef::getFrame(std::size_t index) const {
-  return frames.at(index);
+  return frames.getFrame(index);
 }
 // end TileDef
 
