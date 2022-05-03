@@ -1,8 +1,9 @@
 #pragma once
 
 #include <string>
+#include <vector>
 
 namespace kme::util {
-std::string base64_encode(const std::string& in);
-std::string base64_decode(const std::string& in);
+std::vector<char> base64_decode(std::string str);
+std::string base64_encode(const std::vector<char>& data);
 }

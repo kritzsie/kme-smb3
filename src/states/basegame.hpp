@@ -2,6 +2,7 @@
 
 #include "basestate.hpp"
 
+#include "../renderstates.hpp"
 #include "../types.hpp"
 #include "basegame/ecs/entitydata.hpp"
 #include "basegame/theme.hpp"
@@ -44,6 +45,7 @@ public:
   EntityData entity_data;
   TileDefs level_tile_data;
 
+  StringTable<RenderFrames> backgrounds;
   StringTable<Theme> themes;
 
 private:
