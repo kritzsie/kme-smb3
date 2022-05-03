@@ -7,9 +7,6 @@
 #include "basegame/theme.hpp"
 #include "basegame/tiledefs.hpp"
 
-#include <memory>
-#include <unordered_map>
-
 namespace kme {
 class BaseGame final : public BaseState {
 public:
@@ -47,7 +44,7 @@ public:
   EntityData entity_data;
   TileDefs level_tile_data;
 
-  std::unordered_map<std::string, Theme> themes;
+  StringTable<Theme> themes;
 
 private:
   UByte coins = 0;

@@ -10,7 +10,6 @@
 #include <SFML/Graphics.hpp>
 
 #include <map>
-#include <memory>
 #include <sstream>
 #include <utility>
 
