@@ -200,8 +200,8 @@ void Gameplay::enter() {
   entities.emplace<CRender>(pswitch);
   */
 
-  std::shared_ptr<Theme> theme_ptr = getBaseGame()->themes.at(subworld.getTheme());
-  playMusic(theme_ptr->music);
+  const auto& theme = getBaseGame()->themes.at(subworld.getTheme());
+  playMusic(theme.music);
 }
 
 void Gameplay::exit() {}
@@ -277,9 +277,9 @@ void Gameplay::draw(float delta) {
     view.setCenter(toScreen(camera_pos));
     scene->setView(view);
 
-    std::shared_ptr<Theme> theme_ptr = getBaseGame()->themes.at(subworld.getTheme());
-    drawBackground(theme_ptr->background);
-    for (std::pair<int, const Layer&> it : theme_ptr->layers) {
+    const auto& theme = getBaseGame()->themes.at(subworld.getTheme());
+    drawBackground(theme.background);
+    for (const auto& it : theme.layers) {
       const auto& layer = it.second;
       drawBackground(layer.texture, layer.offset, layer.parallax, layer.repeat_y);
     }

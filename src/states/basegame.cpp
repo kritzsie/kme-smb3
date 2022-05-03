@@ -226,10 +226,10 @@ void BaseGame::enter() {
     level_tile_data.registerTileDef(ss.str(), std::move(goalhills[i]));
   }
 
-  auto mario_hitboxes = std::make_unique<EntityData::Hitboxes>();
-  (*mario_hitboxes)[Powerup::NONE][EState::IDLE] = Hitbox(5.f / 16.f, 15.f / 16.f);
-  (*mario_hitboxes)[Powerup::MUSHROOM][EState::IDLE] = Hitbox(5.f / 16.f, 25.f / 16.f);
-  (*mario_hitboxes)[Powerup::MUSHROOM][EState::DUCK] = Hitbox(5.f / 16.f, 15.f / 16.f);
+  EntityData::Hitboxes mario_hitboxes;
+  mario_hitboxes[Powerup::NONE][EState::IDLE] = Hitbox(5.f / 16.f, 15.f / 16.f);
+  mario_hitboxes[Powerup::MUSHROOM][EState::IDLE] = Hitbox(5.f / 16.f, 25.f / 16.f);
+  mario_hitboxes[Powerup::MUSHROOM][EState::DUCK] = Hitbox(5.f / 16.f, 15.f / 16.f);
   entity_data.registerHitboxes("Player", std::move(mario_hitboxes));
 
   RenderStates mario_rs;
@@ -290,94 +290,94 @@ void BaseGame::enter() {
   pswitch_rs.pushFrame("IDLE", "pswitch_2", Rect<int>(0, 0, 16, 16), Vec2f(8, -1), 8.f / 60.f);
   entity_data.registerRenderStates("PSwitch", std::move(pswitch_rs));
 
-  auto overworld_blocks = std::make_unique<Theme>();
-  overworld_blocks->background = sf::Color(0x6898F8FF);
-  overworld_blocks->layers[0] = {
+  Theme overworld_blocks;
+  overworld_blocks.background = sf::Color(0x6898F8FF);
+  overworld_blocks.layers[0] = {
     .texture = "overworldblockstop",
     .offset = Vec2f(128.f, -11.f),
     .parallax = Vec2f(0.375f, 0.25f),
     .repeat_y = false
   };
-  overworld_blocks->layers[1] = {
+  overworld_blocks.layers[1] = {
     .texture = "cloudlayer",
     .offset = Vec2f(0.f, 224.f),
     .parallax = Vec2f(0.75f, 0.125f),
     .repeat_y = false
   };
-  overworld_blocks->music = "overworld.spc";
+  overworld_blocks.music = "overworld.spc";
   themes["overworld_blocks"] = std::move(overworld_blocks);
 
-  auto athletic_hills = std::make_unique<Theme>();
-  athletic_hills->background = sf::Color(0x6898F8FF);
-  athletic_hills->layers[-1] = {
+  Theme athletic_hills;
+  athletic_hills.background = sf::Color(0x6898F8FF);
+  athletic_hills.layers[-1] = {
     .texture = "athletichills",
     .offset = Vec2f(128.f, -11.f),
     .parallax = Vec2f(0.375f, 0.25f),
     .repeat_y = false
   };
-  athletic_hills->layers[0] = {
+  athletic_hills.layers[0] = {
     .texture = "cloudlayer",
     .offset = Vec2f(0.f, 224.f),
     .parallax = Vec2f(0.75f, 0.125f),
     .repeat_y = false
   };
-  athletic_hills->music = "athletic.spc";
+  athletic_hills.music = "athletic.spc";
   themes["athletic_hills"] = std::move(athletic_hills);
 
-  auto overworld_cave = std::make_unique<Theme>();
-  overworld_cave->background = sf::Color(0x6898F8FF);
-  overworld_cave->layers[-1] = {
+  Theme overworld_cave;
+  overworld_cave.background = sf::Color(0x6898F8FF);
+  overworld_cave.layers[-1] = {
     .texture = "overworldcaveback",
     .offset = Vec2f(0.f, -68.f),
     .parallax = Vec2f(0.75f, 0.f),
     .repeat_y = false
   };
-  overworld_cave->layers[0] = {
+  overworld_cave.layers[0] = {
     .texture = "overworldcavefront",
     .offset = Vec2f(0.f, -5.f),
     .parallax = Vec2f(0.375f, 0.f),
     .repeat_y = false
   };
-  overworld_cave->music = "underworld.spc";
+  overworld_cave.music = "underworld.spc";
   themes["overworld_cave"] = std::move(overworld_cave);
 
-  auto water = std::make_unique<Theme>();
-  water->background = sf::Color(0x080060FF);
-  water->layers[0] = {
+  Theme water;
+  water.background = sf::Color(0x080060FF);
+  water.layers[0] = {
     .texture = "waterworld",
     .offset = Vec2f(0.f, -11.f),
     .parallax = Vec2f(0.375f, 0.f),
     .repeat_y = false
   };
-  water->music = "swimming.spc";
+  water.music = "swimming.spc";
   themes["water"] = std::move(water);
 
-  auto fortress = std::make_unique<Theme>();
-  fortress->background = sf::Color::Black;
-  fortress->layers[-1] = {
+  Theme fortress;
+  fortress.background = sf::Color::Black;
+  fortress.layers[-1] = {
     .texture = "fortressback",
     .offset = Vec2f(0.f, -62.f),
     .parallax = Vec2f(0.75f, 0.f),
     .repeat_y = false
   };
-  fortress->layers[0] = {
+  fortress.layers[0] = {
     .texture = "fortressfront",
     .offset = Vec2f(0.f, 0.f),
     .parallax = Vec2f(0.375f, 0.f),
     .repeat_y = false
   };
-  fortress->music = "fortress.spc";
+  fortress.music = "fortress.spc";
   themes["fortress"] = std::move(fortress);
 
-  auto bonus_room = std::make_unique<Theme>();
-  bonus_room->background = sf::Color::Black;
-  bonus_room->layers[0] = {
+  Theme bonus_room;
+  bonus_room.background = sf::Color::Black;
+  bonus_room.layers[0] = {
     .texture = "bonusquestion",
     .offset = Vec2f(0.f, 0.f),
     .parallax = Vec2f(0.f, 0.f),
     .repeat_y = true
   };
-  bonus_room->music = "underworld.spc";
+  bonus_room.music = "underworld.spc";
   themes["bonus_room"] = std::move(bonus_room);
 }
 

@@ -4,6 +4,10 @@
 #include <sstream>
 
 namespace kme {
+void EntityData::registerHitboxes(EntityType type, Hitboxes states) {
+  registerHitboxes(type, std::make_shared<Hitboxes>(std::move(states)));
+}
+
 void EntityData::registerHitboxes(EntityType type, std::shared_ptr<Hitboxes> states) {
   if (hitboxes.find(type) != hitboxes.end()) {
     std::stringstream ss;
@@ -19,10 +23,6 @@ std::shared_ptr<const EntityData::Hitboxes> EntityData::getHitboxes(EntityType t
 
 void EntityData::registerRenderStates(EntityType type, RenderStates rs) {
   registerRenderStates(type, std::make_shared<RenderStates>(std::move(rs)));
-}
-
-void EntityData::registerRenderStates(EntityType type, std::unique_ptr<RenderStates> rs) {
-  registerRenderStates(type, std::shared_ptr<RenderStates>(std::move(rs)));
 }
 
 void EntityData::registerRenderStates(EntityType type, std::shared_ptr<RenderStates> rs) {

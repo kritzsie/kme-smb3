@@ -47,7 +47,7 @@ public:
   EntityData entity_data;
   TileDefs level_tile_data;
 
-  std::unordered_map<std::string, std::shared_ptr<Theme>> themes;
+  std::unordered_map<std::string, Theme> themes;
 
 private:
   UByte coins = 0;
