@@ -172,7 +172,7 @@ void Subworld::update(float delta) {
     bool run  = gameplay->inputs.at(Gameplay::Action::RUN) > 0.25f;
     bool duck = gameplay->inputs.at(Gameplay::Action::DOWN) > 0.25f;
 
-    float max_x = run ? (flags & EFlags::RUNNING ? 12.f : 10.f) : 5.f;
+    const float max_x = run ? (flags & EFlags::RUNNING ? 12.f : 10.f) : 5.f;
 
     if (x != 0) {
       direction = toSign(x);
@@ -289,7 +289,9 @@ void Subworld::update(float delta) {
 
       if (timers.jump > 0.f) {
         flags |= EFlags::NOGRAVITY;
-        vel.y = 12.f;
+        if (vel.y < 12.f) {
+          vel.y = 12.f;
+        }
         timers.jump = std::max(timers.jump - 1.f * delta, 0.f);
       }
       else {
@@ -368,7 +370,7 @@ void Subworld::update(float delta) {
     // apply gravity
     float gravity = getGravity();
     if (~flags & EFlags::NOGRAVITY) {
-      float min_y = -15.f;
+      const float min_y = -15.f;
 
       vel.y += gravity * delta;
       vel.y = std::max(vel.y, min_y);
@@ -754,7 +756,7 @@ void Subworld::handleEntityCollisions(Entity entity) {
           auto& timers2 = entities.get<CTimers>(entity2);
           auto& state2 = entities.get<CState>(entity2).value;
 
-          vel1.y = 12.f;
+          vel1.y = 13.5f;
           timers1.jump = 0.275f + 0.125f;
 
           vel2.x = 0.f;
