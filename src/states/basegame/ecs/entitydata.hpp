@@ -5,7 +5,6 @@
 #include "components.hpp"
 
 #include <map>
-#include <memory>
 #include <stdexcept>
 #include <string>
 #include <unordered_map>
@@ -23,15 +22,13 @@ public:
   using Hitboxes = std::map<Powerup, std::map<EState, Hitbox>>;
 
   void registerHitboxes(EntityType type, Hitboxes states);
-  void registerHitboxes(EntityType type, std::shared_ptr<Hitboxes> states);
-  std::shared_ptr<const Hitboxes> getHitboxes(EntityType type) const;
+  const Hitboxes& getHitboxes(EntityType type) const;
 
   void registerRenderStates(EntityType type, RenderStates rs);
-  void registerRenderStates(EntityType type, std::shared_ptr<RenderStates> rs);
-  std::shared_ptr<const RenderStates> getRenderStates(EntityType type) const;
+  const RenderStates& getRenderStates(EntityType type) const;
 
 private:
-  std::unordered_map<EntityType, std::shared_ptr<Hitboxes>> hitboxes;
-  std::unordered_map<EntityType, std::shared_ptr<RenderStates>> render_states;
+  std::unordered_map<EntityType, Hitboxes> hitboxes;
+  std::unordered_map<EntityType, RenderStates> render_states;
 };
 }

@@ -226,11 +226,11 @@ void BaseGame::enter() {
     level_tile_data.registerTileDef(ss.str(), std::move(goalhills[i]));
   }
 
-  EntityData::Hitboxes mario_hitboxes;
-  mario_hitboxes[Powerup::NONE][EState::IDLE] = Hitbox(5.f / 16.f, 15.f / 16.f);
-  mario_hitboxes[Powerup::MUSHROOM][EState::IDLE] = Hitbox(5.f / 16.f, 25.f / 16.f);
-  mario_hitboxes[Powerup::MUSHROOM][EState::DUCK] = Hitbox(5.f / 16.f, 15.f / 16.f);
-  entity_data.registerHitboxes("Player", std::move(mario_hitboxes));
+  EntityData::Hitboxes mario_hb;
+  mario_hb[Powerup::NONE][EState::IDLE] = Hitbox(5.f / 16.f, 15.f / 16.f);
+  mario_hb[Powerup::MUSHROOM][EState::IDLE] = Hitbox(5.f / 16.f, 25.f / 16.f);
+  mario_hb[Powerup::MUSHROOM][EState::DUCK] = Hitbox(5.f / 16.f, 15.f / 16.f);
+  entity_data.registerHitboxes("Player", std::move(mario_hb));
 
   RenderStates mario_rs;
   mario_rs.pushFrame("IDLE", "smallmariowalk_0", Rect<int>(0, 0, 12, 15), Vec2f(6, -1), 0.f);
@@ -270,12 +270,12 @@ void BaseGame::enter() {
   mario_rs.pushFrame("DUCK.BIG", "bigmarioduck", Rect<int>(0, 0, 14, 18), Vec2f(6, -1), 0.f);
   entity_data.registerRenderStates("Player", std::move(mario_rs));
 
-  RenderStates goomba;
-  goomba.pushFrame("WALK", "goombawalk_0", Rect<int>(0, 0, 16, 16), Vec2f(8, -1), 8.f / 60.f);
-  goomba.pushFrame("WALK", "goombawalk_1", Rect<int>(0, 0, 16, 16), Vec2f(8, -1), 8.f / 60.f);
+  RenderStates goomba_rs;
+  goomba_rs.pushFrame("WALK", "goombawalk_0", Rect<int>(0, 0, 16, 16), Vec2f(8, -1), 8.f / 60.f);
+  goomba_rs.pushFrame("WALK", "goombawalk_1", Rect<int>(0, 0, 16, 16), Vec2f(8, -1), 8.f / 60.f);
 
-  goomba.pushFrame("DEATH", "goombastomp", Rect<int>(0, 0, 16, 9), Vec2f(8, -1), 0.f);
-  entity_data.registerRenderStates("Goomba", std::move(goomba));
+  goomba_rs.pushFrame("DEATH", "goombastomp", Rect<int>(0, 0, 16, 9), Vec2f(8, -1), 0.f);
+  entity_data.registerRenderStates("Goomba", std::move(goomba_rs));
 
   RenderStates mushroom_rs;
   mushroom_rs.pushFrame("IDLE.BIG", "redmushroom", Rect<int>(0, 0, 16, 16), Vec2f(8, -1), 0.f);

@@ -144,9 +144,8 @@ void Gameplay::enter() {
   auto player = entities.create();
   auto player_powerup = Powerup::NONE;
   auto player_state = EState::IDLE;
-  auto player_hitbox = getBaseGame() \
-    ->entity_data.getHitboxes("Player") \
-    ->at(player_powerup).at(player_state);
+  const auto& player_hitbox = getBaseGame() \
+    ->entity_data.getHitboxes("Player").at(player_powerup).at(player_state);
   entities.emplace<CInfo>(player, "Player");
   entities.emplace<CPosition>(player, Vec2f(2.f, lowest_y));
   entities.emplace<CPowerup>(player, player_powerup);
@@ -401,7 +400,7 @@ void Gameplay::drawEntities() {
     const auto& pos = view.get<const CPosition>(entity).value;
     const auto& render = view.get<const CRender>(entity);
 
-    const auto& frame = entity_data.getRenderStates(info.type)->getFrame(render.state);
+    const auto& frame = entity_data.getRenderStates(info.type).getFrame(render.state);
 
     Sign direction = Sign::PLUS;
     auto direction_view = entities.view<CDirection>();

@@ -17,8 +17,6 @@ struct RenderFrame {
 
 class RenderFrames {
 public:
-  using List = std::vector<RenderFrame>;
-
   void pushFrame(RenderFrame frame);
 
   std::size_t getFrameCount() const;

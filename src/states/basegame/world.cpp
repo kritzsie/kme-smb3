@@ -159,8 +159,8 @@ void Subworld::update(float delta) {
     auto& render = entities.get<CRender>(player);
     auto& audio = entities.get<CAudio>(player);
 
-    auto hitboxes = basegame->entity_data.getHitboxes(info.type);
-    auto hitbox_states = hitboxes->at(powerup);
+    const auto& hitboxes = basegame->entity_data.getHitboxes(info.type);
+    const auto& hitbox_states = hitboxes.at(powerup);
 
     float x = 0.f;
     x += gameplay->inputs.at(Gameplay::Action::RIGHT) > 0.25f;
@@ -338,10 +338,10 @@ void Subworld::update(float delta) {
       render.time = 0.f;
 
       if (hitbox_states.find(state) != hitbox_states.end()) {
-        coll.hitbox = hitbox_states[state];
+        coll.hitbox = hitbox_states.at(state);
       }
       else {
-        coll.hitbox = hitbox_states[EState::IDLE];
+        coll.hitbox = hitbox_states.at(EState::IDLE);
       }
 
       if (state_prev == EState::SLIP) {
@@ -468,7 +468,7 @@ void Subworld::update(float delta) {
     auto& state = renderstate_view.get<CState>(entity).value;
     auto& render = renderstate_view.get<CRender>(entity);
 
-    auto states = basegame->entity_data.getRenderStates(info.type);
+    const auto& states = basegame->entity_data.getRenderStates(info.type);
 
     std::string label = getStateName(state).data();
     if (powerup_view.contains(entity)) {
@@ -478,7 +478,7 @@ void Subworld::update(float delta) {
       }
     }
 
-    render.state.setState(label, states->getFrameOffset(label, render.time));
+    render.state.setState(label, states.getFrameOffset(label, render.time));
   }
 
   if (entities.valid(player)) {
@@ -743,13 +743,14 @@ void Subworld::handleEntityCollisions(Entity entity) {
       }
       else if (flags2 & EFlags::ENEMY and ~flags2 & EFlags::DEAD) {
         auto& pos1 = entities.get<CPosition>(entity1).value;
+        auto& vel1 = entities.get<CVelocity>(entity1).value;
         auto& pos2 = entities.get<CPosition>(entity2).value;
+        auto& vel2 = entities.get<CVelocity>(entity2).value;
         auto& coll2 = entities.get<CCollision>(entity2);
 
-        if (pos1.y >= pos2.y + coll2.hitbox.height / 2) {
-          auto& vel1 = entities.get<CVelocity>(entity1).value;
+        if (vel1.y <= vel2.y
+        and pos1.y >= pos2.y + coll2.hitbox.height / 2) {
           auto& timers1 = entities.get<CTimers>(entity1);
-          auto& vel2 = entities.get<CVelocity>(entity2).value;
           auto& timers2 = entities.get<CTimers>(entity2);
           auto& state2 = entities.get<CState>(entity2).value;
 
@@ -780,12 +781,12 @@ void Subworld::handleEntityCollisions(Entity entity) {
               break;
             case 1:
               powerup1 = Powerup::NONE;
-              timers1.i_frames = 2.f;
+              timers1.i_frames = 1.f;
               gameplay->playSound("pipe");
               break;
             case 2:
               powerup1 = Powerup::MUSHROOM;
-              timers1.i_frames = 2.f;
+              timers1.i_frames = 1.f;
               gameplay->playSound("pipe");
               break;
             }
