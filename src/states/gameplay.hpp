@@ -67,7 +67,7 @@ private:
 
   void drawBackground(sf::Color color);
   // parallax here is a factor from 0.0 to 1.0, not distance
-  void drawBackground(std::string texture, Vec2f offset, Vec2f parallax,
+  void drawBackground(std::string name, Vec2f offset, Vec2f parallax,
                       bool vertical_tiling = false);
   void drawTiles();
   void drawEntities();

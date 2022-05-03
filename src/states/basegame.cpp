@@ -325,15 +325,15 @@ void BaseGame::enter() {
   bonusquestion.pushFrame("bonusquestion", Rect<int>(64, 64, 0, 0), Vec2f(0, 0), 0.f);
   backgrounds["bonusquestion"] = std::move(bonusquestion);
 
-  RenderFrames pipes;
-  pipes.pushFrame("pipes", Rect<int>(256, 512, 0, 0), Vec2f(0, 0), 0.f);
-  backgrounds["pipes"] = std::move(pipes);
+  RenderFrames pipesback;
+  pipesback.pushFrame("pipes", Rect<int>(256, 512, 0, 0), Vec2f(0, 0), 0.f);
+  backgrounds["pipesback"] = std::move(pipesback);
 
-  RenderFrames pipesoverlay;
-  pipesoverlay.pushFrame("", Rect<int>(256, 512, 0, 0), Vec2f(0, 0), 0.f);
-  pipesoverlay.pushFrame("pipes_1", Rect<int>(256, 512, 0, 0), Vec2f(0, 0), 0.f);
-  pipesoverlay.pushFrame("pipes_2", Rect<int>(256, 512, 0, 0), Vec2f(0, 0), 0.f);
-  backgrounds["pipesoverlay"] = std::move(pipesoverlay);
+  RenderFrames pipesfront;
+  pipesfront.pushFrame("", Rect<int>(256, 512, 0, 0), Vec2f(0, 0), 8.f / 60.f);
+  pipesfront.pushFrame("pipes_1", Rect<int>(256, 512, 0, 0), Vec2f(0, 0), 8.f / 60.f);
+  pipesfront.pushFrame("pipes_2", Rect<int>(256, 512, 0, 0), Vec2f(0, 0), 8.f / 60.f);
+  backgrounds["pipesfront"] = std::move(pipesfront);
 
   Theme overworld_blocks;
   overworld_blocks.background = sf::Color(0x6898F8FF);
@@ -396,6 +396,23 @@ void BaseGame::enter() {
   };
   water.music = "swimming.spc";
   themes["water"] = std::move(water);
+
+  Theme pipes;
+  pipes.background = sf::Color::Black;
+  pipes.layers[-1] = {
+    .background = "pipesback",
+    .offset = Vec2f(0.f, 0.f),
+    .parallax = Vec2f(0.375f, 0.375f),
+    .repeat_y = true
+  };
+  pipes.layers[0] = {
+    .background = "pipesfront",
+    .offset = Vec2f(0.f, 0.f),
+    .parallax = Vec2f(0.375f, 0.375f),
+    .repeat_y = true
+  };
+  pipes.music = "underworld.spc";
+  themes["pipes"] = std::move(pipes);
 
   Theme fortress;
   fortress.background = sf::Color::Black;

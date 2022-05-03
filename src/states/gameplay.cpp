@@ -305,10 +305,13 @@ void Gameplay::drawBackground(sf::Color color) {
 }
 
 // NOTE: this function could use a few improvements
-void Gameplay::drawBackground(std::string texture, Vec2f offset, Vec2f parallax,
+void Gameplay::drawBackground(std::string name, Vec2f offset, Vec2f parallax,
                               bool vertical_tiling) {
-  const sf::Texture& sf_texture = gfx.getTexture(texture);
-  Vec2f size = static_cast<sf::Vector2f>(sf_texture.getSize());
+  const BaseGame* basegame = getBaseGame();
+  const RenderFrames& background = basegame->backgrounds.at(name);
+  const RenderFrame& frame = background.getFrame(background.getFrameOffset(rendertime));
+  const sf::Texture& texture = gfx.getTexture(frame.texture);
+  Vec2f size = static_cast<sf::Vector2f>(texture.getSize());
 
   Vec2f tiling_ratio = Vec2f(480.f / size.x, 270.f / size.y);
 
@@ -325,7 +328,7 @@ void Gameplay::drawBackground(std::string texture, Vec2f offset, Vec2f parallax,
   if (vertical_tiling == true) {
     for (float y = std::floor(bg_start.y + offset.y / size.y); y < std::floor(bg_end.y + offset.y / size.y) + 1.f; y += 1.f)
     for (float x = std::floor(bg_start.x + offset.x / size.x); x < std::floor(bg_end.x + offset.x / size.x) + 1.f; x += 1.f) {
-      sf::Sprite sprite(sf_texture);
+      sf::Sprite sprite(texture);
       Vec2f pos = Vec2f((start.x * parallax.x * 16.f) + x * size.x,
                       -((start.y * parallax.y * 16.f) + y * size.y + size.y));
       pos -= offset;
@@ -335,7 +338,7 @@ void Gameplay::drawBackground(std::string texture, Vec2f offset, Vec2f parallax,
   }
   else {
     for (float x = std::floor(bg_start.x + offset.x / size.x); x < std::floor(bg_end.x + offset.x / size.x) + 1.f; x += 1.f) {
-      sf::Sprite sprite(sf_texture);
+      sf::Sprite sprite(texture);
       Vec2f pos = Vec2f((start.x * parallax.x * 16.f) + x * size.x,
                       -((start.y * parallax.y * 16.f) + size.y));
       pos -= offset;
