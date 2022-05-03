@@ -9,12 +9,12 @@ namespace kme::util {
 char highASCII(char str);
 std::string highASCII(std::string str);
 
-std::string trim(const std::string& str, const std::string& pattern);
-std::string trim(const std::string& str);
+std::string trim(std::string str, std::string pattern);
+std::string trim(std::string str);
 
-StringList split(const std::string& str, const std::string& pattern);
-StringList split(const std::string& str);
+StringList split(std::string str, std::string pattern);
+StringList split(std::string str);
 
-std::string join(const StringList& lst, const std::string& sep);
+std::string join(const StringList& lst, std::string sep);
 std::string join(const StringList& lst);
 }

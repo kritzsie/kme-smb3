@@ -12,13 +12,14 @@ char highASCII(char c) {
 }
 
 std::string highASCII(std::string str) {
-  for (auto& c : str) {
+  std::string result = str;
+  for (auto& c : result) {
     c = highASCII(c);
   }
-  return str;
+  return result;
 }
 
-std::string trim(const std::string& str, const std::string& pattern) {
+std::string trim(std::string str, std::string pattern) {
   std::string result = str;
   std::regex front("^" + pattern);
   std::regex back(pattern + "$");
@@ -27,11 +28,11 @@ std::string trim(const std::string& str, const std::string& pattern) {
   return result;
 }
 
-std::string trim(const std::string& str) {
+std::string trim(std::string str) {
   return trim(str, "\\s+");
 }
 
-StringList split(const std::string& str, const std::string& pattern) {
+StringList split(std::string str, std::string pattern) {
   StringList lst;
   std::regex regex(pattern);
   std::sregex_token_iterator iter(str.begin(), str.end(), regex, -1);
@@ -43,11 +44,11 @@ StringList split(const std::string& str, const std::string& pattern) {
   return lst;
 }
 
-StringList split(const std::string& str) {
+StringList split(std::string str) {
   return split(str, "\\s+");
 }
 
-std::string join(const StringList& lst, const std::string& sep) {
+std::string join(const StringList& lst, std::string sep) {
   std::stringstream ss;
   if (lst.size()) {
     ss << lst[0];
