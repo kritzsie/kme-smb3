@@ -289,16 +289,62 @@ void BaseGame::enter() {
   pswitch_rs.pushFrame("IDLE", "pswitch_2", Rect<int>(0, 0, 16, 16), Vec2f(8, -1), 8.f / 60.f);
   entity_data.registerRenderStates("PSwitch", std::move(pswitch_rs));
 
+  RenderFrames cloudlayer;
+  cloudlayer.pushFrame("cloudlayer", Rect<int>(256, 256, 0, 0), Vec2f(0, 0), 0.f);
+  backgrounds["cloudlayer"] = std::move(cloudlayer);
+
+  RenderFrames overworldblockstop;
+  overworldblockstop.pushFrame("overworldblockstop", Rect<int>(512, 192, 0, 0), Vec2f(0, 0), 0.f);
+  backgrounds["overworldblockstop"] = std::move(overworldblockstop);
+
+  RenderFrames athletichills;
+  athletichills.pushFrame("athletichills", Rect<int>(512, 256, 0, 0), Vec2f(0, 0), 0.f);
+  backgrounds["athletichills"] = std::move(athletichills);
+
+  RenderFrames overworldcavefront;
+  overworldcavefront.pushFrame("overworldcavefront", Rect<int>(512, 384, 0, 0), Vec2f(0, 0), 0.f);
+  backgrounds["overworldcavefront"] = std::move(overworldcavefront);
+
+  RenderFrames overworldcaveback;
+  overworldcaveback.pushFrame("overworldcaveback", Rect<int>(256, 256, 0, 0), Vec2f(0, 0), 0.f);
+  backgrounds["overworldcaveback"] = std::move(overworldcaveback);
+
+  RenderFrames waterworld;
+  waterworld.pushFrame("waterworld", Rect<int>(512, 384, 0, 0), Vec2f(0, 0), 0.f);
+  backgrounds["waterworld"] = std::move(waterworld);
+
+  RenderFrames fortressfront;
+  fortressfront.pushFrame("fortressfront", Rect<int>(512, 432, 0, 0), Vec2f(0, 0), 0.f);
+  backgrounds["fortressfront"] = std::move(fortressfront);
+
+  RenderFrames fortressback;
+  fortressback.pushFrame("fortressback", Rect<int>(256, 256, 0, 0), Vec2f(0, 0), 0.f);
+  backgrounds["fortressback"] = std::move(fortressback);
+
+  RenderFrames bonusquestion;
+  bonusquestion.pushFrame("bonusquestion", Rect<int>(64, 64, 0, 0), Vec2f(0, 0), 0.f);
+  backgrounds["bonusquestion"] = std::move(bonusquestion);
+
+  RenderFrames pipes;
+  pipes.pushFrame("pipes", Rect<int>(256, 512, 0, 0), Vec2f(0, 0), 0.f);
+  backgrounds["pipes"] = std::move(pipes);
+
+  RenderFrames pipesoverlay;
+  pipesoverlay.pushFrame("", Rect<int>(256, 512, 0, 0), Vec2f(0, 0), 0.f);
+  pipesoverlay.pushFrame("pipes_1", Rect<int>(256, 512, 0, 0), Vec2f(0, 0), 0.f);
+  pipesoverlay.pushFrame("pipes_2", Rect<int>(256, 512, 0, 0), Vec2f(0, 0), 0.f);
+  backgrounds["pipesoverlay"] = std::move(pipesoverlay);
+
   Theme overworld_blocks;
   overworld_blocks.background = sf::Color(0x6898F8FF);
   overworld_blocks.layers[0] = {
-    .texture = "overworldblockstop",
+    .background = "overworldblockstop",
     .offset = Vec2f(128.f, -11.f),
     .parallax = Vec2f(0.375f, 0.25f),
     .repeat_y = false
   };
   overworld_blocks.layers[1] = {
-    .texture = "cloudlayer",
+    .background = "cloudlayer",
     .offset = Vec2f(0.f, 224.f),
     .parallax = Vec2f(0.75f, 0.125f),
     .repeat_y = false
@@ -309,13 +355,13 @@ void BaseGame::enter() {
   Theme athletic_hills;
   athletic_hills.background = sf::Color(0x6898F8FF);
   athletic_hills.layers[-1] = {
-    .texture = "athletichills",
+    .background = "athletichills",
     .offset = Vec2f(128.f, -11.f),
     .parallax = Vec2f(0.375f, 0.25f),
     .repeat_y = false
   };
   athletic_hills.layers[0] = {
-    .texture = "cloudlayer",
+    .background = "cloudlayer",
     .offset = Vec2f(0.f, 224.f),
     .parallax = Vec2f(0.75f, 0.125f),
     .repeat_y = false
@@ -326,13 +372,13 @@ void BaseGame::enter() {
   Theme overworld_cave;
   overworld_cave.background = sf::Color(0x6898F8FF);
   overworld_cave.layers[-1] = {
-    .texture = "overworldcaveback",
+    .background = "overworldcaveback",
     .offset = Vec2f(0.f, -68.f),
     .parallax = Vec2f(0.75f, 0.f),
     .repeat_y = false
   };
   overworld_cave.layers[0] = {
-    .texture = "overworldcavefront",
+    .background = "overworldcavefront",
     .offset = Vec2f(0.f, -5.f),
     .parallax = Vec2f(0.375f, 0.f),
     .repeat_y = false
@@ -343,7 +389,7 @@ void BaseGame::enter() {
   Theme water;
   water.background = sf::Color(0x080060FF);
   water.layers[0] = {
-    .texture = "waterworld",
+    .background = "waterworld",
     .offset = Vec2f(0.f, -11.f),
     .parallax = Vec2f(0.375f, 0.f),
     .repeat_y = false
@@ -354,13 +400,13 @@ void BaseGame::enter() {
   Theme fortress;
   fortress.background = sf::Color::Black;
   fortress.layers[-1] = {
-    .texture = "fortressback",
+    .background = "fortressback",
     .offset = Vec2f(0.f, -62.f),
     .parallax = Vec2f(0.75f, 0.f),
     .repeat_y = false
   };
   fortress.layers[0] = {
-    .texture = "fortressfront",
+    .background = "fortressfront",
     .offset = Vec2f(0.f, 0.f),
     .parallax = Vec2f(0.375f, 0.f),
     .repeat_y = false
@@ -371,7 +417,7 @@ void BaseGame::enter() {
   Theme bonus_room;
   bonus_room.background = sf::Color::Black;
   bonus_room.layers[0] = {
-    .texture = "bonusquestion",
+    .background = "bonusquestion",
     .offset = Vec2f(0.f, 0.f),
     .parallax = Vec2f(0.f, 0.f),
     .repeat_y = true

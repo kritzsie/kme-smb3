@@ -8,7 +8,7 @@
 
 namespace kme {
 struct Layer {
-  std::string texture;
+  std::string background;
   Vec2f offset;
   Vec2f parallax;
   bool repeat_y;

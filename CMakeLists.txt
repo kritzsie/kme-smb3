@@ -12,7 +12,6 @@ add_executable(
   kme-smb3
   src/states/basestate.cpp
   src/states/basegame/ecs/entitydata.cpp
-  src/states/basegame/background.cpp
   src/states/basegame/collision.cpp
   src/states/basegame/hitbox.cpp
   src/states/basegame/levelloader.cpp

@@ -9,6 +9,16 @@ void RenderFrames::pushFrame(RenderFrame frame) {
   duration += frame.duration;
 }
 
+void RenderFrames::pushFrame(std::string texture, Rect<int> cliprect,
+                             Vec2f offset, float duration) {
+  pushFrame(RenderFrame {
+    .texture = texture,
+    .cliprect = cliprect,
+    .offset = offset,
+    .duration = duration
+  });
+}
+
 std::size_t RenderFrames::getFrameCount() const {
   return frames.size();
 }

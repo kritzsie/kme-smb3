@@ -18,6 +18,8 @@ struct RenderFrame {
 class RenderFrames {
 public:
   void pushFrame(RenderFrame frame);
+  void pushFrame(std::string texture, Rect<int> cliprect,
+                 Vec2f offset, float duration);
 
   std::size_t getFrameCount() const;
   std::size_t getFrameOffset(float time) const;

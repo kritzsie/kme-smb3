@@ -280,7 +280,7 @@ void Gameplay::draw(float delta) {
     drawBackground(theme.background);
     for (const auto& it : theme.layers) {
       const auto& layer = it.second;
-      drawBackground(layer.texture, layer.offset, layer.parallax, layer.repeat_y);
+      drawBackground(layer.background, layer.offset, layer.parallax, layer.repeat_y);
     }
 
     drawTiles();
