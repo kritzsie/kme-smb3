@@ -26,7 +26,7 @@ private:
   void onOpen();
 
 private:
-  Music_Emu* gme;
+  Music_Emu* gme = nullptr;
   double tempo = 1.0;
   std::vector<short> buffer;
 };

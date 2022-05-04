@@ -1,7 +1,7 @@
 #include "intro.hpp"
 
-#include "basegame.hpp"
 #include "../engine.hpp"
+#include "mainmenu.hpp"
 
 namespace kme {
 Intro::Factory Intro::create() {
@@ -24,7 +24,7 @@ void Intro::resume() {
 
 void Intro::update(float delta) {
   if (not paused) {
-    engine->pushState(BaseGame::create());
+    engine->pushState(MainMenu::create());
     pause();
   }
 }

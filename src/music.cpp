@@ -14,7 +14,9 @@ MusicStream::MusicStream(std::size_t buffer_size, unsigned int channels, unsigne
 MusicStream::MusicStream() : MusicStream(2048, 2, 44100) {}
 
 MusicStream::~MusicStream() {
-  gme_delete(gme);
+  if (gme != nullptr) {
+    gme_delete(gme);
+  }
 }
 
 bool MusicStream::openFromFile(std::string name) {

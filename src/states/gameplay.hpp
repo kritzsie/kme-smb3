@@ -19,8 +19,6 @@
 namespace kme {
 class Gameplay final : public BaseState {
 public:
-  static Factory create();
-
   enum class Action {
     UP, LEFT, DOWN, RIGHT,
     JUMP, SPINJUMP, RUN,
@@ -31,6 +29,9 @@ public:
   using ButtonMap = std::map<std::tuple<UInt, UInt>, Action>;
   using AxisMap = std::map<std::tuple<UInt, sf::Joystick::Axis, Sign>, Action>;
   using InputMap = std::map<Action, Input<float>>;
+
+public:
+  static Factory create();
 
 private:
   Gameplay(BaseState* parent, Engine* engine);
