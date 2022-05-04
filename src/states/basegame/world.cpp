@@ -163,14 +163,14 @@ void Subworld::update(float delta) {
     const auto& hitbox_states = hitboxes.at(powerup);
 
     float x = 0.f;
-    x += gameplay->inputs.at(Gameplay::Action::RIGHT) > 0.25f;
-    x -= gameplay->inputs.at(Gameplay::Action::LEFT)  > 0.25f;
+    x += gameplay->inputs.actions.at(Gameplay::Action::RIGHT) > 0.25f;
+    x -= gameplay->inputs.actions.at(Gameplay::Action::LEFT)  > 0.25f;
     x = std::clamp(x, -1.f, 1.f);
 
-    const auto& jump_input = gameplay->inputs.at(Gameplay::Action::JUMP);
+    const auto& jump_input = gameplay->inputs.actions.at(Gameplay::Action::JUMP);
     bool jump = jump_input > 0.25f;
-    bool run  = gameplay->inputs.at(Gameplay::Action::RUN) > 0.25f;
-    bool duck = gameplay->inputs.at(Gameplay::Action::DOWN) > 0.25f;
+    bool run  = gameplay->inputs.actions.at(Gameplay::Action::RUN) > 0.25f;
+    bool duck = gameplay->inputs.actions.at(Gameplay::Action::DOWN) > 0.25f;
 
     const float max_x = run ? (flags & EFlags::RUNNING ? 12.f : 10.f) : 5.f;
 

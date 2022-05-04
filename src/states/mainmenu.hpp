@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../input.hpp"
+#include "../inputhandler.hpp"
 #include "../types.hpp"
 #include "basestate.hpp"
 
@@ -46,10 +47,7 @@ public:
   void draw(float delta) final;
 
 private:
-  KeyMap keybinds;
-  ButtonMap buttonbinds;
-  AxisMap axisbinds;
-  InputMap inputs;
+  InputHandler<Action> inputs;
 
 private:
   bool paused = false;

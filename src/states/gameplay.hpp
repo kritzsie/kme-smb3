@@ -5,6 +5,7 @@
 #include "basegame.hpp"
 #include "../geometry.hpp"
 #include "../input.hpp"
+#include "../inputhandler.hpp"
 #include "../types.hpp"
 
 #include <SFML/Graphics.hpp>
@@ -24,11 +25,6 @@ public:
     JUMP, SPINJUMP, RUN,
     SELECT, PAUSE
   };
-
-  using KeyMap = std::map<sf::Keyboard::Key, Action>;
-  using ButtonMap = std::map<std::tuple<UInt, UInt>, Action>;
-  using AxisMap = std::map<std::tuple<UInt, sf::Joystick::Axis, Sign>, Action>;
-  using InputMap = std::map<Action, Input<float>>;
 
 public:
   static Factory create();
@@ -76,10 +72,7 @@ private:
   void drawHUD();
 
 public:
-  KeyMap keybinds;
-  ButtonMap buttonbinds;
-  AxisMap axisbinds;
-  InputMap inputs;
+  InputHandler<Action> inputs;
 
 private:
   bool paused = false;

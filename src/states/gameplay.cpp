@@ -34,41 +34,41 @@ Gameplay::Gameplay(BaseState* parent, Engine* engine)
   camera_pos = Vec2f(15.f, 8.4375f);
   camera_radius = Vec2f(15.f, 8.4375f);
 
-  inputs[Action::UP]       = 0;
-  inputs[Action::DOWN]     = 0;
-  inputs[Action::LEFT]     = 0;
-  inputs[Action::RIGHT]    = 0;
-  inputs[Action::JUMP]     = 0;
-  inputs[Action::SPINJUMP] = 0;
-  inputs[Action::RUN]      = 0;
-  inputs[Action::SELECT]   = 0;
-  inputs[Action::PAUSE]    = 0;
+  inputs.actions[Action::UP]       = 0;
+  inputs.actions[Action::DOWN]     = 0;
+  inputs.actions[Action::LEFT]     = 0;
+  inputs.actions[Action::RIGHT]    = 0;
+  inputs.actions[Action::JUMP]     = 0;
+  inputs.actions[Action::SPINJUMP] = 0;
+  inputs.actions[Action::RUN]      = 0;
+  inputs.actions[Action::SELECT]   = 0;
+  inputs.actions[Action::PAUSE]    = 0;
 
-  keybinds[sf::Keyboard::Key::Left]   = Action::LEFT;
-  keybinds[sf::Keyboard::Key::Right]  = Action::RIGHT;
-  keybinds[sf::Keyboard::Key::Up]     = Action::UP;
-  keybinds[sf::Keyboard::Key::Down]   = Action::DOWN;
-  keybinds[sf::Keyboard::Key::Z]      = Action::RUN;
-  keybinds[sf::Keyboard::Key::X]      = Action::JUMP;
-  keybinds[sf::Keyboard::Key::C]      = Action::SPINJUMP;
-  keybinds[sf::Keyboard::Key::Escape] = Action::PAUSE;
+  inputs.keys[sf::Keyboard::Key::Left]   = Action::LEFT;
+  inputs.keys[sf::Keyboard::Key::Right]  = Action::RIGHT;
+  inputs.keys[sf::Keyboard::Key::Up]     = Action::UP;
+  inputs.keys[sf::Keyboard::Key::Down]   = Action::DOWN;
+  inputs.keys[sf::Keyboard::Key::Z]      = Action::RUN;
+  inputs.keys[sf::Keyboard::Key::X]      = Action::JUMP;
+  inputs.keys[sf::Keyboard::Key::C]      = Action::SPINJUMP;
+  inputs.keys[sf::Keyboard::Key::Escape] = Action::PAUSE;
 
-  axisbinds[std::tuple(0, sf::Joystick::Axis::X, Sign::MINUS)] = Action::LEFT;
-  axisbinds[std::tuple(0, sf::Joystick::Axis::X, Sign::PLUS)]  = Action::RIGHT;
-  axisbinds[std::tuple(0, sf::Joystick::Axis::Y, Sign::MINUS)] = Action::UP;
-  axisbinds[std::tuple(0, sf::Joystick::Axis::Y, Sign::PLUS)]  = Action::DOWN;
+  inputs.axes[std::tuple(0, sf::Joystick::Axis::X, Sign::MINUS)] = Action::LEFT;
+  inputs.axes[std::tuple(0, sf::Joystick::Axis::X, Sign::PLUS)]  = Action::RIGHT;
+  inputs.axes[std::tuple(0, sf::Joystick::Axis::Y, Sign::MINUS)] = Action::UP;
+  inputs.axes[std::tuple(0, sf::Joystick::Axis::Y, Sign::PLUS)]  = Action::DOWN;
 
-  axisbinds[std::tuple(0, sf::Joystick::Axis::PovX, Sign::MINUS)] = Action::LEFT;
-  axisbinds[std::tuple(0, sf::Joystick::Axis::PovX, Sign::PLUS)]  = Action::RIGHT;
-  axisbinds[std::tuple(0, sf::Joystick::Axis::PovY, Sign::MINUS)] = Action::UP;
-  axisbinds[std::tuple(0, sf::Joystick::Axis::PovY, Sign::PLUS)]  = Action::DOWN;
+  inputs.axes[std::tuple(0, sf::Joystick::Axis::PovX, Sign::MINUS)] = Action::LEFT;
+  inputs.axes[std::tuple(0, sf::Joystick::Axis::PovX, Sign::PLUS)]  = Action::RIGHT;
+  inputs.axes[std::tuple(0, sf::Joystick::Axis::PovY, Sign::MINUS)] = Action::UP;
+  inputs.axes[std::tuple(0, sf::Joystick::Axis::PovY, Sign::PLUS)]  = Action::DOWN;
 
-  buttonbinds[std::tuple(0, 0)] = Action::JUMP;
-  buttonbinds[std::tuple(0, 1)] = Action::SPINJUMP;
-  buttonbinds[std::tuple(0, 2)] = Action::RUN;
-  buttonbinds[std::tuple(0, 3)] = Action::RUN;
-  buttonbinds[std::tuple(0, 6)] = Action::SELECT;
-  buttonbinds[std::tuple(0, 7)] = Action::PAUSE;
+  inputs.buttons[std::tuple(0, 0)] = Action::JUMP;
+  inputs.buttons[std::tuple(0, 1)] = Action::SPINJUMP;
+  inputs.buttons[std::tuple(0, 2)] = Action::RUN;
+  inputs.buttons[std::tuple(0, 3)] = Action::RUN;
+  inputs.buttons[std::tuple(0, 6)] = Action::SELECT;
+  inputs.buttons[std::tuple(0, 7)] = Action::PAUSE;
 }
 
 Gameplay::~Gameplay() {
@@ -81,48 +81,12 @@ BaseGame* Gameplay::getBaseGame() {
   return dynamic_cast<BaseGame*>(parent);
 }
 
-// TODO: de-duplicate this code in MainMenu::handleInput
 bool Gameplay::handleInput(sf::Event::EventType type, const sf::Event& event) {
-  if (paused) {
-    return false;
+  if (not paused) {
+    inputs.update(type, event);
   }
 
-  switch (type) {
-  case sf::Event::KeyPressed:
-  case sf::Event::KeyReleased: {
-    auto it = keybinds.find(event.key.code);
-    if (it != keybinds.end()) {
-      inputs[it->second] = sf::Keyboard::isKeyPressed(event.key.code);
-    }
-    break;
-  }
-  case sf::Event::JoystickMoved: {
-    const auto& js = event.joystickMove;
-    Sign sign = toSign(js.position);
-    float pos = std::abs(js.position / 100.f);
-    auto it_pos = axisbinds.find(std::tuple(js.joystickId, js.axis, Sign::PLUS));
-    if (it_pos != axisbinds.end()) {
-      inputs[it_pos->second] = sign == Sign::PLUS ? pos : 0;
-    }
-    auto it_neg = axisbinds.find(std::tuple(js.joystickId, js.axis, Sign::MINUS));
-    if (it_neg != axisbinds.end()) {
-      inputs[it_neg->second] = sign == Sign::MINUS ? pos : 0;
-    }
-  }
-  case sf::Event::JoystickButtonPressed:
-  case sf::Event::JoystickButtonReleased: {
-    const auto& js = event.joystickButton;
-    auto it = buttonbinds.find(std::tuple(js.joystickId, js.button));
-    if (it != buttonbinds.end()) {
-      inputs[it->second] = sf::Joystick::isButtonPressed(js.joystickId, js.button);
-    }
-    break;
-  }
-  default:
-    break;
-  }
-
-  return true;
+  return not paused;
 }
 
 void Gameplay::enter() {
@@ -220,8 +184,8 @@ void Gameplay::resume() {
 
 void Gameplay::update(float delta) {
   if (not paused) {
-    for (auto& input : inputs) {
-      input.second.update();
+    for (auto& action : inputs.actions) {
+      action.second.update();
     }
 
     suspended_previous = suspended;
