@@ -66,9 +66,10 @@ private:
   BaseGame* getBaseGame();
 
   void drawBackground(sf::Color color);
+  void drawBackground(Layer layer);
   // parallax here is a factor from 0.0 to 1.0, not distance
   void drawBackground(std::string name, Vec2f offset, Vec2f parallax,
-                      bool vertical_tiling = false);
+                      bool tile_vertically = false);
   void drawTiles();
   void drawEntities();
   void drawHUD();

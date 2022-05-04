@@ -279,8 +279,7 @@ void Gameplay::draw(float delta) {
     const auto& theme = getBaseGame()->themes.at(subworld.getTheme());
     drawBackground(theme.background);
     for (const auto& it : theme.layers) {
-      const auto& layer = it.second;
-      drawBackground(layer.background, layer.offset, layer.parallax, layer.repeat_y);
+      drawBackground(it.second);
     }
 
     drawTiles();
@@ -304,11 +303,14 @@ void Gameplay::drawBackground(sf::Color color) {
   scene->clear(color);
 }
 
+void Gameplay::drawBackground(Layer layer) {
+  drawBackground(layer.background, layer.offset, layer.parallax, layer.repeat_y);
+}
+
 // NOTE: this function could use a few improvements
 void Gameplay::drawBackground(std::string name, Vec2f offset, Vec2f parallax,
-                              bool vertical_tiling) {
-  const BaseGame* basegame = getBaseGame();
-  const RenderFrames& background = basegame->backgrounds.at(name);
+                              bool tile_vertically) {
+  const RenderFrames& background = getBaseGame()->backgrounds.at(name);
   const RenderFrame& frame = background.getFrame(background.getFrameOffset(rendertime));
   const sf::Texture& texture = gfx.getTexture(frame.texture);
   Vec2f size = static_cast<sf::Vector2f>(texture.getSize());
@@ -325,7 +327,7 @@ void Gameplay::drawBackground(std::string name, Vec2f offset, Vec2f parallax,
   bg_end.x = bg_end.x * 16.f / 480.f * tiling_ratio.x;
   bg_end.y = bg_end.y * 16.f / 270.f * tiling_ratio.y;
 
-  if (vertical_tiling == true) {
+  if (tile_vertically == true) {
     for (float y = std::floor(bg_start.y + offset.y / size.y); y < std::floor(bg_end.y + offset.y / size.y) + 1.f; y += 1.f)
     for (float x = std::floor(bg_start.x + offset.x / size.x); x < std::floor(bg_end.x + offset.x / size.x) + 1.f; x += 1.f) {
       sf::Sprite sprite(texture);
