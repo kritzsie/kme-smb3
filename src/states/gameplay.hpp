@@ -82,6 +82,8 @@ public:
   InputMap inputs;
 
 private:
+  bool paused = false;
+
   bool suspended = false;
   bool suspended_previous = false;
 

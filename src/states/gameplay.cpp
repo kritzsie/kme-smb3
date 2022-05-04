@@ -72,16 +72,21 @@ Gameplay::Gameplay(BaseState* parent, Engine* engine)
 }
 
 Gameplay::~Gameplay() {
-  if (scene != nullptr) {
-    delete scene;
-  }
+  delete framebuffer;
+  delete scene;
+  delete hud;
 }
 
 BaseGame* Gameplay::getBaseGame() {
   return dynamic_cast<BaseGame*>(parent);
 }
 
+// TODO: de-duplicate this code in MainMenu::handleInput
 bool Gameplay::handleInput(sf::Event::EventType type, const sf::Event& event) {
+  if (paused) {
+    return false;
+  }
+
   switch (type) {
   case sf::Event::KeyPressed:
   case sf::Event::KeyReleased: {
@@ -116,6 +121,7 @@ bool Gameplay::handleInput(sf::Event::EventType type, const sf::Event& event) {
   default:
     break;
   }
+
   return true;
 }
 
@@ -204,31 +210,37 @@ void Gameplay::enter() {
 
 void Gameplay::exit() {}
 
-void Gameplay::pause() {}
+void Gameplay::pause() {
+  paused = true;
+}
 
-void Gameplay::resume() {}
+void Gameplay::resume() {
+  paused = false;
+}
 
 void Gameplay::update(float delta) {
-  suspended_previous = suspended;
-
-  for (auto& input : inputs) {
-    input.second.update();
-  }
-
-  Subworld& subworld = level.getSubworld(current_subworld);
-  if (not suspended) {
-    subworld.update(delta);
-
-    if (level.timer > 0.f) {
-      level.timer = std::max(level.timer - delta, 0.f);
+  if (not paused) {
+    for (auto& input : inputs) {
+      input.second.update();
     }
-  }
 
-  if (suspended != suspended_previous and not suspended_previous) {
-    engine->sound->stop();
-  }
+    suspended_previous = suspended;
 
-  ticktime += delta;
+    Subworld& subworld = level.getSubworld(current_subworld);
+    if (not suspended) {
+      subworld.update(delta);
+
+      if (level.timer > 0.f) {
+        level.timer = std::max(level.timer - delta, 0.f);
+      }
+    }
+
+    if (suspended != suspended_previous and not suspended_previous) {
+      engine->sound->stop();
+    }
+
+    ticktime += delta;
+  }
 }
 
 void Gameplay::suspend() {

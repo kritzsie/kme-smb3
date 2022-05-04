@@ -10,6 +10,8 @@ Intro::Factory Intro::create() {
   };
 }
 
+Intro::Intro(Engine* engine) : BaseState(nullptr, engine) {}
+
 void Intro::enter() {}
 
 void Intro::exit() {}
@@ -24,12 +26,11 @@ void Intro::resume() {
 
 void Intro::update(float delta) {
   if (not paused) {
+    engine->popState();
     engine->pushState(MainMenu::create());
     pause();
   }
 }
 
 void Intro::draw(float delta) {}
-
-Intro::Intro(Engine* engine) : BaseState(nullptr, engine) {}
 }

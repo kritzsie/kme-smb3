@@ -157,8 +157,7 @@ bool Engine::main() {
       nextrender += renderdelta;
     }
 
-    if (events.size() > 0
-    or  states.size() > 0) {
+    if (events.size() + states.size() > 0) {
       std::this_thread::sleep_until(std::min(nexttick, nextrender));
       prevtime = curtime;
       curtime = Clock::now();

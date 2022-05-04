@@ -20,6 +20,8 @@ BaseGame::Factory BaseGame::create() {
   };
 }
 
+BaseGame::BaseGame(BaseState* parent, Engine* engine) : BaseState(parent, engine) {}
+
 void BaseGame::enter() {
   TileDef brick_block;
   brick_block.pushFrame("smb3_tile_atlas", Vec2i(0, 0), 8.f / 60.f);
@@ -493,6 +495,4 @@ void BaseGame::addScore(long count) {
 void BaseGame::addScore(ULong count) {
   score += count;
 }
-
-BaseGame::BaseGame(BaseState* parent, Engine* engine) : BaseState(parent, engine) {}
 }

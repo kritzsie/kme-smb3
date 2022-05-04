@@ -4,10 +4,13 @@
 #include "../types.hpp"
 #include "basestate.hpp"
 
+#include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
 
 #include <map>
 #include <tuple>
+
+#include <cstddef>
 
 namespace kme {
 class MainMenu final : public BaseState {
@@ -29,7 +32,7 @@ private:
   MainMenu(Engine* engine);
 
 public:
-  ~MainMenu() final = default;
+  ~MainMenu() final;
 
   bool handleInput(sf::Event::EventType type, const sf::Event& event) final;
 
@@ -48,6 +51,14 @@ private:
   AxisMap axisbinds;
   InputMap inputs;
 
+private:
   bool paused = false;
+
+  sf::RenderTexture* framebuffer = nullptr;
+
+  std::size_t entry = 0;
+
+  float ticktime = 0.f;
+  float rendertime = 0.f;
 };
 }
