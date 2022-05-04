@@ -195,7 +195,13 @@ void Gameplay::update(float delta) {
       subworld.update(delta);
 
       if (level.timer > 0.f) {
+        float timer_old = level.timer;
         level.timer = std::max(level.timer - delta, 0.f);
+        if (level.timer < 100.f and timer_old >= 100.f) {
+          engine->sound->play("hurry");
+          engine->music->setTempo(engine->music->getTempo() * 4.f / 3.f);
+          engine->music->play();
+        }
       }
     }
 

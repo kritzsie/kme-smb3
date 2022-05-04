@@ -38,7 +38,7 @@ public:
   Rect<int> getBounds() const;
   void setBounds(int width, int height);
   void setBounds(int x, int y, int width, int height);
-  void setBounds(Rect<int> size);
+  void setBounds(Rect<int> bounds);
 
   float getGravity() const;
   void setGravity(float value);

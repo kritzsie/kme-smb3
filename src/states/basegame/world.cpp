@@ -46,8 +46,8 @@ Rect<int> Subworld::getBounds() const {
   return bounds;
 }
 
-void Subworld::setBounds(Rect<int> size_arg) {
-  bounds = size_arg;
+void Subworld::setBounds(Rect<int> bounds_arg) {
+  bounds = bounds_arg;
 }
 
 void Subworld::setBounds(int x, int y, int width, int height) {
