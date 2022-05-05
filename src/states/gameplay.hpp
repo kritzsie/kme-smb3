@@ -27,10 +27,11 @@ public:
   };
 
 public:
-  static Factory create();
+  static Factory create(std::size_t worldnum, std::size_t levelnum);
 
 private:
-  Gameplay(BaseState* parent, Engine* engine);
+  Gameplay(BaseState* parent, Engine* engine,
+           std::size_t worldnum, std::size_t levelnum);
 
 public:
   ~Gameplay() final;
@@ -96,6 +97,7 @@ private:
   Vec2f camera_pos;
   Vec2f camera_radius;
 
+  std::size_t worldnum, levelnum;
   std::size_t current_subworld = 0;
   Level level;
 };

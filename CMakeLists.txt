@@ -22,6 +22,7 @@ add_executable(
   src/states/gameplay.cpp
   src/states/intro.cpp
   src/states/mainmenu.cpp
+  src/states/worldmap.cpp
   src/util/base64.cpp
   src/util/file.cpp
   src/util/string.cpp

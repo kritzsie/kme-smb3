@@ -14,15 +14,14 @@
 #include <cmath>
 
 namespace kme {
-Gameplay::Factory Gameplay::create() {
+Gameplay::Factory Gameplay::create(std::size_t worldnum, std::size_t levelnum) {
   return [=](BaseState* parent, Engine* engine) -> BaseState* {
-    return new Gameplay(parent, engine);
+    return new Gameplay(parent, engine, worldnum, levelnum);
   };
 }
 
-Gameplay::Gameplay(BaseState* parent, Engine* engine)
-: BaseState(parent, engine)
-, level(getBaseGame(), this) {
+Gameplay::Gameplay(BaseState* parent, Engine* engine, std::size_t worldnum, std::size_t levelnum)
+: BaseState(parent, engine), worldnum(worldnum), levelnum(levelnum), level(getBaseGame(), this) {
   framebuffer = new sf::RenderTexture;
   scene = new sf::RenderTexture;
   hud = new sf::RenderTexture;
@@ -90,7 +89,7 @@ bool Gameplay::handleInput(sf::Event::EventType type, const sf::Event& event) {
 }
 
 void Gameplay::enter() {
-  LevelLoader loader = LevelLoader(1, 1);
+  LevelLoader loader(worldnum, levelnum);
   loader.load(level);
 
   Subworld& subworld = level.getSubworld(current_subworld);
@@ -168,9 +167,9 @@ void Gameplay::enter() {
   auto pswitch = entities.create();
   entities.emplace<CInfo>(pswitch, "PSwitch");
   entities.emplace<CPosition>(pswitch, Vec2f(6.5f, 8.f));
-  entities.emplace<CVelocity>(pswitch);
   entities.emplace<CCollision>(pswitch, Hitbox(0.5f, 1.f));
   entities.emplace<CFlags>(pswitch, EFlags::SOLID);
+  entities.emplace<CVelocity>(pswitch);
   entities.emplace<CState>(pswitch);
   entities.emplace<CRender>(pswitch);
 
@@ -426,8 +425,8 @@ void Gameplay::drawHUD() {
 
   const auto& counters = entities.get<CCounters>(subworld.player);
 
-  std::stringstream worldnum;
-  worldnum << util::highASCII("abcd") << '\0' << '-' << 1;
+  std::stringstream world;
+  world << util::highASCII("abcd") << worldnum << '-' << levelnum;
 
   std::stringstream p_meter;
   for (std::size_t i = 0; i < 6; ++i) {
@@ -450,17 +449,17 @@ void Gameplay::drawHUD() {
   std::stringstream score;
   score << std::internal << std::setw(7) << std::setfill('0') << getBaseGame()->getScore();
 
-  std::stringstream timerstr;
-  timerstr << "@" << std::fixed << std::internal
+  std::stringstream timer;
+  timer << "@" << std::fixed << std::internal
            << std::setprecision(0) << std::setw(3) << std::setfill('0')
            << int(std::ceil(level.timer));
 
   TextStyle align_left("smb3_sbfont");
-  drawText(hud, worldnum.str(), Vec2f(16, 16), align_left);
+  drawText(hud, world.str(), Vec2f(16, 16), align_left);
   drawText(hud, mario.str(), Vec2f(16, 24), align_left);
 
   TextStyle align_right("smb3_sbfont", TextStyle::Flags::ALIGN_RIGHT);
-  drawText(hud, timerstr.str(), Vec2f(48, 16), align_right);
+  drawText(hud, timer.str(), Vec2f(48, 16), align_right);
   drawText(hud, coins.str(), Vec2f(16, 16), align_right);
   drawText(hud, score.str(), Vec2f(16, 24), align_right);
 

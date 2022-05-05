@@ -5,7 +5,7 @@
 #include "basegame/hitbox.hpp"
 #include "basegame/powerup.hpp"
 #include "basegame/theme.hpp"
-#include "gameplay.hpp"
+#include "worldmap.hpp"
 
 #include <SFML/Graphics.hpp>
 
@@ -465,7 +465,7 @@ void BaseGame::resume() {
 
 void BaseGame::update(float delta) {
   if (not paused) {
-    engine->pushState(Gameplay::create());
+    engine->pushState(WorldMap::create());
     pause();
   }
 }
