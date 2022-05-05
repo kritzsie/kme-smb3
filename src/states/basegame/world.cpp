@@ -743,6 +743,14 @@ void Subworld::handleEntityCollisions(Entity entity) {
           info2.valid = false;
         }
       }
+      else if (info2.type == "GoalCard") {
+        auto& vel1 = entities.get<CVelocity>(entity1).value;
+        vel1 = Vec2f(0.f, 0.f);
+        gameplay->playSound("clear");
+        gameplay->playMusic("courseclear.spc");
+
+        info2.valid = false;
+      }
       else if (flags2 & EFlags::ENEMY and ~flags2 & EFlags::DEAD) {
         auto& pos1 = entities.get<CPosition>(entity1).value;
         auto& vel1 = entities.get<CVelocity>(entity1).value;

@@ -120,11 +120,11 @@ void Gameplay::enter() {
   entities.emplace<CPowerup>(player, player_powerup);
   entities.emplace<CState>(player, player_state);
   entities.emplace<CCollision>(player, player_hitbox);
+  entities.emplace<CVelocity>(player);
+  entities.emplace<CDirection>(player);
   entities.emplace<CFlags>(player);
   entities.emplace<CCounters>(player);
   entities.emplace<CTimers>(player);
-  entities.emplace<CVelocity>(player);
-  entities.emplace<CDirection>(player);
   entities.emplace<CRender>(player);
   entities.emplace<CAudio>(player);
   subworld.player = player;
@@ -134,6 +134,14 @@ void Gameplay::enter() {
   entities.emplace<CPosition>(camera, Vec2f(15.f, 8.4375f));
   entities.emplace<CCollision>(camera, Hitbox(15.f, 16.875f));
   subworld.camera = camera;
+
+  auto goalcard = entities.create();
+  entities.emplace<CInfo>(goalcard, "GoalCard");
+  entities.emplace<CPosition>(goalcard, Vec2f(164.5f, 5.f));
+  entities.emplace<CCollision>(goalcard, Hitbox(0.5f, 1.f));
+  entities.emplace<CFlags>(goalcard);
+  entities.emplace<CState>(goalcard);
+  entities.emplace<CRender>(goalcard);
 
   auto mushroom = entities.create();
   entities.emplace<CInfo>(mushroom, "Mushroom");
@@ -150,23 +158,21 @@ void Gameplay::enter() {
   entities.emplace<CInfo>(goomba, "Goomba");
   entities.emplace<CFlags>(goomba, EFlags::ENEMY | EFlags::NOFRICTION);
   entities.emplace<CState>(goomba, EState::WALK);
-  entities.emplace<CPosition>(goomba, Vec2f(15.f, 1.f));
+  entities.emplace<CPosition>(goomba, Vec2f(15.5f, 1.f));
   entities.emplace<CVelocity>(goomba, Vec2f(-2.f, 0.f));
   entities.emplace<CCollision>(goomba, Hitbox(0.5f, 0.75f));
   entities.emplace<CDirection>(goomba);
   entities.emplace<CTimers>(goomba);
   entities.emplace<CRender>(goomba);
 
-  /*
   auto pswitch = entities.create();
   entities.emplace<CInfo>(pswitch, "PSwitch");
-  entities.emplace<CPosition>(pswitch, Vec2f(6.f, 3.f));
+  entities.emplace<CPosition>(pswitch, Vec2f(6.5f, 8.f));
+  entities.emplace<CVelocity>(pswitch);
   entities.emplace<CCollision>(pswitch, Hitbox(0.5f, 1.f));
-  entities.emplace<CPowerup>(pswitch, player_powerup);
   entities.emplace<CFlags>(pswitch, EFlags::SOLID);
   entities.emplace<CState>(pswitch);
   entities.emplace<CRender>(pswitch);
-  */
 
   const auto& theme = getBaseGame()->themes.at(subworld.getTheme());
   playMusic(theme.music);

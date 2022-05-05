@@ -271,6 +271,12 @@ void BaseGame::enter() {
   mario_rs.pushFrame("DUCK.BIG", "bigmarioduck", Rect<int>(0, 0, 14, 18), Vec2f(6, -1), 0.f);
   entity_data.registerRenderStates("Player", std::move(mario_rs));
 
+  RenderStates goalcard_rs;
+  goalcard_rs.pushFrame("IDLE", "redmushroom", Rect<int>(0, 0, 16, 16), Vec2f(8, 0), 8.f / 60.f);
+  goalcard_rs.pushFrame("IDLE", "fireflower", Rect<int>(0, 0, 16, 16), Vec2f(8, 0), 8.f / 60.f);
+  goalcard_rs.pushFrame("IDLE", "superstar_0", Rect<int>(0, 0, 16, 16), Vec2f(8, 0), 8.f / 60.f);
+  entity_data.registerRenderStates("GoalCard", std::move(goalcard_rs));
+
   RenderStates goomba_rs;
   goomba_rs.pushFrame("WALK", "goombawalk_0", Rect<int>(0, 0, 16, 16), Vec2f(8, -1), 8.f / 60.f);
   goomba_rs.pushFrame("WALK", "goombawalk_1", Rect<int>(0, 0, 16, 16), Vec2f(8, -1), 8.f / 60.f);
@@ -285,10 +291,12 @@ void BaseGame::enter() {
   entity_data.registerRenderStates("Mushroom", std::move(mushroom_rs));
 
   RenderStates pswitch_rs;
-  pswitch_rs.pushFrame("IDLE", "pswitch_0", Rect<int>(0, 0, 16, 16), Vec2f(8, -1), 8.f / 60.f);
-  pswitch_rs.pushFrame("IDLE", "pswitch_1", Rect<int>(0, 0, 16, 16), Vec2f(8, -1), 8.f / 60.f);
-  pswitch_rs.pushFrame("IDLE", "pswitch_0", Rect<int>(0, 0, 16, 16), Vec2f(8, -1), 8.f / 60.f);
-  pswitch_rs.pushFrame("IDLE", "pswitch_2", Rect<int>(0, 0, 16, 16), Vec2f(8, -1), 8.f / 60.f);
+  pswitch_rs.pushFrame("IDLE", "pswitch_0", Rect<int>(0, 0, 16, 16), Vec2f(8, 0), 8.f / 60.f);
+  pswitch_rs.pushFrame("IDLE", "pswitch_1", Rect<int>(0, 0, 16, 16), Vec2f(8, 0), 8.f / 60.f);
+  pswitch_rs.pushFrame("IDLE", "pswitch_0", Rect<int>(0, 0, 16, 16), Vec2f(8, 0), 8.f / 60.f);
+  pswitch_rs.pushFrame("IDLE", "pswitch_2", Rect<int>(0, 0, 16, 16), Vec2f(8, 0), 8.f / 60.f);
+
+  pswitch_rs.pushFrame("DEATH", "pswitchspent", Rect<int>(0, 0, 16, 16), Vec2f(8, 0), 0.f);
   entity_data.registerRenderStates("PSwitch", std::move(pswitch_rs));
 
   RenderFrames cloudlayer;
