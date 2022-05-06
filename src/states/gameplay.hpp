@@ -1,12 +1,12 @@
 #pragma once
 
-#include "basestate.hpp"
-#include "basegame/world.hpp"
-#include "basegame.hpp"
 #include "../geometry.hpp"
 #include "../input.hpp"
 #include "../inputhandler.hpp"
 #include "../types.hpp"
+#include "basegame/theme.hpp"
+#include "basegame/world.hpp"
+#include "basestate.hpp"
 
 #include <SFML/Graphics.hpp>
 #include <SFML/Window/Event.hpp>
@@ -18,6 +18,8 @@
 #include <cstddef>
 
 namespace kme {
+class BaseGame;
+
 class Gameplay final : public BaseState {
 public:
   enum class Action {

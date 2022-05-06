@@ -1,12 +1,15 @@
 #pragma once
 
-#include "basestate.hpp"
-
+#include "../engine.hpp"
+#include "../inputhandler.hpp"
+#include "../music.hpp"
 #include "../renderstates.hpp"
+#include "../sound.hpp"
 #include "../types.hpp"
 #include "basegame/ecs/entitydata.hpp"
 #include "basegame/theme.hpp"
 #include "basegame/tiledefs.hpp"
+#include "basestate.hpp"
 
 namespace kme {
 class BaseGame final : public BaseState {
@@ -34,7 +37,6 @@ public:
 
   void addCoins(int count);
   void addLives(int count);
-  void addScore(int count);
   void addScore(long count);
   void addScore(ULong count);
 

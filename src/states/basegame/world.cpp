@@ -2,6 +2,7 @@
 
 #include "../../sound.hpp"
 #include "../../util.hpp"
+#include "../basegame.hpp"
 #include "../gameplay.hpp"
 #include "ecs/components.hpp"
 #include "powerup.hpp"
@@ -822,30 +823,30 @@ std::size_t Level::createSubworld() {
 
 // TODO: de-duplicate this
 std::size_t Level::createSubworld(std::size_t index_hint) {
-  if (subworld.find(index_hint) == subworld.end()) {
+  if (subworlds.find(index_hint) == subworlds.end()) {
     if (count == index_hint) {
       ++count;
     }
 
-    subworld.emplace(index_hint, Subworld(basegame, gameplay));
+    subworlds.emplace(index_hint, Subworld(basegame, gameplay));
     return index_hint;
   }
 
-  while (subworld.find(count) != subworld.end()) {
+  while (subworlds.find(count) != subworlds.end()) {
     ++count;
   }
 
-  subworld.emplace(count, Subworld(basegame, gameplay));
+  subworlds.emplace(count, Subworld(basegame, gameplay));
   return count;
 }
 
 bool Level::subworldExists(std::size_t index) {
-  return subworld.find(index) != subworld.end();
+  return subworlds.find(index) != subworlds.end();
 }
 
 bool Level::deleteSubworld(std::size_t index) {
   if (subworldExists(index)) {
-    subworld.erase(index);
+    subworlds.erase(index);
     return true;
   }
 
@@ -853,35 +854,18 @@ bool Level::deleteSubworld(std::size_t index) {
 }
 
 const Subworld& Level::getSubworld(std::size_t index) const {
-  return subworld.at(index);
+  return subworlds.at(index);
 }
 
 Subworld& Level::getSubworld(std::size_t index) {
   return const_cast<Subworld&>(static_cast<const Level*>(this)->getSubworld(index));
 }
 
-const Level::const_iterator Level::begin() const {
-  return subworld.cbegin();
-}
-
-const Level::const_iterator Level::end() const {
-  return subworld.cend();
-}
-
-const Level::const_iterator Level::cbegin() const {
-  return begin();
-}
-
-const Level::const_iterator Level::cend() const {
-  return end();
-}
-
-Level::iterator Level::begin() {
-  return subworld.begin();
-}
-
-Level::iterator Level::end() {
-  return subworld.end();
-}
+const Level::const_iterator Level::begin() const { return subworlds.cbegin(); }
+const Level::const_iterator Level::end() const { return subworlds.cend(); }
+const Level::const_iterator Level::cbegin() const { return begin(); }
+const Level::const_iterator Level::cend() const { return end(); }
+Level::iterator Level::begin() { return subworlds.begin(); }
+Level::iterator Level::end() { return subworlds.end(); }
 // end Level
 }

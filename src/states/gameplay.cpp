@@ -6,6 +6,7 @@
 #include "../util.hpp"
 #include "basegame/ecs/components.hpp"
 #include "basegame/levelloader.hpp"
+#include "basegame.hpp"
 
 #include <iomanip>
 #include <map>

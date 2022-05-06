@@ -1,12 +1,11 @@
 #pragma once
 
-#include "../basegame.hpp"
 #include "ecs/ecs.hpp"
 #include "collision.hpp"
 #include "theme.hpp"
 #include "tilemap.hpp"
 
-#include <unordered_map>
+#include <map>
 #include <unordered_set>
 #include <utility>
 #include <variant>
@@ -15,6 +14,7 @@
 #include <cstdlib>
 
 namespace kme {
+class BaseGame;
 class Gameplay;
 
 // begin Subworld
@@ -86,10 +86,7 @@ private:
 // begin Level
 class Level {
 public:
-  using Map = std::unordered_map<std::size_t, Subworld>;
-
-  using const_iterator = Map::const_iterator;
-  using iterator = Map::iterator;
+  using Subworlds = std::map<std::size_t, Subworld>;
 
   Level(const BaseGame* basegame, Gameplay* gameplay);
 
@@ -100,6 +97,9 @@ public:
 
   const Subworld& getSubworld(std::size_t index) const;
   Subworld& getSubworld(std::size_t index);
+
+  using const_iterator = Subworlds::const_iterator;
+  using iterator = Subworlds::iterator;
 
   const const_iterator cbegin() const;
   const const_iterator cend() const;
@@ -113,8 +113,7 @@ private:
   Gameplay* gameplay;
 
   std::size_t count = 0;
-
-  Map subworld;
+  Subworlds subworlds;
 
 public:
   float timer = 300.f;

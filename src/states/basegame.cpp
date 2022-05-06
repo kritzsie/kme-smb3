@@ -455,13 +455,8 @@ void BaseGame::enter() {
 
 void BaseGame::exit() {}
 
-void BaseGame::pause() {
-  paused = true;
-}
-
-void BaseGame::resume() {
-  paused = false;
-}
+void BaseGame::pause() { paused = true; }
+void BaseGame::resume() { paused = false; }
 
 void BaseGame::update(float delta) {
   if (not paused) {
@@ -472,17 +467,9 @@ void BaseGame::update(float delta) {
 
 void BaseGame::draw(float delta) {}
 
-UInt BaseGame::getCoins() const {
-  return coins;
-}
-
-UInt BaseGame::getLives() const {
-  return lives;
-}
-
-ULong BaseGame::getScore() const {
-  return score;
-}
+UInt BaseGame::getCoins() const { return coins; }
+UInt BaseGame::getLives() const { return lives; }
+ULong BaseGame::getScore() const { return score; }
 
 void BaseGame::addCoins(int count) {
   coins = util::absmod(coins + count, 100);
@@ -492,15 +479,6 @@ void BaseGame::addLives(int count) {
   lives = std::max(0, std::min(lives + count, 99));
 }
 
-void BaseGame::addScore(int count) {
-  score += count;
-}
-
-void BaseGame::addScore(long count) {
-  score += count;
-}
-
-void BaseGame::addScore(ULong count) {
-  score += count;
-}
+void BaseGame::addScore(long count) { score += count; }
+void BaseGame::addScore(ULong count) { score += count; }
 }
