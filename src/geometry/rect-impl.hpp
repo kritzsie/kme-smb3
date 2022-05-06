@@ -125,13 +125,10 @@ Rect<T>& Rect<T>::operator/=(T rhs) {
 
 template<typename T>
 bool Rect<T>::intersects(const Rect<T>& rhs) const {
-  if (x < rhs.x + rhs.width
-  and x + width > rhs.x
-  and y < rhs.y + rhs.height
-  and y + height > rhs.y) {
-    return true;
-  }
-  return false;
+  return x < rhs.x + rhs.width
+  and    x + width > rhs.x
+  and    y < rhs.y + rhs.height
+  and    y + height > rhs.y;
 }
 
 template<typename T>

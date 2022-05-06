@@ -167,7 +167,7 @@ void Gameplay::enter() {
 
   auto pswitch = entities.create();
   entities.emplace<CInfo>(pswitch, "PSwitch");
-  entities.emplace<CPosition>(pswitch, Vec2f(6.5f, 8.f));
+  entities.emplace<CPosition>(pswitch, Vec2f(16.5f, 4.f));
   entities.emplace<CCollision>(pswitch, Hitbox(0.5f, 1.f));
   entities.emplace<CFlags>(pswitch, EFlags::SOLID);
   entities.emplace<CVelocity>(pswitch);

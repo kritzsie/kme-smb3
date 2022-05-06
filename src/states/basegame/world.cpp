@@ -643,8 +643,6 @@ void Subworld::handleWorldCollisions(Entity entity) {
 
   pos += best_move;
 
-  auto timers_view = entities.view<CTimers>();
-
   if (flags & EFlags::ENEMY
   or  flags & EFlags::POWERUP) {
     if (best_move.x != 0.f) {
@@ -680,6 +678,7 @@ void Subworld::handleWorldCollisions(Entity entity) {
     flags &= ~EFlags::LANDED;
 
     if (best_move.y < 0.f) {
+      auto timers_view = entities.view<CTimers>();
       if (timers_view.contains(entity)) {
         auto& timers = timers_view.get<CTimers>(entity);
         timers.jump = 0.f;
@@ -730,6 +729,99 @@ void Subworld::handleEntityCollisions(Entity entity) {
 
     auto& info2 = entities.get<CInfo>(entity2);
     auto& flags2 = entities.get<CFlags>(entity2).value;
+
+    if (~flags1 & EFlags::INTANGIBLE
+    and ~flags2 & EFlags::INTANGIBLE
+    and flags2 & EFlags::SOLID) {
+      auto& pos1 = entities.get<CPosition>(entity1).value;
+      auto& vel1 = entities.get<CVelocity>(entity1).value;
+      auto& coll1 = entities.get<CCollision>(entity1);
+      auto& pos2 = entities.get<CPosition>(entity2).value;
+      auto& vel2 = entities.get<CVelocity>(entity2).value;
+      auto& coll2 = entities.get<CCollision>(entity2);
+
+      Rect<float> aabb1;
+      Rect<float> aabb2;
+
+      Vec2f best_move;
+
+      aabb1 = coll1.hitbox.toAABB(Vec2f(pos1.x, coll1.pos_old.y));
+      aabb2 = coll2.hitbox.toAABB(Vec2f(pos2.x, coll2.pos_old.y));
+      if (aabb1.intersects(aabb2)) {
+        Rect<float> collision = aabb1.intersection(aabb2);
+        float vrel = vel1.x - vel2.x;
+        float time = collision.width / std::abs(vrel);
+
+        best_move.x = (vel2.x - vel1.x) * time;
+      }
+
+      aabb1 = coll1.hitbox.toAABB(Vec2f(pos1.x + best_move.x, pos1.y));
+      aabb2 = coll2.hitbox.toAABB(pos2);
+      if (aabb1.intersects(aabb2)) {
+        Rect<float> collision = aabb1.intersection(aabb2);
+        float vrel = vel1.y - vel2.y;
+        float time = collision.height / std::abs(vrel);
+
+        if (vrel > 0.f) {
+          auto timers_view = entities.view<CTimers>();
+          if (timers_view.contains(entity1)) {
+            auto& timers1 = entities.get<CTimers>(entity1);
+            timers1.jump = 0.f;
+          }
+        }
+        else {
+          flags1 &= ~EFlags::AIRBORNE;
+        }
+
+        best_move.y = (vel2.y - vel1.y) * time;
+      }
+
+      pos1 += best_move;
+
+      if (flags1 & EFlags::ENEMY
+      or  flags1 & EFlags::POWERUP) {
+        if (best_move.x != 0.f) {
+          auto direction_view = entities.view<CDirection>();
+          if (direction_view.contains(entity)) {
+            auto& direction = direction_view.get<CDirection>(entity).value;
+            direction = -direction;
+          }
+          vel1.x = -vel1.x;
+        }
+      }
+      else {
+        if (best_move.x > 0.f) {
+          vel1.x = 0.f;
+        }
+        else if (best_move.x < 0.f) {
+          vel1.x = 0.f;
+        }
+      }
+
+      if (best_move.y > 0.f) {
+        if (flags1 & EFlags::AIRBORNE) {
+          flags1 |= EFlags::LANDED;
+        }
+        else {
+          flags1 &= ~EFlags::LANDED;
+        }
+        flags1 &= ~EFlags::AIRBORNE;
+        vel1.y = 0.f;
+      }
+      else {
+        if (best_move.y < 0.f) {
+          auto timers_view = entities.view<CTimers>();
+          if (timers_view.contains(entity)) {
+            auto& timers = timers_view.get<CTimers>(entity);
+            timers.jump = 0.f;
+          }
+          if (vel1.y > 0.f) {
+            gameplay->playSound("bump");
+          }
+          vel1.y = 0.f;
+        }
+      }
+    }
 
     if (info1.type == "Player") {
       if (flags2 & EFlags::POWERUP) {
