@@ -1,6 +1,7 @@
 #include "basegame.hpp"
 
 #include "../engine.hpp"
+#include "../math.hpp"
 #include "basegame/ecs/components.hpp"
 #include "basegame/hitbox.hpp"
 #include "basegame/powerup.hpp"
@@ -14,6 +15,8 @@
 #include <utility>
 
 namespace kme {
+using namespace vec2_aliases;
+
 BaseGame::Factory BaseGame::create() {
   return [](BaseState* parent, Engine* engine) -> BaseState* {
     return new BaseGame(parent, engine);

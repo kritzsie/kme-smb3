@@ -10,8 +10,12 @@ namespace kme {
 template<typename T>
 class Rect {
 public:
-  T x, y;
-  T width, height;
+  Vec2<T> pos, size;
+
+  T& x = pos.x;
+  T& y = pos.y;
+  T& width = size.x;
+  T& height = size.y;
 
   Rect();
   Rect(T x, T y, T width, T height);

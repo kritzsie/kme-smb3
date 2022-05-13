@@ -64,15 +64,15 @@ std::vector<char> readFile(const std::string& path) {
     throw std::runtime_error(PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode()));
   }
 
-  std::size_t size = PHYSFS_fileLength(file);
-  if (size == 0) {
+  std::size_t length = PHYSFS_fileLength(file);
+  if (length == 0) {
     return std::vector<char>();
   }
 
-  char* data = new char[size];
-  PHYSFS_readBytes(file, data, size);
+  std::vector<char> data(length);
+  PHYSFS_readBytes(file, data.data(), length);
   PHYSFS_close(file);
-  return std::vector<char>(data, data + size);
+  return data;
 }
 
 FileInputStream::FileInputStream() : sf::FileInputStream(), filehandle(nullptr) {}

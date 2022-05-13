@@ -6,21 +6,21 @@
 
 namespace kme {
 template<typename T>
-Rect<T>::Rect() : x(), y(), width(), height() {}
+Rect<T>::Rect() : pos(), size() {}
 
 template<typename T>
 Rect<T>::Rect(T x, T y, T width, T height) :
-  x(x), y(y), width(width), height(height)
+  pos(x, y), size(width, height)
 {}
 
 template<typename T>
 Rect<T>::Rect(const Rect<T>& rect) :
-  x(rect.x), y(rect.y), width(rect.width), height(rect.height)
+  pos(rect.pos), size(rect.size)
 {}
 
 template<typename T>
 Rect<T>::Rect(const Vec2<T>& pos, const Vec2<T>& size) :
-  x(pos.x), y(pos.y), width(size.x), height(size.y)
+  pos(pos), size(size)
 {}
 
 template<typename T>

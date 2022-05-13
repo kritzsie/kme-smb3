@@ -1,11 +1,13 @@
 #pragma once
 
-#include "../../geometry.hpp"
+#include "../../math.hpp"
 #include "ecs/ecs.hpp"
 
 #include <variant>
 
 namespace kme {
+using namespace vec2_aliases;
+
 struct WorldCollision {
   Entity entity;
   Vec2i tile;

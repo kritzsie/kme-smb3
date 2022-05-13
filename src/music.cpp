@@ -111,10 +111,10 @@ void Music::setTempo(double tempo) {
 }
 
 double Music::getVolume() const {
-  return stream.getVolume() / 100.0;
+  return stream.getVolume() / 100.f;
 }
 
 void Music::setVolume(double volume) {
-  stream.setVolume(volume * 100.0);
+  stream.setVolume(volume * 100.f);
 }
 }

@@ -12,10 +12,10 @@ template<typename T>
 Vec2<T>::Vec2(T x, T y) : x(x), y(y) {}
 
 template<typename T>
-Vec2<T>::Vec2(const Vec2<T>& vec2) : x(vec2.x), y(vec2.y) {}
+Vec2<T>::Vec2(const Vec2<T>& other) : x(other.x), y(other.y) {}
 
 template<typename T>
-Vec2<T>::Vec2(const sf::Vector2<T>& vec2) : Vec2<T>(vec2.x, vec2.y) {}
+Vec2<T>::Vec2(const sf::Vector2<T>& other) : Vec2<T>(other.x, other.y) {}
 
 template<typename T>
 Vec2<T>& Vec2<T>::operator=(const Vec2<T>& rhs) {

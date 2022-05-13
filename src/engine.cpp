@@ -1,5 +1,6 @@
 #include "engine.hpp"
 
+#include "math.hpp"
 #include "music.hpp"
 #include "sound.hpp"
 #include "states.hpp"
@@ -15,6 +16,8 @@
 #include <cstdlib>
 
 namespace kme {
+using namespace vec2_aliases;
+
 std::size_t Engine::instance_count = 0;
 
 TimeInfo::TimeInfo(float rate) : rate(rate), delta(1.f / rate) {}
@@ -31,11 +34,8 @@ Window::Window(UInt width, UInt height, std::string title)
 
   setKeyRepeatEnabled(false);
 
-  sf::VideoMode videomode = sf::VideoMode::getDesktopMode();
-  setPosition(sf::Vector2i(
-    (videomode.width - width) / 2,
-    (videomode.height - height) / 2
-  ));
+  sf::VideoMode screen = sf::VideoMode::getDesktopMode();
+  setPosition((Vec2i(screen.width, screen.height) - Vec2i(width, height)) / 2);
 }
 
 Window::~Window() {
@@ -58,10 +58,10 @@ void Window::drawWindow() {
 }
 
 void Window::resize(UInt width, UInt height) {
-  sf::Vector2u size = framebuffer->getSize();
-  UInt scale = std::max<UInt>(1, std::min(width / size.x, height / size.y));
+  Vec2u size = framebuffer->getSize();
+  UInt scale = std::max(1u, std::min(width / size.x, height / size.y));
 
-  sf::View view(sf::FloatRect(0, 0, width, height));
+  sf::View view(Rect<float>(0, 0, width, height));
   view.setCenter(size.x / 2, size.y / 2);
   view.zoom(1.0f / scale);
   setView(view);

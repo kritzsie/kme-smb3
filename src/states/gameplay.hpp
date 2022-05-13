@@ -1,8 +1,8 @@
 #pragma once
 
-#include "../geometry.hpp"
 #include "../input.hpp"
 #include "../inputhandler.hpp"
+#include "../math.hpp"
 #include "../types.hpp"
 #include "basegame/theme.hpp"
 #include "basegame/world.hpp"
@@ -18,6 +18,8 @@
 #include <cstddef>
 
 namespace kme {
+using namespace vec2_aliases;
+
 class BaseGame;
 
 class Gameplay final : public BaseState {

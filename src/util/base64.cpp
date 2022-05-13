@@ -45,7 +45,7 @@ std::string base64_encode(const std::vector<char>& data) {
   if (valb > -6)
     result.push_back(base64_chars[((val << 8) >> (valb + 8)) & 0x3F]);
 
-  while (result.size() % 4)
+  while (result.length() % 4)
     result.push_back('=');
 
   return result;

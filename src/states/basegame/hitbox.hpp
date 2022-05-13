@@ -1,8 +1,10 @@
 #pragma once
 
-#include "../../geometry/rect.hpp"
+#include "../../math.hpp"
 
 namespace kme {
+using namespace vec2_aliases;
+
 class Hitbox {
 public:
   float radius;

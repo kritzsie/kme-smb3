@@ -1,12 +1,14 @@
 #pragma once
 
-#include "../../geometry.hpp"
+#include "../../math.hpp"
 
 #include <SFML/Graphics.hpp>
 
 #include <string>
 
 namespace kme {
+using namespace vec2_aliases;
+
 struct Layer {
   std::string background;
   Vec2f offset;

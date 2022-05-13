@@ -1,11 +1,15 @@
 #pragma once
 
-#include "geometry.hpp"
+#include "math.hpp"
 #include "types.hpp"
 
 #include <SFML/Graphics.hpp>
 
+#include <string>
+
 namespace kme {
+using namespace vec2_aliases;
+
 class TextStyle {
 public:
   struct Flags {
@@ -23,5 +27,6 @@ public:
   std::string font;
 };
 
-void drawText(sf::RenderTarget* canvas, std::string text, Vec2f pos, TextStyle style);
+void drawText(sf::RenderTarget* canvas, std::string text,
+              Vec2f origin, TextStyle style);
 }

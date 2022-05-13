@@ -2,7 +2,7 @@
 
 #include "ecs.hpp"
 
-#include "../../../geometry.hpp"
+#include "../../../math.hpp"
 #include "../../../input.hpp"
 #include "../../../renderstates.hpp"
 #include "../../../sound.hpp"
@@ -19,6 +19,8 @@
 #include <cstddef>
 
 namespace kme {
+using namespace vec2_aliases;
+
 struct EFlags {
   enum : UInt32 {
     DEAD       = 1 << 0,

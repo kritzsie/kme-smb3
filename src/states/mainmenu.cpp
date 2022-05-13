@@ -2,7 +2,7 @@
 
 #include "../assetmanager.hpp"
 #include "../engine.hpp"
-#include "../geometry.hpp"
+#include "../math.hpp"
 #include "../renderer.hpp"
 #include "../types.hpp"
 #include "../util.hpp"

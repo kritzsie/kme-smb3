@@ -14,8 +14,8 @@ public:
 
   Vec2();
   Vec2(T x, T y);
-  Vec2(const Vec2<T>& vec2);
-  Vec2(const sf::Vector2<T>& vec2);
+  Vec2(const Vec2<T>& other);
+  Vec2(const sf::Vector2<T>& other);
 
   Vec2<T>& operator=(const Vec2<T>& rhs);
 
@@ -46,6 +46,13 @@ public:
   operator sf::Vector2<T>() const;
 };
 
-using Vec2i = Vec2<Int32>;
-using Vec2f = Vec2<float>;
+namespace vec2_aliases {
+  using Vec2s = Vec2<Int16>;
+  using Vec2i = Vec2<Int32>;
+  using Vec2u = Vec2<UInt32>;
+  using Vec2l = Vec2<UInt64>;
+  using Vec2f = Vec2<float>;
+  using Vec2d = Vec2<double>;
+  using Vec2z = Vec2<std::size_t>;
+}
 }

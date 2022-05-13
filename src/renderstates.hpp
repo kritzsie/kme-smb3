@@ -1,13 +1,14 @@
 #pragma once
 
-#include "geometry/rect.hpp"
-#include "geometry/vec2.hpp"
+#include "math.hpp"
 #include "types.hpp"
 
 #include <string>
 #include <vector>
 
 namespace kme {
+using namespace vec2_aliases;
+
 struct RenderFrame {
   std::string texture;
   Rect<int> cliprect;

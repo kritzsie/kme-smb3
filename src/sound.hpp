@@ -2,13 +2,14 @@
 
 #include <SFML/Audio.hpp>
 
-#include <map>
 #include <string>
+
+#include <cstddef>
 
 namespace kme {
 class Sound {
 public:
-  static const std::size_t MAX_VOICES = 32;
+  static constexpr std::size_t MAX_VOICES = 32;
 
 private:
   sf::Sound voices[MAX_VOICES];

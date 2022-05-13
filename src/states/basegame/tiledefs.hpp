@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../geometry/rect.hpp"
+#include "../../math.hpp"
 #include "../../renderstates.hpp"
 
 #include <map>
@@ -8,6 +8,8 @@
 #include <vector>
 
 namespace kme {
+using namespace vec2_aliases;
+
 using TileID = std::string;
 
 class TileRedefinitionError : public std::runtime_error {

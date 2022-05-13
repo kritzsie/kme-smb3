@@ -5,6 +5,9 @@
 #include <gme/gme.h>
 
 #include <string>
+#include <vector>
+
+#include <cstddef>
 
 namespace kme {
 class MusicStream final : public sf::SoundStream {

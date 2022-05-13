@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../../math.hpp"
 #include "ecs/ecs.hpp"
 #include "collision.hpp"
 #include "theme.hpp"
@@ -14,6 +15,8 @@
 #include <cstdlib>
 
 namespace kme {
+using namespace vec2_aliases;
+
 class BaseGame;
 class Gameplay;
 

@@ -2,6 +2,7 @@
 
 #include "../assetmanager.hpp"
 #include "../engine.hpp"
+#include "../math.hpp"
 #include "../renderer.hpp"
 #include "../util.hpp"
 #include "basegame/ecs/components.hpp"
@@ -15,6 +16,8 @@
 #include <cmath>
 
 namespace kme {
+using namespace vec2_aliases;
+
 Gameplay::Factory Gameplay::create(std::size_t worldnum, std::size_t levelnum) {
   return [=](BaseState* parent, Engine* engine) -> BaseState* {
     return new Gameplay(parent, engine, worldnum, levelnum);
@@ -344,11 +347,11 @@ static Rect<float> rectFromBox(Vec2f pos, Vec2f radius) {
 
 static Rect<float> regionFromRect(Rect<float> rect) {
   Rect<float> border(-0.5f, -0.5f, 1.f, 1.f);
-  return rect + border;
+  return Rect<float>(rect.pos + border.pos, rect.size + border.size);
 }
 
 static Rect<int> viewportFromRegion(Rect<float> region) {
-  return static_cast<Rect<int>>(region.map(std::roundf));
+  return static_cast<Rect<int>>(la::map(region, std::roundf));
 }
 // end ugly
 

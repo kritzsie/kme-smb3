@@ -11,10 +11,8 @@ enum class Sign { PLUS, MINUS };
 Sign operator +(const Sign& rhs);
 Sign operator -(const Sign& rhs);
 
-template<
-  typename T,
-  std::enable_if_t<not std::is_same<Sign, T>::value, std::nullptr_t> = nullptr
->
+template<typename T,
+  std::enable_if_t<not std::is_same_v<Sign, T>, std::nullptr_t> = nullptr>
 T operator *(const T& lhs, const Sign& rhs);
 
 template<typename T>
