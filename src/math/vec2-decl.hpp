@@ -2,55 +2,64 @@
 
 #include "../types.hpp"
 
-#include <SFML/System/Vector2.hpp>
+#include <type_traits>
 
-#include <functional>
+namespace sf {
+template<typename T>
+class Vector2;
+}
 
 namespace kme {
+template<typename T, typename U>
+constexpr bool VEC2_ENABLE_CONVERSION = false;
+
 template<typename T>
-class Vec2 {
-public:
+constexpr bool VEC2_ENABLE_CONVERSION<T, sf::Vector2<T>> = true;
+
+template<typename T>
+struct Vec2 {
   T x, y;
 
-  Vec2();
-  Vec2(T x, T y);
-  Vec2(const Vec2<T>& other);
-  Vec2(const sf::Vector2<T>& other);
+  constexpr Vec2();
+  constexpr Vec2(T x, T y);
 
-  Vec2<T>& operator=(const Vec2<T>& rhs);
+  constexpr bool operator ==(const Vec2<T>& rhs) const;
+  constexpr bool operator !=(const Vec2<T>& rhs) const;
 
-  Vec2<T> operator+() const;
-  Vec2<T> operator-() const;
-  Vec2<T> operator+(const Vec2<T>& rhs) const;
-  Vec2<T> operator-(const Vec2<T>& rhs) const;
-  Vec2<T> operator*(T rhs) const;
-  Vec2<T> operator/(T rhs) const;
+  constexpr Vec2<T> operator +() const;
+  constexpr Vec2<T> operator -() const;
+  constexpr Vec2<T> operator +(const Vec2<T>& rhs) const;
+  constexpr Vec2<T> operator -(const Vec2<T>& rhs) const;
+  constexpr Vec2<T> operator *(const T& rhs) const;
+  constexpr Vec2<T> operator /(const T& rhs) const;
 
-  bool operator==(const Vec2<T>& rhs) const;
-  bool operator!=(const Vec2<T>& rhs) const;
-
-  Vec2<T>& operator+=(const Vec2<T>& rhs);
-  Vec2<T>& operator-=(const Vec2<T>& rhs);
-  Vec2<T>& operator*=(T rhs);
-  Vec2<T>& operator/=(T rhs);
-
-  T dot(const Vec2<T>& other) const;
-  T length() const;
-  Vec2 normalized() const;
-
-  Vec2 map(std::function<T (T)> f);
+  constexpr Vec2<T>& operator +=(const Vec2<T>& rhs);
+  constexpr Vec2<T>& operator -=(const Vec2<T>& rhs);
+  constexpr Vec2<T>& operator *=(const T& rhs);
+  constexpr Vec2<T>& operator /=(const T& rhs);
 
   template<typename U>
-  explicit operator Vec2<U>() const;
+  constexpr explicit operator Vec2<U>() const;
 
-  operator sf::Vector2<T>() const;
+  template<typename U,
+    std::enable_if_t<VEC2_ENABLE_CONVERSION<T, U>, std::nullptr_t> = nullptr>
+  constexpr Vec2(const U& other);
+  template<typename U,
+    std::enable_if_t<VEC2_ENABLE_CONVERSION<T, U>, std::nullptr_t> = nullptr>
+  constexpr operator U() const;
 };
+
+template<typename T>
+constexpr Vec2<T> operator *(const T& lhs, const Vec2<T>& rhs);
+
+template<typename T>
+constexpr Vec2<T> operator /(const T& lhs, const Vec2<T>& rhs);
 
 namespace vec2_aliases {
   using Vec2s = Vec2<Int16>;
   using Vec2i = Vec2<Int32>;
   using Vec2u = Vec2<UInt32>;
-  using Vec2l = Vec2<UInt64>;
+  using Vec2l = Vec2<Int64>;
   using Vec2f = Vec2<float>;
   using Vec2d = Vec2<double>;
   using Vec2z = Vec2<std::size_t>;
