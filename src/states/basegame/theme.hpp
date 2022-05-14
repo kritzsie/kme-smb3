@@ -1,8 +1,7 @@
 #pragma once
 
+#include "../../graphics.hpp"
 #include "../../math.hpp"
-
-#include <SFML/Graphics.hpp>
 
 #include <string>
 
@@ -17,7 +16,7 @@ struct Layer {
 };
 
 struct Theme {
-  sf::Color background;
+  Color background;
   std::map<int, Layer> layers;
   std::string music;
 };

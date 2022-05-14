@@ -10,6 +10,7 @@ pkg_check_modules(JSONCPP REQUIRED IMPORTED_TARGET jsoncpp)
 
 add_executable(
   kme-smb3
+  src/graphics/color.cpp
   src/states/basestate.cpp
   src/states/basegame/ecs/entitydata.cpp
   src/states/basegame/collision.cpp

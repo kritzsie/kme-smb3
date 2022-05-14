@@ -2,6 +2,7 @@
 
 #include "../assetmanager.hpp"
 #include "../engine.hpp"
+#include "../graphics.hpp"
 #include "../math.hpp"
 #include "../renderer.hpp"
 #include "../util.hpp"
@@ -289,7 +290,7 @@ void Gameplay::draw(float delta) {
   rendertime += delta;
 }
 
-void Gameplay::drawBackground(sf::Color color) {
+void Gameplay::drawBackground(Color color) {
   scene->clear(color);
 }
 
@@ -368,7 +369,8 @@ void Gameplay::drawTiles() {
       if (texture != "") {
         Vec2<int> pos = tile.getPos();
         sf::Sprite sprite(gfx.getTile(texture), tiledef.getFrame(frame).cliprect);
-        sprite.setPosition(sf::Vector2f(pos.x * 16.f, -(pos.y * 16.f + 16.f)));
+        //sprite.setPosition(pos.x * 16.f, -(pos.y * 16.f + 16.f));
+        sprite.setPosition(toScreen(Vec2f(pos.x, pos.y + 1)));
         scene->draw(sprite);
       }
     }
@@ -422,7 +424,7 @@ void Gameplay::drawEntities() {
 }
 
 void Gameplay::drawHUD() {
-  hud->clear(sf::Color::Transparent);
+  hud->clear(Color(0));
 
   const auto& subworld = level.getSubworld(current_subworld);
   const auto& entities = subworld.getEntities();

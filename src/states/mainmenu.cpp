@@ -128,8 +128,8 @@ void MainMenu::draw(float delta) {
 
     if (window != nullptr) {
       const auto& background = gfx.getTexture("bonusquestion");
-      auto bgsize = static_cast<sf::Vector2f>(background.getSize());
-      auto fbsize = static_cast<sf::Vector2f>(framebuffer->getSize());
+      Vec2f bgsize = static_cast<sf::Vector2f>(background.getSize());
+      Vec2f fbsize = static_cast<sf::Vector2f>(framebuffer->getSize());
 
       for (std::size_t y = 0; y < fbsize.y / bgsize.y; ++y)
       for (std::size_t x = 0; x < fbsize.x / bgsize.x; ++x) {

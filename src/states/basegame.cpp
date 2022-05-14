@@ -1,14 +1,13 @@
 #include "basegame.hpp"
 
 #include "../engine.hpp"
+#include "../graphics.hpp"
 #include "../math.hpp"
 #include "basegame/ecs/components.hpp"
 #include "basegame/hitbox.hpp"
 #include "basegame/powerup.hpp"
 #include "basegame/theme.hpp"
 #include "worldmap.hpp"
-
-#include <SFML/Graphics.hpp>
 
 #include <map>
 #include <sstream>
@@ -349,7 +348,7 @@ void BaseGame::enter() {
   backgrounds["pipesfront"] = std::move(pipesfront);
 
   Theme overworld_blocks;
-  overworld_blocks.background = sf::Color(0x6898F8FF);
+  overworld_blocks.background = Color(0x6898F8FF);
   overworld_blocks.layers[0] = {
     .background = "overworldblockstop",
     .offset = Vec2f(128.f, -11.f),
@@ -366,7 +365,7 @@ void BaseGame::enter() {
   themes["overworld_blocks"] = std::move(overworld_blocks);
 
   Theme athletic_hills;
-  athletic_hills.background = sf::Color(0x6898F8FF);
+  athletic_hills.background = Color(0x6898F8FF);
   athletic_hills.layers[-1] = {
     .background = "athletichills",
     .offset = Vec2f(128.f, -11.f),
@@ -383,7 +382,7 @@ void BaseGame::enter() {
   themes["athletic_hills"] = std::move(athletic_hills);
 
   Theme overworld_cave;
-  overworld_cave.background = sf::Color(0x6898F8FF);
+  overworld_cave.background = Color(0x6898F8FF);
   overworld_cave.layers[-1] = {
     .background = "overworldcaveback",
     .offset = Vec2f(0.f, -68.f),
@@ -400,7 +399,7 @@ void BaseGame::enter() {
   themes["overworld_cave"] = std::move(overworld_cave);
 
   Theme water;
-  water.background = sf::Color(0x080060FF);
+  water.background = Color(0x080060FF);
   water.layers[0] = {
     .background = "waterworld",
     .offset = Vec2f(0.f, -11.f),
@@ -411,7 +410,7 @@ void BaseGame::enter() {
   themes["water"] = std::move(water);
 
   Theme pipes;
-  pipes.background = sf::Color::Black;
+  pipes.background = Color();
   pipes.layers[-1] = {
     .background = "pipesback",
     .offset = Vec2f(0.f, 0.f),
@@ -428,7 +427,7 @@ void BaseGame::enter() {
   themes["pipes"] = std::move(pipes);
 
   Theme fortress;
-  fortress.background = sf::Color::Black;
+  fortress.background = Color();
   fortress.layers[-1] = {
     .background = "fortressback",
     .offset = Vec2f(0.f, -62.f),
@@ -445,7 +444,7 @@ void BaseGame::enter() {
   themes["fortress"] = std::move(fortress);
 
   Theme bonus_room;
-  bonus_room.background = sf::Color::Black;
+  bonus_room.background = Color();
   bonus_room.layers[0] = {
     .background = "bonusquestion",
     .offset = Vec2f(0.f, 0.f),
