@@ -568,7 +568,7 @@ void Subworld::checkWorldCollisions(Entity entity) {
       Rect<float> tile_aabb = Rect<float>(x, y, 1.f, 1.f);
       switch (basegame->level_tile_data.getTileDef(tiles[x][y]).getCollisionType()) {
       case TileDef::CollisionType::SOLID: {
-        if (la::intersects(ent_aabb, tile_aabb)) {
+        if (geo::intersects(ent_aabb, tile_aabb)) {
           genCollisionEvent(entity, Vec2(x, y));
         }
         break;
@@ -600,8 +600,8 @@ void Subworld::handleWorldCollisions(Entity entity) {
     TileDef tile_data = basegame->level_tile_data.getTileDef(tile);
     Rect<float> ent_aabb = coll.hitbox.toAABB(pos_new);
     Rect<float> tile_aabb = Rect<float>(i.x, i.y, 1.f, 1.f);
-    if (la::intersects(ent_aabb, tile_aabb)) {
-      auto collision = la::intersection(ent_aabb, tile_aabb);
+    if (geo::intersects(ent_aabb, tile_aabb)) {
+      auto collision = ent_aabb & tile_aabb;
       switch (tile_data.getCollisionType()) {
       case TileDef::CollisionType::SOLID:
         if (coll.pos_old.x >= pos_new.x)
@@ -623,8 +623,8 @@ void Subworld::handleWorldCollisions(Entity entity) {
     TileDef tiledef = basegame->level_tile_data.getTileDef(tile);
     Rect<float> ent_aabb = coll.hitbox.toAABB(pos_new);
     Rect<float> tile_aabb = Rect<float>(i.x, i.y, 1.f, 1.f);
-    if (la::intersects(ent_aabb, tile_aabb)) {
-      auto collision = la::intersection(ent_aabb, tile_aabb);
+    if (geo::intersects(ent_aabb, tile_aabb)) {
+      auto collision = ent_aabb & tile_aabb;
       switch (tiledef.getCollisionType()) {
       case TileDef::CollisionType::SOLID:
         if (coll.pos_old.y >= pos_new.y)
@@ -716,7 +716,7 @@ void Subworld::checkEntityCollisions(Entity entity1) {
 
     Rect<float> entity1_aabb = coll1.hitbox.toAABB(pos1);
     Rect<float> entity2_aabb = coll2.hitbox.toAABB(pos2);
-    if (la::intersects(entity1_aabb, entity2_aabb)) {
+    if (geo::intersects(entity1_aabb, entity2_aabb)) {
       genCollisionEvent(entity1, entity2);
     }
   }
@@ -750,8 +750,8 @@ void Subworld::handleEntityCollisions(Entity entity) {
 
       aabb1 = coll1.hitbox.toAABB(Vec2f(pos1.x, coll1.pos_old.y));
       aabb2 = coll2.hitbox.toAABB(Vec2f(pos2.x, coll2.pos_old.y));
-      if (la::intersects(aabb1, aabb2)) {
-        Rect<float> collision = la::intersection(aabb1, aabb2);
+      if (geo::intersects(aabb1, aabb2)) {
+        Rect<float> collision = aabb1 & aabb2;
         float vrel = vel1.x - vel2.x;
         float time = collision.width / std::abs(vrel);
 
@@ -760,8 +760,8 @@ void Subworld::handleEntityCollisions(Entity entity) {
 
       aabb1 = coll1.hitbox.toAABB(Vec2f(pos1.x + best_move.x, pos1.y));
       aabb2 = coll2.hitbox.toAABB(pos2);
-      if (la::intersects(aabb1, aabb2)) {
-        Rect<float> collision = la::intersection(aabb1, aabb2);
+      if (geo::intersects(aabb1, aabb2)) {
+        Rect<float> collision = aabb1 & aabb2;
         float vrel = vel1.y - vel2.y;
         float time = collision.height / std::abs(vrel);
 

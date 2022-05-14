@@ -7,15 +7,23 @@
 
 namespace kme {
 template<typename T>
-constexpr Vec2<T>::Vec2() : x(), y() {}
+constexpr Vec2<T>::Vec2() : Vec2(T(), T()) {}
+
+template<typename T>
+constexpr Vec2<T>::Vec2(const Vec2<T>& other)
+: Vec2(other.x, other.y) {}
 
 template<typename T>
 constexpr Vec2<T>::Vec2(T x, T y) : x(x), y(y) {}
 
+template<typename T> template<typename U>
+constexpr Vec2<T>::operator Vec2<U>() const {
+  return Vec2<U>(x, y);
+}
+
 template<typename T> template<typename U,
   std::enable_if_t<VEC2_ENABLE_CONVERSION<T, U>, std::nullptr_t>>
 constexpr Vec2<T>::Vec2(const U& other) : Vec2<T>(other.x, other.y) {}
-
 
 template<typename T> template<typename U,
   std::enable_if_t<VEC2_ENABLE_CONVERSION<T, U>, std::nullptr_t>>
@@ -23,9 +31,21 @@ constexpr Vec2<T>::operator U() const {
   return U(x, y);
 }
 
-template<typename T> template<typename U>
-constexpr Vec2<T>::operator Vec2<U>() const {
-  return Vec2<U>(x, y);
+template<typename T>
+constexpr Vec2<T>& Vec2<T>::operator =(const Vec2<T>& rhs) {
+  x = rhs.x;
+  y = rhs.y;
+  return *this;
+}
+
+template<typename T>
+constexpr bool Vec2<T>::operator ==(const Vec2<T>& rhs) const {
+  return (x == rhs.x) and (y == rhs.y);
+}
+
+template<typename T>
+constexpr bool Vec2<T>::operator !=(const Vec2<T>& rhs) const {
+  return (x != rhs.x) or (y != rhs.y);
 }
 
 template<typename T>
@@ -66,16 +86,6 @@ constexpr Vec2<T> operator/(const T& lhs, const Vec2<T>& rhs) {
 template<typename T>
 constexpr Vec2<T> Vec2<T>::operator /(const T& rhs) const {
   return Vec2<T>(x / rhs, y / rhs);
-}
-
-template<typename T>
-constexpr bool Vec2<T>::operator ==(const Vec2<T>& rhs) const {
-  return (x == rhs.x) and (y == rhs.y);
-}
-
-template<typename T>
-constexpr bool Vec2<T>::operator !=(const Vec2<T>& rhs) const {
-  return (x != rhs.x) or (y != rhs.y);
 }
 
 template<typename T>

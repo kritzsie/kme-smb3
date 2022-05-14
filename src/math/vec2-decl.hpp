@@ -21,7 +21,20 @@ struct Vec2 {
   T x, y;
 
   constexpr Vec2();
+  constexpr Vec2(const Vec2& other);
   constexpr Vec2(T x, T y);
+
+  template<typename U>
+  constexpr explicit operator Vec2<U>() const;
+
+  template<typename U,
+    std::enable_if_t<VEC2_ENABLE_CONVERSION<T, U>, std::nullptr_t> = nullptr>
+  constexpr Vec2(const U& other);
+  template<typename U,
+    std::enable_if_t<VEC2_ENABLE_CONVERSION<T, U>, std::nullptr_t> = nullptr>
+  constexpr operator U() const;
+
+  constexpr Vec2& operator =(const Vec2&);
 
   constexpr bool operator ==(const Vec2<T>& rhs) const;
   constexpr bool operator !=(const Vec2<T>& rhs) const;
@@ -37,16 +50,6 @@ struct Vec2 {
   constexpr Vec2<T>& operator -=(const Vec2<T>& rhs);
   constexpr Vec2<T>& operator *=(const T& rhs);
   constexpr Vec2<T>& operator /=(const T& rhs);
-
-  template<typename U>
-  constexpr explicit operator Vec2<U>() const;
-
-  template<typename U,
-    std::enable_if_t<VEC2_ENABLE_CONVERSION<T, U>, std::nullptr_t> = nullptr>
-  constexpr Vec2(const U& other);
-  template<typename U,
-    std::enable_if_t<VEC2_ENABLE_CONVERSION<T, U>, std::nullptr_t> = nullptr>
-  constexpr operator U() const;
 };
 
 template<typename T>

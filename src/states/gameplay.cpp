@@ -351,7 +351,7 @@ static Rect<float> regionFromRect(Rect<float> rect) {
 }
 
 static Rect<int> viewportFromRegion(Rect<float> region) {
-  return static_cast<Rect<int>>(la::map(region, std::roundf));
+  return static_cast<Rect<int>>(fp::map(std::roundf, region));
 }
 // end ugly
 
