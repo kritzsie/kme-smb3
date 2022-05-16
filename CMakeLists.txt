@@ -14,6 +14,7 @@ add_executable(
   src/states/basestate.cpp
   src/states/basegame/ecs/entitydata.cpp
   src/states/basegame/collision.cpp
+  src/states/basegame/gameloader.cpp
   src/states/basegame/hitbox.cpp
   src/states/basegame/levelloader.cpp
   src/states/basegame/tiledefs.cpp

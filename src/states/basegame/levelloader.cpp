@@ -6,8 +6,9 @@
 #include "tilemap.hpp"
 
 #include <json/reader.h>
+#include <json/value.h>
 
-#include <unordered_map>
+#include <map>
 #include <string>
 #include <vector>
 
@@ -23,14 +24,15 @@ LevelLoader::LevelLoader(std::size_t world, std::size_t level) {
     std::size_t subworld = std::stoi(filename);
     SubworldData& data = subworld_data[subworld];
 
-    std::unordered_map<std::size_t, TileID> tileids;
+    std::map<std::size_t, TileID> tileids;
 
-    if (reader.parse(util::readFile(util::join({path.str(), filename}, "/")).data(), data.root)) {
-      data.bounds.width = data.root["width"].asInt();
-      data.bounds.height = data.root["height"].asInt();
+    Json::Value root;
+    if (reader.parse(util::readFile(util::join({path.str(), filename}, "/")).data(), root)) {
+      data.bounds.width = root["width"].asInt();
+      data.bounds.height = root["height"].asInt();
     }
 
-    for (const auto& tileset : data.root["tilesets"]) {
+    for (const auto& tileset : root["tilesets"]) {
       std::size_t firstgid = tileset["firstgid"].asInt();
       std::string source = tileset["source"].asString();
       std::string tileset_path = util::join({path.str(), source}, "/");
@@ -44,7 +46,7 @@ LevelLoader::LevelLoader(std::size_t world, std::size_t level) {
       }
     }
 
-    for (const auto& layer : data.root["layers"]) {
+    for (const auto& layer : root["layers"]) {
       if (layer["type"].asString() == "tilelayer") {
         auto layer_data = util::base64_decode(layer["data"].asString());
         for (std::size_t i = 0; i < layer_data.size(); i += 4) {
@@ -63,7 +65,7 @@ LevelLoader::LevelLoader(std::size_t world, std::size_t level) {
       }
     }
 
-    for (const auto& properties : data.root["properties"]) {
+    for (const auto& properties : root["properties"]) {
       if (properties["name"].asString() == "theme") {
         data.theme = properties["value"].asString();
       }

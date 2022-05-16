@@ -4,6 +4,7 @@
 #include "../graphics.hpp"
 #include "../math.hpp"
 #include "basegame/ecs/components.hpp"
+#include "basegame/gameloader.hpp"
 #include "basegame/hitbox.hpp"
 #include "basegame/powerup.hpp"
 #include "basegame/theme.hpp"
@@ -25,6 +26,10 @@ BaseGame::Factory BaseGame::create() {
 BaseGame::BaseGame(BaseState* parent, Engine* engine) : BaseState(parent, engine) {}
 
 void BaseGame::enter() {
+  TileDefLoader loader;
+  loader.load(level_tile_data);
+
+  /*
   TileDef brick_block;
   brick_block.pushFrame("smb3_tile_atlas", Vec2i(0, 0), 8.f / 60.f);
   brick_block.pushFrame("smb3_tile_atlas", Vec2i(16, 0), 8.f / 60.f);
@@ -50,6 +55,7 @@ void BaseGame::enter() {
   TileDef empty_block;
   empty_block.pushFrame("smb3_tile_atlas", Vec2i(64, 48), 0.f);
   level_tile_data.registerTileDef("EmptyBlock", std::move(empty_block));
+  */
 
   TileDef bush;
   bush.setCollisionType(TileDef::CollisionType::NONE);
@@ -107,6 +113,7 @@ void BaseGame::enter() {
     level_tile_data.registerTileDef(ss.str(), std::move(green_pipes[i]));
   }
 
+  /*
   TileDef orange_platforms[12];
   orange_platforms[0].pushFrame("smb3_tile_atlas", Vec2i(128, 0), 0.f);
   orange_platforms[1].pushFrame("smb3_tile_atlas", Vec2i(144, 0), 0.f);
@@ -194,6 +201,7 @@ void BaseGame::enter() {
     );
     level_tile_data.registerTileDef(ss.str(), std::move(gray_platforms[i]));
   }
+  */
 
   TileDef goalbg[10];
   goalbg[0].pushFrame("smb3_tile_atlas", Vec2i(432, 176), 0.f);

@@ -4,16 +4,13 @@
 #include "tilemap.hpp"
 #include "world.hpp"
 
-#include <json/value.h>
-
 #include <map>
-#include <vector>
+#include <string>
 
 namespace kme {
 class LevelLoader {
 public:
   struct SubworldData {
-    Json::Value root;
     Tilemap tiles;
     Rect<int> bounds;
     std::string theme;
