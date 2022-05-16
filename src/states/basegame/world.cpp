@@ -163,8 +163,8 @@ void Subworld::update(float delta) {
     auto& render = entities.get<CRender>(player);
     auto& audio = entities.get<CAudio>(player);
 
-    const auto& hitboxes = basegame->entity_data.getHitboxes(info.type);
-    const auto& hitbox_states = hitboxes.at(powerup);
+    const auto& hitbox_table = basegame->entity_data.getHitboxes(info.type);
+    const auto& hitbox_states = hitbox_table.at(powerup);
 
     float x = 0.f;
     x += gameplay->inputs.actions.at(Gameplay::Action::RIGHT) > 0.25f;
@@ -343,17 +343,17 @@ void Subworld::update(float delta) {
     if (state != state_prev) {
       render.time = 0.f;
 
-      if (hitbox_states.find(state) != hitbox_states.end()) {
-        coll.hitbox = hitbox_states.at(state);
-      }
-      else {
-        coll.hitbox = hitbox_states.at(EState::IDLE);
-      }
-
       if (state_prev == EState::SLIP) {
         gameplay->stopSoundLoop(audio.channels.slip);
         audio.channels.slip = Sound::MAX_VOICES;
       }
+    }
+
+    if (hitbox_states.find(state) != hitbox_states.end()) {
+      coll.hitbox = hitbox_states.at(state);
+    }
+    else {
+      coll.hitbox = hitbox_states.at(EState::IDLE);
     }
   }
 
