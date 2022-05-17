@@ -17,19 +17,21 @@ using ChunkMap = std::unordered_map<Vec2s, Chunk>;
 // TODO: create separate class for Chunk type
 class Tile {
 public:
-  static const inline TileID none;
+  inline static const TileID none;
 
   Tile(ChunkMap& chunks, Vec2i pos);
 
   Tile& operator =(const TileID& rhs);
 
+  bool operator ==(const Tile& rhs) const;
+  bool operator !=(const Tile& rhs) const;
+
   bool operator ==(const TileID& rhs) const;
   bool operator !=(const TileID& rhs) const;
 
+  TileID getTileID() const;
   Vec2i getPos() const;
-
   Vec2z getLocalPos() const;
-
   Vec2s getChunkPos() const;
 
   const Chunk& getChunk() const;
@@ -42,7 +44,7 @@ public:
 private:
   ChunkMap& chunks;
 
-  const Vec2<int> pos;
+  const Vec2i pos;
 };
 
 class Tilemap {
@@ -60,7 +62,6 @@ public:
   };
 
   Proxy operator [](int x);
-  Tile operator [](Vec2<int> pos);
 
   const ChunkMap& getChunks() const;
   ChunkMap& getChunks();

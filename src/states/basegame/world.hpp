@@ -6,7 +6,7 @@
 #include "theme.hpp"
 #include "tilemap.hpp"
 
-#include <map>
+#include <unordered_map>
 #include <unordered_set>
 #include <utility>
 #include <variant>
@@ -89,7 +89,7 @@ private:
 // begin Level
 class Level {
 public:
-  using Subworlds = std::map<std::size_t, Subworld>;
+  using Subworlds = std::unordered_map<std::size_t, Subworld>;
 
   Level(const BaseGame* basegame, Gameplay* gameplay);
 
