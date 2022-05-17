@@ -102,49 +102,49 @@ void BaseGame::enter() {
   entity_data.registerRenderStates("PSwitch", std::move(pswitch_rs));
 
   RenderFrames cloudlayer;
-  cloudlayer.pushFrame("cloudlayer", Rect<int>(256, 256, 0, 0), Vec2f(0, 0), 0.f);
+  cloudlayer.pushFrame("cloudlayer", Rect<int>(0, 0, 256, 256), Vec2f(), 0.f);
   backgrounds["cloudlayer"] = std::move(cloudlayer);
 
   RenderFrames overworldblockstop;
-  overworldblockstop.pushFrame("overworldblockstop", Rect<int>(512, 192, 0, 0), Vec2f(0, 0), 0.f);
+  overworldblockstop.pushFrame("overworldblockstop", Rect<int>(0, 0, 512, 192), Vec2f(), 0.f);
   backgrounds["overworldblockstop"] = std::move(overworldblockstop);
 
   RenderFrames athletichills;
-  athletichills.pushFrame("athletichills", Rect<int>(512, 256, 0, 0), Vec2f(0, 0), 0.f);
+  athletichills.pushFrame("athletichills", Rect<int>(0, 0, 512, 256), Vec2f(), 0.f);
   backgrounds["athletichills"] = std::move(athletichills);
 
   RenderFrames overworldcavefront;
-  overworldcavefront.pushFrame("overworldcavefront", Rect<int>(512, 384, 0, 0), Vec2f(0, 0), 0.f);
+  overworldcavefront.pushFrame("overworldcavefront", Rect<int>(0, 0, 512, 384), Vec2f(), 0.f);
   backgrounds["overworldcavefront"] = std::move(overworldcavefront);
 
   RenderFrames overworldcaveback;
-  overworldcaveback.pushFrame("overworldcaveback", Rect<int>(256, 256, 0, 0), Vec2f(0, 0), 0.f);
+  overworldcaveback.pushFrame("overworldcaveback", Rect<int>(0, 0, 256, 256), Vec2f(), 0.f);
   backgrounds["overworldcaveback"] = std::move(overworldcaveback);
 
   RenderFrames waterworld;
-  waterworld.pushFrame("waterworld", Rect<int>(512, 384, 0, 0), Vec2f(0, 0), 0.f);
+  waterworld.pushFrame("waterworld", Rect<int>(0, 0, 512, 384), Vec2f(), 0.f);
   backgrounds["waterworld"] = std::move(waterworld);
 
   RenderFrames fortressfront;
-  fortressfront.pushFrame("fortressfront", Rect<int>(512, 432, 0, 0), Vec2f(0, 0), 0.f);
+  fortressfront.pushFrame("fortressfront", Rect<int>(0, 0, 512, 432), Vec2f(), 0.f);
   backgrounds["fortressfront"] = std::move(fortressfront);
 
   RenderFrames fortressback;
-  fortressback.pushFrame("fortressback", Rect<int>(256, 256, 0, 0), Vec2f(0, 0), 0.f);
+  fortressback.pushFrame("fortressback", Rect<int>(0, 0, 256, 256), Vec2f(), 0.f);
   backgrounds["fortressback"] = std::move(fortressback);
 
   RenderFrames bonusquestion;
-  bonusquestion.pushFrame("bonusquestion", Rect<int>(64, 64, 0, 0), Vec2f(0, 0), 0.f);
+  bonusquestion.pushFrame("bonusquestion", Rect<int>(0, 0, 64, 64), Vec2f(), 0.f);
   backgrounds["bonusquestion"] = std::move(bonusquestion);
 
   RenderFrames pipesback;
-  pipesback.pushFrame("pipes", Rect<int>(256, 512, 0, 0), Vec2f(0, 0), 0.f);
+  pipesback.pushFrame("pipes", Rect<int>(0, 0, 256, 512), Vec2f(), 0.f);
   backgrounds["pipesback"] = std::move(pipesback);
 
   RenderFrames pipesfront;
-  pipesfront.pushFrame("", Rect<int>(256, 512, 0, 0), Vec2f(0, 0), 8.f / 60.f);
-  pipesfront.pushFrame("pipes_1", Rect<int>(256, 512, 0, 0), Vec2f(0, 0), 8.f / 60.f);
-  pipesfront.pushFrame("pipes_2", Rect<int>(256, 512, 0, 0), Vec2f(0, 0), 8.f / 60.f);
+  pipesfront.pushFrame("", Rect<int>(), Vec2f(), 8.f / 60.f);
+  pipesfront.pushFrame("pipes_1", Rect<int>(0, 0, 256, 512), Vec2f(), 8.f / 60.f);
+  pipesfront.pushFrame("pipes_2", Rect<int>(0, 0, 256, 512), Vec2f(), 8.f / 60.f);
   backgrounds["pipesfront"] = std::move(pipesfront);
 
   Theme overworld_blocks;

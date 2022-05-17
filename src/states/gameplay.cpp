@@ -310,32 +310,42 @@ void Gameplay::drawBackground(std::string name, Vec2f offset, Vec2f parallax,
 
   Vec2f tiling_ratio = Vec2f(480.f / size.x, 270.f / size.y);
 
-  Vec2f start = camera_pos - camera_radius;
-  Vec2f bg_start = start;
-  bg_start.x = bg_start.x * (1.f - parallax.x);
-  bg_start.y = bg_start.y * (1.f - parallax.y);
-  Vec2f bg_end = bg_start + camera_radius * 2.f;
-  bg_start.x = bg_start.x * 16.f / 480.f * tiling_ratio.x;
-  bg_start.y = bg_start.y * 16.f / 270.f * tiling_ratio.y;
+  Vec2f origin = camera_pos - camera_radius;
+  Vec2f bg_begin = origin;
+  bg_begin.x = bg_begin.x * (1.f - parallax.x);
+  bg_begin.y = bg_begin.y * (1.f - parallax.y);
+  Vec2f bg_end = bg_begin + camera_radius * 2.f;
+  bg_begin.x = bg_begin.x * 16.f / 480.f * tiling_ratio.x;
+  bg_begin.y = bg_begin.y * 16.f / 270.f * tiling_ratio.y;
   bg_end.x = bg_end.x * 16.f / 480.f * tiling_ratio.x;
   bg_end.y = bg_end.y * 16.f / 270.f * tiling_ratio.y;
 
   if (tile_vertically == true) {
-    for (float y = std::floor(bg_start.y + offset.y / size.y); y < std::floor(bg_end.y + offset.y / size.y) + 1.f; y += 1.f)
-    for (float x = std::floor(bg_start.x + offset.x / size.x); x < std::floor(bg_end.x + offset.x / size.x) + 1.f; x += 1.f) {
+    Vec2f begin(
+      std::floor(bg_begin.x + offset.x / size.x),
+      std::floor(bg_begin.y + offset.y / size.y)
+    );
+    Vec2f end(
+      std::floor(bg_end.x + offset.x / size.x) + 1.f,
+      std::floor(bg_end.y + offset.y / size.y) + 1.f
+    );
+    for (float y = begin.y; y < end.y; y += 1.f)
+    for (float x = begin.x; x < end.x; x += 1.f) {
       sf::Sprite sprite(texture);
-      Vec2f pos = Vec2f((start.x * parallax.x * 16.f) + x * size.x,
-                      -((start.y * parallax.y * 16.f) + y * size.y + size.y));
+      Vec2f pos = Vec2f((origin.x * parallax.x * 16.f) + x * size.x,
+                      -((origin.y * parallax.y * 16.f) + y * size.y + size.y));
       pos -= offset;
       sprite.setPosition(pos);
       scene->draw(sprite);
     }
   }
   else {
-    for (float x = std::floor(bg_start.x + offset.x / size.x); x < std::floor(bg_end.x + offset.x / size.x) + 1.f; x += 1.f) {
+    float begin = std::floor(bg_begin.x + offset.x / size.x);
+    float end = std::floor(bg_end.x + offset.x / size.x) + 1.f;
+    for (float x = begin; x < end; x += 1.f) {
       sf::Sprite sprite(texture);
-      Vec2f pos = Vec2f((start.x * parallax.x * 16.f) + x * size.x,
-                      -((start.y * parallax.y * 16.f) + size.y));
+      Vec2f pos = Vec2f((origin.x * parallax.x * 16.f) + x * size.x,
+                      -((origin.y * parallax.y * 16.f) + size.y));
       pos -= offset;
       sprite.setPosition(pos);
       scene->draw(sprite);
