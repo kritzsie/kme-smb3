@@ -34,16 +34,16 @@ EntityRegistry& Subworld::getEntities() {
   return const_cast<EntityRegistry&>(static_cast<const Subworld*>(this)->getEntities());
 }
 
-const Tilemap& Subworld::getTiles() const {
-  return tiles;
+const Tilemap& Subworld::getTilemap() const {
+  return layers;
 }
 
-Tilemap& Subworld::getTiles() {
-  return const_cast<Tilemap&>(static_cast<const Subworld*>(this)->getTiles());
+Tilemap& Subworld::getTilemap() {
+  return const_cast<Tilemap&>(static_cast<const Subworld*>(this)->getTilemap());
 }
 
-void Subworld::setTiles(const Tilemap& tiles_arg) {
-  tiles = tiles_arg;
+void Subworld::setTilemap(const Tilemap& tiles_arg) {
+  layers = tiles_arg;
 }
 
 Rect<int> Subworld::getBounds() const {
@@ -566,7 +566,7 @@ void Subworld::checkWorldCollisions(Entity entity) {
     for (int y = range.y; y < range.y + range.height; ++y)
     for (int x = range.x; x < range.x + range.width;  ++x) {
       Rect<float> tile_aabb = Rect<float>(x, y, 1.f, 1.f);
-      switch (basegame->level_tile_data.getTileDef(tiles[x][y]).getCollisionType()) {
+      switch (basegame->level_tile_data.getTileDef(layers[x][y]).getCollisionType()) {
       case TileDef::CollisionType::SOLID: {
         if (geo::intersects(ent_aabb, tile_aabb)) {
           genCollisionEvent(entity, Vec2(x, y));
@@ -596,7 +596,7 @@ void Subworld::handleWorldCollisions(Entity entity) {
 
   for (const auto& i : coll.tiles) {
     Vec2f pos_new = Vec2f(pos.x, coll.pos_old.y);
-    Tile tile = tiles[i.x][i.y];
+    Tile tile = layers[i.x][i.y];
     TileDef tile_data = basegame->level_tile_data.getTileDef(tile);
     Rect<float> ent_aabb = coll.hitbox.toAABB(pos_new);
     Rect<float> tile_aabb = Rect<float>(i.x, i.y, 1.f, 1.f);
@@ -619,7 +619,7 @@ void Subworld::handleWorldCollisions(Entity entity) {
 
   for (const auto& i : coll.tiles) {
     Vec2f pos_new = Vec2f(pos.x + best_move.x, pos.y);
-    Tile tile = tiles[i.x][i.y];
+    Tile tile = layers[i.x][i.y];
     TileDef tiledef = basegame->level_tile_data.getTileDef(tile);
     Rect<float> ent_aabb = coll.hitbox.toAABB(pos_new);
     Rect<float> tile_aabb = Rect<float>(i.x, i.y, 1.f, 1.f);

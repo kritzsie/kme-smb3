@@ -6,6 +6,7 @@
 #include "theme.hpp"
 #include "tilemap.hpp"
 
+#include <map>
 #include <unordered_map>
 #include <unordered_set>
 #include <utility>
@@ -34,9 +35,9 @@ public:
   const EntityRegistry& getEntities() const;
   EntityRegistry& getEntities();
 
-  const Tilemap& getTiles() const;
-  Tilemap& getTiles();
-  void setTiles(const Tilemap& tiles);
+  const Tilemap& getTilemap() const;
+  Tilemap& getTilemap();
+  void setTilemap(const Tilemap& tiles);
 
   Rect<int> getBounds() const;
   void setBounds(int width, int height);
@@ -74,7 +75,7 @@ private:
   Gameplay* gameplay;
 
   EntityRegistry entities;
-  Tilemap tiles;
+  Tilemap layers;
 
   std::unordered_set<WorldCollision> world_collisions;
   std::unordered_set<EntityCollision> entity_collisions;

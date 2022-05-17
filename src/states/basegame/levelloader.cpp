@@ -90,7 +90,7 @@ void LevelLoader::load(Level& level) {
     Subworld& subworld = level.getSubworld(index);
     subworld.setBounds(data.bounds);
     subworld.setTheme(data.theme);
-    subworld.setTiles(data.tiles);
+    subworld.setTilemap(data.tiles);
   }
 }
 }

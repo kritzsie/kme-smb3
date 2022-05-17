@@ -102,7 +102,7 @@ void Gameplay::enter() {
   int lowest_y = 1;
   for (int x = 1; x < 3; ++x) {
     for (int y = 1; y < subworld.getBounds().height; ++y) {
-      Tile tile = subworld.getTiles()[x][y];
+      Tile tile = subworld.getTilemap()[x][y];
       const TileDef& tiledef = getBaseGame()->level_tile_data.getTileDef(tile);
       if (tiledef.getCollisionType() == TileDef::CollisionType::NONE) {
         lowest_y = std::max(lowest_y, tile.getPos().y);
@@ -373,7 +373,7 @@ void Gameplay::drawTiles() {
 
   for (int y = region.y; y < region.y + region.height; ++y)
   for (int x = region.x; x < region.x + region.width;  ++x) {
-    Tile tile = level.getSubworld(current_subworld).getTiles()[x][y];
+    Tile tile = level.getSubworld(current_subworld).getTilemap()[x][y];
     if (tile != Tile::none) {
       TileDef tiledef = getBaseGame()->level_tile_data.getTileDef(tile);
       std::size_t frame = tiledef.getFrameOffset(rendertime);
