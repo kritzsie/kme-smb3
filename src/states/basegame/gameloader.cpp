@@ -9,6 +9,7 @@
 #include <json/value.h>
 
 #include <sstream>
+#include <stdexcept>
 #include <string>
 
 #include <cstddef>

@@ -10,6 +10,7 @@
 
 #include <functional>
 #include <map>
+#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -31,6 +32,9 @@ LevelLoader::LevelLoader(std::size_t world, std::size_t level) {
     if (reader.parse(util::readFile(util::join({path.str(), filename}, "/")).data(), root)) {
       data.bounds.width = root["width"].asInt();
       data.bounds.height = root["height"].asInt();
+    }
+    else {
+      throw std::runtime_error(filename + " " + reader.getFormattedErrorMessages());
     }
 
     for (const auto& tileset : root["tilesets"]) {
