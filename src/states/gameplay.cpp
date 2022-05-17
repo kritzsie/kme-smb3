@@ -102,7 +102,7 @@ void Gameplay::enter() {
   int lowest_y = 1;
   for (int x = 1; x < 3; ++x) {
     for (int y = 1; y < subworld.getBounds().height; ++y) {
-      Tile tile = subworld.getTilemap()[x][y];
+      Tile tile = subworld.getTilemap(0)[x][y];
       const TileDef& tiledef = getBaseGame()->level_tile_data.getTileDef(tile);
       if (tiledef.getCollisionType() == TileDef::CollisionType::NONE) {
         lowest_y = std::max(lowest_y, tile.getPos().y);
@@ -370,10 +370,12 @@ static Rect<int> viewportFromRegion(Rect<float> region) {
 
 void Gameplay::drawTiles() {
   Rect<int> region = viewportFromRegion(regionFromRect(rectFromBox(camera_pos, camera_radius)));
+  auto& layers = level.getSubworld(current_subworld).getTileLayers();
 
+  for (auto iter = layers.rbegin(); iter != layers.rend(); ++iter)
   for (int y = region.y; y < region.y + region.height; ++y)
   for (int x = region.x; x < region.x + region.width;  ++x) {
-    Tile tile = level.getSubworld(current_subworld).getTilemap()[x][y];
+    Tile tile = iter->second[x][y];
     if (tile != Tile::none) {
       TileDef tiledef = getBaseGame()->level_tile_data.getTileDef(tile);
       std::size_t frame = tiledef.getFrameOffset(rendertime);

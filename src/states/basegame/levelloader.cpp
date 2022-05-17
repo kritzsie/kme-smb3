@@ -9,9 +9,9 @@
 #include <json/value.h>
 
 #include <functional>
-#include <map>
 #include <stdexcept>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 namespace kme {
@@ -26,7 +26,7 @@ LevelLoader::LevelLoader(std::size_t world, std::size_t level) {
     std::size_t subworld = std::stoi(filename);
     SubworldData& data = subworld_data[subworld];
 
-    std::map<std::size_t, TileID> tileids;
+    std::unordered_map<std::size_t, TileID> tileids;
 
     Json::Value root;
     if (reader.parse(util::readFile(util::join({path.str(), filename}, "/")).data(), root)) {
@@ -51,8 +51,16 @@ LevelLoader::LevelLoader(std::size_t world, std::size_t level) {
       }
     }
 
+    std::size_t layer_count = 0;
     for (const auto& layer : root["layers"]) {
-      if (layer["type"].asString() == "tilelayer") {
+      if (layer["type"] == "tilelayer") {
+        layer_count += 1;
+      }
+    }
+
+    for (const auto& layer : root["layers"]) {
+      if (layer["type"] == "tilelayer") {
+        layer_count -= 1;
         auto layer_data = util::base64_decode(layer["data"].asString());
         for (std::size_t i = 0; i < layer_data.size(); i += 4) {
           std::size_t id = 0;
@@ -64,14 +72,14 @@ LevelLoader::LevelLoader(std::size_t world, std::size_t level) {
           int x = (i / 4) % data.bounds.width;
           int y = data.bounds.height - (i / 4) / data.bounds.width - 1;
           if (it != tileids.end()) {
-            data.tiles[x][y] = it->second;
+            data.layers[layer_count][x][y] = it->second;
           }
         }
       }
     }
 
     for (const auto& properties : root["properties"]) {
-      if (properties["name"].asString() == "theme") {
+      if (properties["name"] == "theme") {
         data.theme = properties["value"].asString();
       }
     }
@@ -79,9 +87,9 @@ LevelLoader::LevelLoader(std::size_t world, std::size_t level) {
 }
 
 void LevelLoader::load(Level& level) {
-  for (std::pair<std::size_t, const SubworldData&> it : subworld_data) {
-    std::size_t index = it.first;
-    const auto& data = it.second;
+  for (std::pair<std::size_t, const SubworldData&> iter : subworld_data) {
+    std::size_t index = iter.first;
+    const auto& data = iter.second;
 
     if (not level.subworldExists(index)) {
       level.createSubworld(index);
@@ -90,7 +98,7 @@ void LevelLoader::load(Level& level) {
     Subworld& subworld = level.getSubworld(index);
     subworld.setBounds(data.bounds);
     subworld.setTheme(data.theme);
-    subworld.setTilemap(data.tiles);
+    subworld.setTileLayers(data.layers);
   }
 }
 }

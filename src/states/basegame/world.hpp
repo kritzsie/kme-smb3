@@ -21,6 +21,8 @@ using namespace vec2_aliases;
 class BaseGame;
 class Gameplay;
 
+using TileLayers = std::map<int, Tilemap>;
+
 // begin Subworld
 class Subworld {
 public:
@@ -35,9 +37,14 @@ public:
   const EntityRegistry& getEntities() const;
   EntityRegistry& getEntities();
 
-  const Tilemap& getTilemap() const;
-  Tilemap& getTilemap();
-  void setTilemap(const Tilemap& tiles);
+  const TileLayers& getTileLayers() const;
+  TileLayers& getTileLayers();
+  void setTileLayers(const TileLayers& layers);
+
+  const Tilemap& getTilemap(int index) const;
+  Tilemap& getTilemap(int index);
+  void setTilemap(int index, const Tilemap& tiles);
+  bool tilemapExists(int index) const;
 
   Rect<int> getBounds() const;
   void setBounds(int width, int height);
@@ -75,7 +82,7 @@ private:
   Gameplay* gameplay;
 
   EntityRegistry entities;
-  Tilemap layers;
+  TileLayers layers;
 
   std::unordered_set<WorldCollision> world_collisions;
   std::unordered_set<EntityCollision> entity_collisions;

@@ -21,9 +21,9 @@ namespace kme {
 using namespace vec2_aliases;
 
 // begin Subworld
-Subworld::Subworld(const BaseGame* basegame_arg, Gameplay* gameplay_arg) {
-  basegame = basegame_arg;
-  gameplay = gameplay_arg;
+Subworld::Subworld(const BaseGame* basegame_new, Gameplay* gameplay_new) {
+  basegame = basegame_new;
+  gameplay = gameplay_new;
 }
 
 const EntityRegistry& Subworld::getEntities() const {
@@ -34,24 +34,40 @@ EntityRegistry& Subworld::getEntities() {
   return const_cast<EntityRegistry&>(static_cast<const Subworld*>(this)->getEntities());
 }
 
-const Tilemap& Subworld::getTilemap() const {
+const TileLayers& Subworld::getTileLayers() const {
   return layers;
 }
 
-Tilemap& Subworld::getTilemap() {
-  return const_cast<Tilemap&>(static_cast<const Subworld*>(this)->getTilemap());
+TileLayers& Subworld::getTileLayers() {
+  return const_cast<TileLayers&>(static_cast<const Subworld*>(this)->getTileLayers());
 }
 
-void Subworld::setTilemap(const Tilemap& tiles_arg) {
-  layers = tiles_arg;
+void Subworld::setTileLayers(const TileLayers& layers_new) {
+  layers = layers_new;
+}
+
+const Tilemap& Subworld::getTilemap(int index) const {
+  return getTileLayers().at(index);
+}
+
+Tilemap& Subworld::getTilemap(int index) {
+  return const_cast<Tilemap&>(static_cast<const Subworld*>(this)->getTilemap(index));
+}
+
+void Subworld::setTilemap(int index, const Tilemap& tiles_new) {
+  layers[index] = tiles_new;
+}
+
+bool Subworld::tilemapExists(int index) const {
+  return layers.find(index) != layers.end();
 }
 
 Rect<int> Subworld::getBounds() const {
   return bounds;
 }
 
-void Subworld::setBounds(Rect<int> bounds_arg) {
-  bounds = bounds_arg;
+void Subworld::setBounds(Rect<int> bounds_new) {
+  bounds = bounds_new;
 }
 
 void Subworld::setBounds(int x, int y, int width, int height) {
@@ -74,8 +90,8 @@ std::string Subworld::getTheme() const {
   return theme;
 }
 
-void Subworld::setTheme(std::string theme_arg) {
-  theme = theme_arg;
+void Subworld::setTheme(std::string theme_new) {
+  theme = theme_new;
 }
 
 // begin ugly
@@ -566,7 +582,7 @@ void Subworld::checkWorldCollisions(Entity entity) {
     for (int y = range.y; y < range.y + range.height; ++y)
     for (int x = range.x; x < range.x + range.width;  ++x) {
       Rect<float> tile_aabb = Rect<float>(x, y, 1.f, 1.f);
-      switch (basegame->level_tile_data.getTileDef(layers[x][y]).getCollisionType()) {
+      switch (basegame->level_tile_data.getTileDef(getTilemap(0)[x][y]).getCollisionType()) {
       case TileDef::CollisionType::SOLID: {
         if (geo::intersects(ent_aabb, tile_aabb)) {
           genCollisionEvent(entity, Vec2(x, y));
@@ -596,7 +612,7 @@ void Subworld::handleWorldCollisions(Entity entity) {
 
   for (const auto& i : coll.tiles) {
     Vec2f pos_new = Vec2f(pos.x, coll.pos_old.y);
-    Tile tile = layers[i.x][i.y];
+    Tile tile = getTilemap(0)[i.x][i.y];
     TileDef tile_data = basegame->level_tile_data.getTileDef(tile);
     Rect<float> ent_aabb = coll.hitbox.toAABB(pos_new);
     Rect<float> tile_aabb = Rect<float>(i.x, i.y, 1.f, 1.f);
@@ -619,7 +635,7 @@ void Subworld::handleWorldCollisions(Entity entity) {
 
   for (const auto& i : coll.tiles) {
     Vec2f pos_new = Vec2f(pos.x + best_move.x, pos.y);
-    Tile tile = layers[i.x][i.y];
+    Tile tile = getTilemap(0)[i.x][i.y];
     TileDef tiledef = basegame->level_tile_data.getTileDef(tile);
     Rect<float> ent_aabb = coll.hitbox.toAABB(pos_new);
     Rect<float> tile_aabb = Rect<float>(i.x, i.y, 1.f, 1.f);
@@ -907,9 +923,9 @@ void Subworld::handleEntityCollisions(Entity entity) {
 }
 
 // begin Level
-Level::Level(const BaseGame* basegame_arg, Gameplay* gameplay_arg) {
-  basegame = basegame_arg;
-  gameplay = gameplay_arg;
+Level::Level(const BaseGame* basegame_new, Gameplay* gameplay_new) {
+  basegame = basegame_new;
+  gameplay = gameplay_new;
 }
 
 std::size_t Level::createSubworld() {

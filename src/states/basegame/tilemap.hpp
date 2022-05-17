@@ -12,8 +12,6 @@
 namespace kme {
 using namespace vec2_aliases;
 
-using TileLayers = std::map<int, class Tilemap>;
-
 using Chunk = std::array<std::array<TileID, 16>, 16>;
 using ChunkMap = std::unordered_map<Vec2s, Chunk>;
 

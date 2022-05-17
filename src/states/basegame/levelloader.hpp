@@ -4,14 +4,14 @@
 #include "tilemap.hpp"
 #include "world.hpp"
 
-#include <map>
 #include <string>
+#include <unordered_map>
 
 namespace kme {
 class LevelLoader {
 public:
   struct SubworldData {
-    Tilemap tiles;
+    TileLayers layers;
     Rect<int> bounds;
     std::string theme;
   };
@@ -21,6 +21,6 @@ public:
   void load(Level& level);
 
 private:
-  std::map<std::size_t, SubworldData> subworld_data;
+  std::unordered_map<std::size_t, SubworldData> subworld_data;
 };
 }
