@@ -147,6 +147,7 @@ void Gameplay::enter() {
   entities.emplace<CState>(goalcard);
   entities.emplace<CRender>(goalcard);
 
+  /*
   auto mushroom = entities.create();
   entities.emplace<CInfo>(mushroom, "Mushroom");
   entities.emplace<CFlags>(mushroom, EFlags::POWERUP | EFlags::NOFRICTION);
@@ -177,6 +178,7 @@ void Gameplay::enter() {
   entities.emplace<CVelocity>(pswitch);
   entities.emplace<CState>(pswitch);
   entities.emplace<CRender>(pswitch);
+  */
 
   const auto& theme = getBaseGame()->themes.at(subworld.getTheme());
   playMusic(theme.music);

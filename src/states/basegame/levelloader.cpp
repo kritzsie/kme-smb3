@@ -8,6 +8,7 @@
 #include <json/reader.h>
 #include <json/value.h>
 
+#include <functional>
 #include <map>
 #include <string>
 #include <vector>
