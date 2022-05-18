@@ -6,9 +6,19 @@ namespace kme {
 using namespace vec2_aliases;
 
 // begin Tile
-Tile::Tile(ChunkMap& chunks, Vec2i pos) : chunks(chunks), pos(pos) {}
+bool Tile::operator ==(const Tile& rhs) const {
+  return layer == rhs.layer and pos == rhs.pos;
+}
 
-Tile& Tile::operator =(const TileID& rhs) {
+bool Tile::operator !=(const Tile& rhs) const {
+  return layer != rhs.layer or pos != rhs.pos;
+}
+// end Tile
+
+// begin ChunkTile
+ChunkTile::ChunkTile(ChunkMap& chunks, Vec2i pos) : chunks(chunks), pos(pos) {}
+
+ChunkTile& ChunkTile::operator =(const TileID& rhs) {
   Vec2s chunk_pos = getChunkPos();
   auto iter = chunks.find(chunk_pos);
   if (iter != chunks.end()) {
@@ -24,23 +34,23 @@ Tile& Tile::operator =(const TileID& rhs) {
   return *this;
 }
 
-bool Tile::operator ==(const Tile& rhs) const {
+bool ChunkTile::operator ==(const ChunkTile& rhs) const {
   return pos == rhs.pos;
 }
 
-bool Tile::operator !=(const Tile& rhs) const {
+bool ChunkTile::operator !=(const ChunkTile& rhs) const {
   return pos != rhs.pos;
 }
 
-bool Tile::operator ==(const TileID& rhs) const {
+bool ChunkTile::operator ==(const TileID& rhs) const {
   return getTileID() == rhs;
 }
 
-bool Tile::operator !=(const TileID& rhs) const {
+bool ChunkTile::operator !=(const TileID& rhs) const {
   return getTileID() != rhs;
 }
 
-TileID Tile::getTileID() const {
+TileID ChunkTile::getTileID() const {
   auto iter = chunks.find(getChunkPos());
   if (iter != chunks.end()) {
     Chunk& chunk = iter->second;
@@ -50,41 +60,41 @@ TileID Tile::getTileID() const {
   return none;
 }
 
-Vec2i Tile::getPos() const {
+Vec2i ChunkTile::getPos() const {
   return pos;
 }
 
-Vec2z Tile::getLocalPos() const {
+Vec2z ChunkTile::getLocalPos() const {
   return Vec2z(util::absmod(pos.x, 16), util::absmod(pos.y, 16));
 }
 
-Vec2s Tile::getChunkPos() const {
+Vec2s ChunkTile::getChunkPos() const {
   return Vec2s(util::absdiv(pos.x, 16), util::absdiv(pos.y, 16));
 }
 
-const Chunk& Tile::getChunk() const {
+const Chunk& ChunkTile::getChunk() const {
   return chunks.at(getChunkPos());
 }
 
-Tile::operator TileID() const {
+ChunkTile::operator TileID() const {
   return getTileID();
 }
 
-Tile::operator bool() const {
+ChunkTile::operator bool() const {
   return getTileID() != none;
 }
 
 // mutable accessors
-Chunk& Tile::getChunk() {
-  return const_cast<Chunk&>(static_cast<const Tile*>(this)->getChunk());
+Chunk& ChunkTile::getChunk() {
+  return const_cast<Chunk&>(static_cast<const ChunkTile*>(this)->getChunk());
 }
-// end Tile
+// end ChunkTile
 
 // begin Tilemap
 Tilemap::Proxy::Proxy(ChunkMap& chunks, int x) : chunks(chunks), x(x) {}
 
-Tile Tilemap::Proxy::operator [](int y) {
-  return Tile(chunks, Vec2i(x, y));
+ChunkTile Tilemap::Proxy::operator [](int y) {
+  return ChunkTile(chunks, Vec2i(x, y));
 }
 
 Tilemap::Proxy Tilemap::operator [](int x) {

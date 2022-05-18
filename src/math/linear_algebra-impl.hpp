@@ -1,7 +1,5 @@
 #pragma once
 
-#include "linear_algebra-decl.hpp"
-
 #include "vec2.hpp"
 
 #include <algorithm>

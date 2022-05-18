@@ -1,7 +1,5 @@
 #pragma once
 
-#include "vec2-decl.hpp"
-
 #include <functional>
 #include <type_traits>
 

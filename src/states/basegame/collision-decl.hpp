@@ -2,6 +2,7 @@
 
 #include "../../math.hpp"
 #include "ecs/ecs.hpp"
+#include "tilemap.hpp"
 
 #include <variant>
 
@@ -10,7 +11,7 @@ using namespace vec2_aliases;
 
 struct WorldCollision {
   Entity entity;
-  Vec2i tile;
+  Tile tile;
 
   bool operator ==(const WorldCollision& rhs) const;
 };

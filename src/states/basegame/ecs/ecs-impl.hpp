@@ -1,7 +1,5 @@
 #pragma once
 
-#include "ecs-decl.hpp"
-
 namespace kme {
 template<typename T>
 Component<T>::operator const T&() const {

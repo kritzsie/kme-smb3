@@ -21,8 +21,6 @@ using namespace vec2_aliases;
 class BaseGame;
 class Gameplay;
 
-using TileLayers = std::map<int, Tilemap>;
-
 // begin Subworld
 class Subworld {
 public:
@@ -62,7 +60,7 @@ public:
 private:
   void genEvent(EventType type, Event event);
 
-  void genCollisionEvent(Entity entity, Vec2i tile);
+  void genCollisionEvent(Entity entity, int layer, Vec2i tile);
   void genCollisionEvent(Entity entity1, Entity entity2);
 
   void consumeEvents();

@@ -2,14 +2,15 @@
 
 #include "ecs.hpp"
 
-#include "../../../math.hpp"
 #include "../../../input.hpp"
+#include "../../../math.hpp"
 #include "../../../renderstates.hpp"
 #include "../../../sound.hpp"
 #include "../../../util.hpp"
+#include "../hitbox.hpp"
 #include "../powerup.hpp"
 #include "../states.hpp"
-#include "../hitbox.hpp"
+#include "../tilemap.hpp"
 
 #include <entt/entt.hpp>
 
@@ -75,7 +76,8 @@ struct CState {
 struct CCollision {
   Hitbox hitbox;
   Vec2f pos_old;
-  std::unordered_set<Vec2i> tiles;
+  std::unordered_set<Tile> tiles;
+  std::unordered_set<Entity> entities;
 };
 
 struct CCounters {

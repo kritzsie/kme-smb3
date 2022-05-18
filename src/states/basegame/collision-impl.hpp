@@ -1,7 +1,5 @@
 #pragma once
 
-#include "collision.hpp"
-
 #include <functional>
 #include <type_traits>
 
@@ -12,7 +10,7 @@ struct std::hash<kme::WorldCollision> {
     static constexpr std::hash<decltype(key.tile)> tile_hasher;
     const auto key1 = static_cast<Entity>(key.entity);
     const auto key2 = tile_hasher(key.tile);
-    return key1 ^ (key2 << 16 | key2 >> 16);
+    return key1 ^ (key2 << 12 | key2 >> 20);
   }
 };
 

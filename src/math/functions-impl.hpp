@@ -1,7 +1,5 @@
 #pragma once
 
-#include "functions-decl.hpp"
-
 #include "rect.hpp"
 #include "vec2.hpp"
 

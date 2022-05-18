@@ -85,52 +85,17 @@ const TileDef& TileDefs::getTileDef(TileID tileid) const {
   return tiledefs.at(tileid);
 }
 
-const TileDefs::const_iterator TileDefs::begin() const {
-  return tiledefs.begin();
-}
-
-const TileDefs::const_iterator TileDefs::end() const {
-  return tiledefs.end();
-}
-
-const TileDefs::const_reverse_iterator TileDefs::rbegin() const {
-  return tiledefs.rbegin();
-}
-
-const TileDefs::const_reverse_iterator TileDefs::rend() const {
-  return tiledefs.rend();
-}
-
-const TileDefs::const_iterator TileDefs::cbegin() const {
-  return begin();
-}
-
-const TileDefs::const_iterator TileDefs::cend() const {
-  return end();
-}
-
-const TileDefs::const_reverse_iterator TileDefs::crbegin() const {
-  return rbegin();
-}
-
-const TileDefs::const_reverse_iterator TileDefs::crend() const {
-  return rend();
-}
-
-TileDefs::iterator TileDefs::begin() {
-  return tiledefs.begin();
-}
-
-TileDefs::iterator TileDefs::end() {
-  return tiledefs.end();
-}
-
-TileDefs::reverse_iterator TileDefs::rbegin() {
-  return tiledefs.rbegin();
-}
-
-TileDefs::reverse_iterator TileDefs::rend() {
-  return tiledefs.rend();
-}
+const TileDefs::const_iterator TileDefs::begin() const { return tiledefs.begin(); }
+const TileDefs::const_iterator TileDefs::end() const { return tiledefs.end(); }
+const TileDefs::const_reverse_iterator TileDefs::rbegin() const { return tiledefs.rbegin(); }
+const TileDefs::const_reverse_iterator TileDefs::rend() const { return tiledefs.rend(); }
+const TileDefs::const_iterator TileDefs::cbegin() const { return begin(); }
+const TileDefs::const_iterator TileDefs::cend() const { return end(); }
+const TileDefs::const_reverse_iterator TileDefs::crbegin() const { return rbegin(); }
+const TileDefs::const_reverse_iterator TileDefs::crend() const { return rend(); }
+TileDefs::iterator TileDefs::begin() { return tiledefs.begin(); }
+TileDefs::iterator TileDefs::end() { return tiledefs.end(); }
+TileDefs::reverse_iterator TileDefs::rbegin() { return tiledefs.rbegin(); }
+TileDefs::reverse_iterator TileDefs::rend() { return tiledefs.rend(); }
 // end TileDefs
 }

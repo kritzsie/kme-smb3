@@ -1,7 +1,5 @@
 #pragma once
 
-#include "rect-decl.hpp"
-
 #include <type_traits>
 
 namespace kme {
