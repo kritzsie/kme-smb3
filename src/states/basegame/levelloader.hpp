@@ -11,7 +11,7 @@ namespace kme {
 class LevelLoader {
 public:
   struct SubworldData {
-    TileLayers layers;
+    Tilemap tilemap;
     Rect<int> bounds;
     std::string theme;
   };

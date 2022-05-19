@@ -99,18 +99,6 @@ void Gameplay::enter() {
 
   Subworld& subworld = level.getSubworld(current_subworld);
 
-  int lowest_y = 1;
-  for (int x = 1; x < 3; ++x) {
-    for (int y = 1; y < subworld.getBounds().height; ++y) {
-      ChunkTile tile = subworld.getTilemap(0)[x][y];
-      const TileDef& tiledef = getBaseGame()->level_tile_data.getTileDef(tile);
-      if (tiledef.getCollisionType() == TileDef::CollisionType::NONE) {
-        lowest_y = std::max(lowest_y, tile.getPos().y);
-        break;
-      }
-    }
-  }
-
   // entities
   auto& entities = subworld.getEntities();
 
@@ -120,7 +108,7 @@ void Gameplay::enter() {
   const auto& player_hitbox = getBaseGame() \
     ->entity_data.getHitboxes("Player").at(player_powerup).at(player_state);
   entities.emplace<CInfo>(player, "Player");
-  entities.emplace<CPosition>(player, Vec2f(2.f, lowest_y));
+  entities.emplace<CPosition>(player, Vec2f(2.f, 1.f));
   entities.emplace<CPowerup>(player, player_powerup);
   entities.emplace<CState>(player, player_state);
   entities.emplace<CCollision>(player, player_hitbox);
@@ -370,21 +358,21 @@ static Rect<int> viewportFromRegion(Rect<float> region) {
 
 void Gameplay::drawTiles() {
   Rect<int> region = viewportFromRegion(regionFromRect(rectFromBox(camera_pos, camera_radius)));
-  auto& layers = level.getSubworld(current_subworld).getTileLayers();
+  const auto& tilemap = level.getSubworld(current_subworld).getTilemap();
+  const auto& layers = tilemap.getLayers();
 
   for (auto iter = layers.rbegin(); iter != layers.rend(); ++iter)
   for (int y = region.y; y < region.y + region.height; ++y)
   for (int x = region.x; x < region.x + region.width;  ++x) {
-    ChunkTile tile = iter->second[x][y];
-    if (tile != ChunkTile::none) {
-      TileDef tiledef = getBaseGame()->level_tile_data.getTileDef(tile);
+    Tile tile(iter->first, x, y);
+    TileID tileid = tilemap.getTile(tile);
+    if (tileid != Tilemap::notile) {
+      TileDef tiledef = getBaseGame()->level_tile_data.getTileDef(tileid);
       std::size_t frame = tiledef.getFrameOffset(rendertime);
       std::string texture = tiledef.getFrame(frame).texture;
       if (texture != "") {
-        Vec2<int> pos = tile.getPos();
         sf::Sprite sprite(gfx.getTile(texture), tiledef.getFrame(frame).cliprect);
-        //sprite.setPosition(pos.x * 16.f, -(pos.y * 16.f + 16.f));
-        sprite.setPosition(toScreen(Vec2f(pos.x, pos.y + 1)));
+        sprite.setPosition(toScreen(Vec2f(tile.pos.x, tile.pos.y + 1)));
         scene->draw(sprite);
       }
     }
@@ -419,9 +407,9 @@ void Gameplay::drawEntities() {
       direction = direction_view.get<const CDirection>(entity).value;
     }
 
-    std::string spritename = frame.texture;
-    if (spritename != "") {
-      sf::Sprite sprite(gfx.getSprite(spritename), frame.cliprect);
+    std::string texture = frame.texture;
+    if (texture != "") {
+      sf::Sprite sprite(gfx.getSprite(texture), frame.cliprect);
       Vec2f scale = Vec2f(direction * render.scale.x, render.scale.y);
       Vec2f offset = Vec2f(
         scale.x * frame.offset.x,

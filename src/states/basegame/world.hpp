@@ -35,14 +35,13 @@ public:
   const EntityRegistry& getEntities() const;
   EntityRegistry& getEntities();
 
-  const TileLayers& getTileLayers() const;
-  TileLayers& getTileLayers();
-  void setTileLayers(const TileLayers& layers);
+  const Tilemap::Chunks& getTileLayer(int layer) const;
+  Tilemap::Chunks& getTileLayer(int layer);
+  void setTileLayer(int layer, const Tilemap::Chunks& tiles);
 
-  const Tilemap& getTilemap(int index) const;
-  Tilemap& getTilemap(int index);
-  void setTilemap(int index, const Tilemap& tiles);
-  bool tilemapExists(int index) const;
+  const Tilemap& getTilemap() const;
+  Tilemap& getTilemap();
+  void setTilemap(const Tilemap& tilemap);
 
   Rect<int> getBounds() const;
   void setBounds(int width, int height);
@@ -60,7 +59,7 @@ public:
 private:
   void genEvent(EventType type, Event event);
 
-  void genCollisionEvent(Entity entity, int layer, Vec2i tile);
+  void genCollisionEvent(Entity entity, Tile tile);
   void genCollisionEvent(Entity entity1, Entity entity2);
 
   void consumeEvents();
@@ -80,7 +79,7 @@ private:
   Gameplay* gameplay;
 
   EntityRegistry entities;
-  TileLayers layers;
+  Tilemap tilemap;
 
   std::unordered_set<WorldCollision> world_collisions;
   std::unordered_set<EntityCollision> entity_collisions;

@@ -72,7 +72,7 @@ LevelLoader::LevelLoader(std::size_t world, std::size_t level) {
           int x = (i / 4) % data.bounds.width;
           int y = data.bounds.height - (i / 4) / data.bounds.width - 1;
           if (it != tileids.end()) {
-            data.layers[layer_count][x][y] = it->second;
+            data.tilemap.setTile(layer_count, x, y, it->second);
           }
         }
       }
@@ -98,7 +98,7 @@ void LevelLoader::load(Level& level) {
     Subworld& subworld = level.getSubworld(index);
     subworld.setBounds(data.bounds);
     subworld.setTheme(data.theme);
-    subworld.setTileLayers(data.layers);
+    subworld.setTilemap(data.tilemap);
   }
 }
 }

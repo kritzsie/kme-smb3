@@ -34,32 +34,28 @@ EntityRegistry& Subworld::getEntities() {
   return const_cast<EntityRegistry&>(static_cast<const Subworld*>(this)->getEntities());
 }
 
-const TileLayers& Subworld::getTileLayers() const {
-  return layers;
+const Tilemap::Chunks& Subworld::getTileLayer(int layer) const {
+  return tilemap.getChunks(layer);
 }
 
-TileLayers& Subworld::getTileLayers() {
-  return const_cast<TileLayers&>(static_cast<const Subworld*>(this)->getTileLayers());
+void Subworld::setTileLayer(int layer, const Tilemap::Chunks& tiles_new) {
+  tilemap.setChunks(layer, tiles_new);
 }
 
-void Subworld::setTileLayers(const TileLayers& layers_new) {
-  layers = layers_new;
+Tilemap::Chunks& Subworld::getTileLayer(int layer) {
+  return const_cast<Tilemap::Chunks&>(static_cast<const Subworld*>(this)->getTileLayer(layer));
 }
 
-const Tilemap& Subworld::getTilemap(int index) const {
-  return getTileLayers().at(index);
+const Tilemap& Subworld::getTilemap() const {
+  return tilemap;
 }
 
-Tilemap& Subworld::getTilemap(int index) {
-  return const_cast<Tilemap&>(static_cast<const Subworld*>(this)->getTilemap(index));
+void Subworld::setTilemap(const Tilemap& tilemap_new) {
+  tilemap = tilemap_new;
 }
 
-void Subworld::setTilemap(int index, const Tilemap& tiles_new) {
-  layers[index] = tiles_new;
-}
-
-bool Subworld::tilemapExists(int index) const {
-  return layers.find(index) != layers.end();
+Tilemap& Subworld::getTilemap() {
+  return const_cast<Tilemap&>(static_cast<const Subworld*>(this)->getTilemap());
 }
 
 Rect<int> Subworld::getBounds() const {
@@ -540,10 +536,10 @@ void Subworld::genEvent(EventType type, Event event) {
   }
 }
 
-void Subworld::genCollisionEvent(Entity entity, int layer, Vec2i pos) {
+void Subworld::genCollisionEvent(Entity entity, Tile tile) {
   genEvent(EventType::COLLISION, CollisionEvent {
     .type = CollisionEvent::Type::WORLD, .collision = WorldCollision {
-      .entity = entity, .tile = { .layer = layer, .pos = pos }
+      .entity = entity, .tile = tile
     }
   });
 }
@@ -577,21 +573,23 @@ void Subworld::checkWorldCollisions(Entity entity) {
   if (~flags & EFlags::NOCLIP) {
     Rect<float> ent_aabb = coll.hitbox.toAABB(pos);
     Rect<int> range = toRange(ent_aabb);
+    const auto& layers = tilemap.getLayers();
     for (auto iter = layers.begin(); iter != layers.end(); ++iter)
     for (int y = range.y; y < range.y + range.height; ++y)
     for (int x = range.x; x < range.x + range.width;  ++x) {
-      Tilemap& tilemap = iter->second;
+      Tile tile(iter->first, x, y);
+      TileID tileid = tilemap.getTile(tile);
       Rect<float> tile_aabb = Rect<float>(x, y, 1.f, 1.f);
-      switch (basegame->level_tile_data.getTileDef(tilemap[x][y]).getCollisionType()) {
+      switch (basegame->level_tile_data.getTileDef(tileid).getCollisionType()) {
       case TileDef::CollisionType::SOLID: {
         if (geo::intersects(ent_aabb, tile_aabb)) {
-          genCollisionEvent(entity, iter->first, Vec2(x, y));
+          genCollisionEvent(entity, tile);
         }
         break;
       }
       case TileDef::CollisionType::PLATFORM: {
         if (coll.pos_old.y >= y + 0.5f) {
-          genCollisionEvent(entity, iter->first, Vec2(x, y));
+          genCollisionEvent(entity, tile);
         }
         break;
       }
@@ -610,14 +608,12 @@ void Subworld::handleWorldCollisions(Entity entity) {
 
   Vec2f best_move;
 
-  for (const auto& iter : coll.tiles) {
-    int tile_layer = iter.layer;
-    Vec2i tile_pos = iter.pos;
+  for (const auto& tile : coll.tiles) {
     Vec2f pos_new = Vec2f(pos.x, coll.pos_old.y);
-    ChunkTile tile = getTilemap(tile_layer)[tile_pos.x][tile_pos.y];
-    TileDef tile_data = basegame->level_tile_data.getTileDef(tile);
+    auto tileid = tilemap.getTile(tile);
+    TileDef tile_data = basegame->level_tile_data.getTileDef(tileid);
     Rect<float> ent_aabb = coll.hitbox.toAABB(pos_new);
-    Rect<float> tile_aabb = Rect<float>(tile_pos.x, tile_pos.y, 1.f, 1.f);
+    Rect<float> tile_aabb = Rect<float>(tile.pos.x, tile.pos.y, 1.f, 1.f);
     if (geo::intersects(ent_aabb, tile_aabb)) {
       auto collision = ent_aabb & tile_aabb;
       switch (tile_data.getCollisionType()) {
@@ -635,14 +631,12 @@ void Subworld::handleWorldCollisions(Entity entity) {
     }
   }
 
-  for (const auto& iter : coll.tiles) {
-    int tile_layer = iter.layer;
-    Vec2i tile_pos = iter.pos;
+  for (const auto& tile : coll.tiles) {
     Vec2f pos_new = Vec2f(pos.x + best_move.x, pos.y);
-    ChunkTile tile = getTilemap(tile_layer)[tile_pos.x][tile_pos.y];
-    TileDef tiledef = basegame->level_tile_data.getTileDef(tile);
+    TileID tileid = tilemap.getTile(tile);
+    TileDef tiledef = basegame->level_tile_data.getTileDef(tileid);
     Rect<float> ent_aabb = coll.hitbox.toAABB(pos_new);
-    Rect<float> tile_aabb = Rect<float>(tile_pos.x, tile_pos.y, 1.f, 1.f);
+    Rect<float> tile_aabb = Rect<float>(tile.pos.x, tile.pos.y, 1.f, 1.f);
     if (geo::intersects(ent_aabb, tile_aabb)) {
       auto collision = ent_aabb & tile_aabb;
       switch (tiledef.getCollisionType()) {

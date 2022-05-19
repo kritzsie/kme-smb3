@@ -1,11 +1,13 @@
 #include "tilemap.hpp"
 
-#include "../../util/math.hpp"
+#include "../../math.hpp"
 
 namespace kme {
 using namespace vec2_aliases;
 
 // begin Tile
+Tile::Tile(int layer, int x, int y) : layer(layer), pos(x, y) {}
+
 bool Tile::operator ==(const Tile& rhs) const {
   return layer == rhs.layer and pos == rhs.pos;
 }
@@ -15,99 +17,66 @@ bool Tile::operator !=(const Tile& rhs) const {
 }
 // end Tile
 
-// begin ChunkTile
-ChunkTile::ChunkTile(ChunkMap& chunks, Vec2i pos) : chunks(chunks), pos(pos) {}
-
-ChunkTile& ChunkTile::operator =(const TileID& rhs) {
-  Vec2s chunk_pos = getChunkPos();
-  auto iter = chunks.find(chunk_pos);
-  if (iter != chunks.end()) {
-    Chunk& chunk = iter->second;
-    Vec2z local_pos = getLocalPos();
-    chunk[local_pos.x][local_pos.y] = rhs;
-  }
-  else if (rhs != none) {
-    Chunk& chunk = chunks[chunk_pos];
-    Vec2z local_pos = getLocalPos();
-    chunk[local_pos.x][local_pos.y] = rhs;
-  }
-  return *this;
-}
-
-bool ChunkTile::operator ==(const ChunkTile& rhs) const {
-  return pos == rhs.pos;
-}
-
-bool ChunkTile::operator !=(const ChunkTile& rhs) const {
-  return pos != rhs.pos;
-}
-
-bool ChunkTile::operator ==(const TileID& rhs) const {
-  return getTileID() == rhs;
-}
-
-bool ChunkTile::operator !=(const TileID& rhs) const {
-  return getTileID() != rhs;
-}
-
-TileID ChunkTile::getTileID() const {
-  auto iter = chunks.find(getChunkPos());
-  if (iter != chunks.end()) {
-    Chunk& chunk = iter->second;
-    Vec2z local_pos = getLocalPos();
-    return chunk[local_pos.x][local_pos.y];
-  }
-  return none;
-}
-
-Vec2i ChunkTile::getPos() const {
-  return pos;
-}
-
-Vec2z ChunkTile::getLocalPos() const {
-  return Vec2z(util::absmod(pos.x, 16), util::absmod(pos.y, 16));
-}
-
-Vec2s ChunkTile::getChunkPos() const {
-  return Vec2s(util::absdiv(pos.x, 16), util::absdiv(pos.y, 16));
-}
-
-const Chunk& ChunkTile::getChunk() const {
-  return chunks.at(getChunkPos());
-}
-
-ChunkTile::operator TileID() const {
-  return getTileID();
-}
-
-ChunkTile::operator bool() const {
-  return getTileID() != none;
-}
-
-// mutable accessors
-Chunk& ChunkTile::getChunk() {
-  return const_cast<Chunk&>(static_cast<const ChunkTile*>(this)->getChunk());
-}
-// end ChunkTile
-
 // begin Tilemap
-Tilemap::Proxy::Proxy(ChunkMap& chunks, int x) : chunks(chunks), x(x) {}
-
-ChunkTile Tilemap::Proxy::operator [](int y) {
-  return ChunkTile(chunks, Vec2i(x, y));
+const Tilemap::Layers& Tilemap::getLayers() const {
+  return layers;
 }
 
-Tilemap::Proxy Tilemap::operator [](int x) {
-  return Proxy(chunks, x);
+const Tilemap::Chunks& Tilemap::getChunks(int layer) const {
+  return layers.at(layer);
 }
 
-const ChunkMap& Tilemap::getChunks() const {
-  return chunks;
+void Tilemap::setChunks(int layer, const Chunks& chunks) {
+  layers[layer] = chunks;
+}
+
+const Tilemap::Chunk& Tilemap::getChunkAt(int layer, int x, int y) const {
+  Vec2s chunk_pos = getChunkPos(x, y);
+  return getChunks(layer).at(chunk_pos);
+}
+
+const Tilemap::Chunk& Tilemap::getChunkAt(Tile tile) const {
+  return getChunkAt(tile.layer, tile.pos.x, tile.pos.y);
+}
+
+TileID Tilemap::getTile(int layer, int x, int y) const {
+  Vec2s chunk_pos = getChunkPos(x, y);
+  Vec2z local_pos = getLocalPos(x, y);
+  const auto& chunks = getChunks(layer);
+  if (chunks.find(chunk_pos) != chunks.end()) {
+    return getChunkAt(layer, x, y)[local_pos.y][local_pos.x];
+  }
+  return notile;
+}
+
+TileID Tilemap::getTile(Tile tile) const {
+  return getTile(tile.layer, tile.pos.x, tile.pos.y);
+}
+
+void Tilemap::setTile(int layer, int x, int y, TileID tileid) {
+  Vec2z local_pos = getLocalPos(x, y);
+  layers[layer][getChunkPos(x, y)][local_pos.y][local_pos.x] = tileid;
+}
+
+void Tilemap::setTile(Tile tile, TileID tileid) {
+  setTile(tile.layer, tile.pos.x, tile.pos.y, tileid);
 }
 
 // mutable accessors
-ChunkMap& Tilemap::getChunks() {
-  return const_cast<ChunkMap&>(static_cast<const Tilemap*>(this)->getChunks());
+Tilemap::Layers& Tilemap::getLayers() {
+  return const_cast<Layers&>(static_cast<const Tilemap*>(this)->getLayers());
+}
+
+Tilemap::Chunks& Tilemap::getChunks(int layer) {
+  return const_cast<Chunks&>(static_cast<const Tilemap*>(this)->getChunks(layer));
+}
+
+Tilemap::Chunk& Tilemap::getChunkAt(int layer, int x, int y) {
+  return const_cast<Chunk&>(static_cast<const Tilemap*>(this)->getChunkAt(layer, x, y));
+}
+
+Tilemap::Chunk& Tilemap::getChunkAt(Tile tile) {
+  return const_cast<Chunk&>(static_cast<const Tilemap*>(this)->getChunkAt(tile));
 }
 // end Tilemap
 }

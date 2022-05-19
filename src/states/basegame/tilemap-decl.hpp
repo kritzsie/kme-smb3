@@ -12,72 +12,45 @@
 namespace kme {
 using namespace vec2_aliases;
 
-using Chunk = std::array<std::array<TileID, 16>, 16>;
-using ChunkMap = std::unordered_map<Vec2s, Chunk>;
-
-using TileLayers = std::map<int, class Tilemap>;
-
 struct Tile {
   int layer;
   Vec2i pos;
+
+  Tile(int layer, int x, int y);
 
   bool operator ==(const Tile& rhs) const;
   bool operator !=(const Tile& rhs) const;
 };
 
-// TODO: create separate class for Chunk type
-class ChunkTile {
-public:
-  inline static const TileID none;
-
-  ChunkTile(ChunkMap& chunks, Vec2i pos);
-
-  ChunkTile& operator =(const TileID& rhs);
-
-  bool operator ==(const ChunkTile& rhs) const;
-  bool operator !=(const ChunkTile& rhs) const;
-
-  bool operator ==(const TileID& rhs) const;
-  bool operator !=(const TileID& rhs) const;
-
-  TileID getTileID() const;
-  Vec2i getPos() const;
-  Vec2z getLocalPos() const;
-  Vec2s getChunkPos() const;
-
-  const Chunk& getChunk() const;
-  Chunk& getChunk();
-
-  operator TileID() const;
-
-  operator bool() const;
-
-private:
-  ChunkMap& chunks;
-
-  const Vec2i pos;
-};
-
 class Tilemap {
 public:
-  class Proxy {
-  public:
-    Proxy(ChunkMap& chunks, int x);
+  using Chunk = std::array<std::array<TileID, 16>, 16>;
+  using Chunks = std::unordered_map<Vec2s, Chunk>;
+  using Layers = std::map<int, Chunks>;
 
-    ChunkTile operator [](int y);
+  inline static const TileID notile;
 
-  private:
-    ChunkMap& chunks;
+  static constexpr Vec2s getChunkPos(int x, int y);
+  static constexpr Vec2z getLocalPos(int x, int y);
 
-    const int x;
-  };
+  const Layers& getLayers() const;
+  Layers& getLayers();
 
-  Proxy operator [](int x);
+  const Chunks& getChunks(int layer) const;
+  Chunks& getChunks(int layer);
+  void setChunks(int layer, const Chunks& chunks);
 
-  const ChunkMap& getChunks() const;
-  ChunkMap& getChunks();
+  const Chunk& getChunkAt(Tile tile) const;
+  const Chunk& getChunkAt(int layer, int x, int y) const;
+  Chunk& getChunkAt(Tile tile);
+  Chunk& getChunkAt(int layer, int x, int y);
+
+  TileID getTile(Tile tile) const;
+  TileID getTile(int layer, int x, int y) const;
+  void setTile(int layer, int x, int y, TileID tileid);
+  void setTile(Tile tile, TileID tileid);
 
 private:
-  ChunkMap chunks;
+  Layers layers;
 };
 }
