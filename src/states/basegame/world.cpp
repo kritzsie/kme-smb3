@@ -34,18 +34,6 @@ EntityRegistry& Subworld::getEntities() {
   return const_cast<EntityRegistry&>(static_cast<const Subworld*>(this)->getEntities());
 }
 
-const Tilemap::Chunks& Subworld::getTileLayer(int layer) const {
-  return tilemap.getChunks(layer);
-}
-
-void Subworld::setTileLayer(int layer, const Tilemap::Chunks& tiles_new) {
-  tilemap.setChunks(layer, tiles_new);
-}
-
-Tilemap::Chunks& Subworld::getTileLayer(int layer) {
-  return const_cast<Tilemap::Chunks&>(static_cast<const Subworld*>(this)->getTileLayer(layer));
-}
-
 const Tilemap& Subworld::getTilemap() const {
   return tilemap;
 }

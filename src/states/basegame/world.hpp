@@ -35,10 +35,6 @@ public:
   const EntityRegistry& getEntities() const;
   EntityRegistry& getEntities();
 
-  const Tilemap::Chunks& getTileLayer(int layer) const;
-  Tilemap::Chunks& getTileLayer(int layer);
-  void setTileLayer(int layer, const Tilemap::Chunks& tiles);
-
   const Tilemap& getTilemap() const;
   Tilemap& getTilemap();
   void setTilemap(const Tilemap& tilemap);
