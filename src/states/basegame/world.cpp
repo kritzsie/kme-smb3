@@ -469,6 +469,22 @@ void Subworld::update(float delta) {
     }
   }
 
+  // death plane
+  if (entities.valid(player)) {
+    if (entities.valid(camera)) {
+      auto& pos = entities.get<CPosition>(player).value;
+      auto& coll = entities.get<CCollision>(player);
+      auto& camera_pos = entities.get<CPosition>(camera).value;
+
+      if (pos.y + coll.hitbox.height < camera_pos.y) {
+        auto& flags = entities.get<CFlags>(player).value;
+        auto& state = entities.get<CState>(player).value;
+        flags |= EFlags::DEAD;
+        state = EState::DEAD;
+      }
+    }
+  }
+
   // handle cases where gameplay must be suspended (death, powerup, pipe, etc.)
   if (entities.valid(player)) {
     auto& state = entities.get<CState>(player).value;
