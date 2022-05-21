@@ -12,6 +12,8 @@
 #include <string>
 #include <utility>
 
+#include "assets/missing_texture_png.h"
+
 namespace kme {
 static const StringList gfx_extensions {
   "", "hdr", "png", "psd", "tga", "bmp", "gif", "pic", "jpg", "jpeg"
@@ -45,6 +47,8 @@ bool AssetManager::load(std::string folder, std::string name) {
 
 // begin GFXAssets
 GFXAssets::GFXAssets() : AssetManager(gfx_extensions) {
+  GFXAssets::missing.loadFromMemory(missing_texture_png, sizeof(missing_texture_png));
+
   assets["sprites" ][""] = GFXAssets::none;
   assets["tiles"   ][""] = GFXAssets::none;
   assets["textures"][""] = GFXAssets::none;
@@ -88,7 +92,7 @@ const sf::Texture& GFXAssets::getTexture(std::string name) {
     }
   }
 
-  return GFXAssets::none;
+  return GFXAssets::missing;
 }
 
 const sf::Texture& GFXAssets::getTile(std::string name) {
@@ -142,7 +146,7 @@ const sf::SoundBuffer& SFXAssets::getSound(std::string name) {
     }
   }
 
-  return SFXAssets::none;
+  return SFXAssets::missing;
 }
 
 SFXAssets& SFXAssets::getInstance() {
