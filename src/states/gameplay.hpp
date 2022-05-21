@@ -99,9 +99,6 @@ private:
   sf::RenderTexture* scene = nullptr;
   sf::RenderTexture* hud = nullptr;
 
-  Vec2f camera_pos;
-  Vec2f camera_radius;
-
   std::size_t worldnum, levelnum;
   std::size_t current_subworld = 0;
   Level level;

@@ -35,8 +35,8 @@ Gameplay::Gameplay(BaseState* parent, Engine* engine, std::size_t worldnum, std:
   scene->create(480, 270);
   hud->create(480, 270);
 
-  camera_pos = Vec2f(15.f, 8.4375f);
-  camera_radius = Vec2f(15.f, 8.4375f);
+  Vec2f camera_pos = Vec2f(15.f, 8.4375f);
+  Vec2f camera_hitbox = Vec2f(15.f, 8.4375f);
 
   inputs.actions[Action::UP]       = 0;
   inputs.actions[Action::DOWN]     = 0;
@@ -123,7 +123,7 @@ void Gameplay::enter() {
 
   auto camera = entities.create();
   entities.emplace<CInfo>(camera, "Camera", player);
-  entities.emplace<CPosition>(camera, Vec2f(15.f, 8.4375f));
+  entities.emplace<CPosition>(camera, Vec2f(15.f, 0.f));
   entities.emplace<CCollision>(camera, Hitbox(15.f, 16.875f));
   subworld.camera = camera;
 
@@ -232,29 +232,15 @@ void Gameplay::draw(float delta) {
     const Subworld& subworld = level.getSubworld(current_subworld);
     const EntityRegistry& entities = subworld.getEntities();
     const auto& pos = entities.get<CPosition>(subworld.camera).value;
-    Rect bounds = subworld.getBounds();
-
-    // restrict camera to world boundaries
-    camera_pos.x = std::clamp(
-      pos.x,
-      camera_radius.x + bounds.x,
-      bounds.width - camera_radius.x + bounds.x
-    );
-    camera_pos.y = std::clamp(
-      pos.y,
-      camera_radius.y + bounds.y,
-      bounds.height - camera_radius.y + bounds.y
-    );
+    const auto& coll = entities.get<CCollision>(subworld.camera);
+    Rect<float> aabb = coll.hitbox.toAABB(pos);
 
     // snap camera to integer coordinates on screen
-    camera_pos = toScreen(camera_pos);
-    camera_pos.x = util::round(camera_pos.x);
-    camera_pos.y = util::round(camera_pos.y);
-    camera_pos = fromScreen(camera_pos);
+    aabb.pos = fromScreen(fp::map(util::round, toScreen(aabb.pos)));
 
     // set view to camera
     sf::View view = scene->getView();
-    view.setCenter(toScreen(camera_pos));
+    view.setCenter(toScreen(geo::midpoint(aabb)));
     scene->setView(view);
 
     const auto& theme = getBaseGame()->themes.at(subworld.getTheme());
@@ -295,14 +281,19 @@ void Gameplay::drawBackground(std::string name, Vec2f offset, Vec2f parallax,
   const RenderFrame& frame = background.getFrame(background.getFrameOffset(rendertime));
   const sf::Texture& texture = gfx.getTexture(frame.texture);
   Vec2f size = static_cast<sf::Vector2f>(texture.getSize());
-
   Vec2f tiling_ratio = Vec2f(480.f / size.x, 270.f / size.y);
 
-  Vec2f origin = camera_pos - camera_radius;
+  const Subworld& subworld = level.getSubworld(current_subworld);
+  const EntityRegistry& entities = subworld.getEntities();
+  const auto& pos = entities.get<CPosition>(subworld.camera).value;
+  const auto& coll = entities.get<CCollision>(subworld.camera);
+  const auto aabb = coll.hitbox.toAABB(pos);
+
+  Vec2f origin = aabb.pos;
   Vec2f bg_begin = origin;
   bg_begin.x = bg_begin.x * (1.f - parallax.x);
   bg_begin.y = bg_begin.y * (1.f - parallax.y);
-  Vec2f bg_end = bg_begin + camera_radius * 2.f;
+  Vec2f bg_end = bg_begin + aabb.size;
   bg_begin.x = bg_begin.x * 16.f / 480.f * tiling_ratio.x;
   bg_begin.y = bg_begin.y * 16.f / 270.f * tiling_ratio.y;
   bg_end.x = bg_end.x * 16.f / 480.f * tiling_ratio.x;
@@ -342,12 +333,8 @@ void Gameplay::drawBackground(std::string name, Vec2f offset, Vec2f parallax,
 }
 
 // begin ugly
-static Rect<float> rectFromBox(Vec2f pos, Vec2f radius) {
-  return Rect<float>(pos - radius, 2.f * radius);
-}
-
 static Rect<float> regionFromRect(Rect<float> rect) {
-  Rect<float> border(-0.5f, -0.5f, 1.f, 1.f);
+  static constexpr Rect<float> border(-0.5f, -0.5f, 1.f, 1.f);
   return Rect<float>(rect.pos + border.pos, rect.size + border.size);
 }
 
@@ -357,7 +344,12 @@ static Rect<int> viewportFromRegion(Rect<float> region) {
 // end ugly
 
 void Gameplay::drawTiles() {
-  Rect<int> region = viewportFromRegion(regionFromRect(rectFromBox(camera_pos, camera_radius)));
+  const Subworld& subworld = level.getSubworld(current_subworld);
+  const EntityRegistry& entities = subworld.getEntities();
+  const auto& pos = entities.get<CPosition>(subworld.camera).value;
+  const auto& coll = entities.get<CCollision>(subworld.camera);
+
+  Rect<int> region = viewportFromRegion(regionFromRect(coll.hitbox.toAABB(pos)));
   const auto& tilemap = level.getSubworld(current_subworld).getTilemap();
   const auto& layers = tilemap.getLayers();
 

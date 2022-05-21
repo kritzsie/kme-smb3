@@ -411,27 +411,30 @@ void Subworld::update(float delta) {
     }
   }
 
+  // move camera to follow target
   if (entities.valid(camera)) {
     auto& info = entities.get<CInfo>(camera);
+    auto& target = info.parent;
 
-    if (entities.valid(info.parent)) {
-      auto& parent_pos = entities.get<CPosition>(info.parent).value;
+    if (entities.valid(target)) {
       auto& pos = entities.get<CPosition>(camera).value;
       auto& coll = entities.get<CCollision>(camera);
+      auto& target_pos = entities.get<CPosition>(target).value;
+      float target_height = 0.5f;
 
-      // position camera relative to world
-      if (parent_pos.x - 1.f > pos.x) {
-        pos.x = parent_pos.x - 1.f;
+      // move camera to target
+      if (target_pos.x - 1.f > pos.x) {
+        pos.x = target_pos.x - 1.f;
       }
-      else if (parent_pos.x + 1.f < pos.x) {
-        pos.x = parent_pos.x + 1.f;
+      else if (target_pos.x + 1.f < pos.x) {
+        pos.x = target_pos.x + 1.f;
       }
 
-      if (parent_pos.y - 1.5f > pos.y) {
-        pos.y = parent_pos.y - 1.5f;
+      if (target_pos.y + target_height - 1.f - coll.hitbox.height / 2 > pos.y) {
+        pos.y = target_pos.y + target_height - 1.f - coll.hitbox.height / 2;
       }
-      else if (parent_pos.y + 3.f < pos.y) {
-        pos.y = parent_pos.y + 3.f;
+      else if (target_pos.y + target_height + 3.f - coll.hitbox.height / 2 < pos.y) {
+        pos.y = target_pos.y + target_height + 3.f - coll.hitbox.height / 2;
       }
 
       // restrict camera to world boundaries
@@ -466,6 +469,15 @@ void Subworld::update(float delta) {
     }
   }
 
+  // handle cases where gameplay must be suspended (death, powerup, pipe, etc.)
+  if (entities.valid(player)) {
+    auto& state = entities.get<CState>(player).value;
+    if (state == EState::DEAD) {
+      gameplay->suspend();
+      gameplay->playMusic("playerdown.spc");
+    }
+  }
+
   // drawable entities
   auto renderstate_view = entities.view<CInfo, CState, CRender>();
   auto powerup_view = entities.view<CPowerup>();
@@ -485,14 +497,6 @@ void Subworld::update(float delta) {
     }
 
     render.state.setState(label, states.getFrameOffset(label, render.time));
-  }
-
-  if (entities.valid(player)) {
-    auto& state = entities.get<CState>(player).value;
-    if (state == EState::DEAD) {
-      gameplay->suspend();
-      gameplay->playMusic("playerdown.spc");
-    }
   }
 
   consumeEvents();
