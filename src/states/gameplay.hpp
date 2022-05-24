@@ -10,9 +10,7 @@
 #include "basestate.hpp"
 
 #include <SFML/Graphics.hpp>
-#include <SFML/Window/Event.hpp>
-#include <SFML/Window/Keyboard.hpp>
-#include <SFML/Window/Joystick.hpp>
+#include <SFML/Window.hpp>
 
 #include <string>
 

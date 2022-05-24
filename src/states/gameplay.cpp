@@ -35,9 +35,6 @@ Gameplay::Gameplay(BaseState* parent, Engine* engine, std::size_t worldnum, std:
   scene->create(480, 270);
   hud->create(480, 270);
 
-  Vec2f camera_pos = Vec2f(15.f, 8.4375f);
-  Vec2f camera_hitbox = Vec2f(15.f, 8.4375f);
-
   inputs.actions[Action::UP]       = 0;
   inputs.actions[Action::DOWN]     = 0;
   inputs.actions[Action::LEFT]     = 0;
