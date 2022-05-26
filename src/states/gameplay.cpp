@@ -12,6 +12,7 @@
 
 #include <iomanip>
 #include <map>
+#include <optional>
 #include <vector>
 
 #include <cmath>
@@ -27,13 +28,15 @@ Gameplay::Factory Gameplay::create(std::size_t worldnum, std::size_t levelnum) {
 
 Gameplay::Gameplay(BaseState* parent, Engine* engine, std::size_t worldnum, std::size_t levelnum)
 : BaseState(parent, engine), worldnum(worldnum), levelnum(levelnum), level(getBaseGame(), this) {
-  framebuffer = new sf::RenderTexture;
-  scene = new sf::RenderTexture;
-  hud = new sf::RenderTexture;
+  if (engine->getWindow()) {
+    framebuffer.emplace();
+    scene.emplace();
+    hud.emplace();
 
-  framebuffer->create(480, 270);
-  scene->create(480, 270);
-  hud->create(480, 270);
+    framebuffer->create(480, 270);
+    scene->create(480, 270);
+    hud->create(480, 270);
+  }
 
   inputs.actions[Action::UP]       = 0;
   inputs.actions[Action::DOWN]     = 0;
@@ -72,22 +75,16 @@ Gameplay::Gameplay(BaseState* parent, Engine* engine, std::size_t worldnum, std:
   inputs.buttons[std::tuple(0, 7)] = Action::PAUSE;
 }
 
-Gameplay::~Gameplay() {
-  delete framebuffer;
-  delete scene;
-  delete hud;
-}
-
 BaseGame* Gameplay::getBaseGame() {
   return dynamic_cast<BaseGame*>(parent);
 }
 
 bool Gameplay::handleInput(sf::Event::EventType type, const sf::Event& event) {
-  if (not paused) {
+  bool active = not paused;
+  if (active) {
     inputs.update(type, event);
   }
-
-  return not paused;
+  return active;
 }
 
 void Gameplay::enter() {
@@ -223,9 +220,7 @@ bool Gameplay::isSuspended() const {
 }
 
 void Gameplay::draw(float delta) {
-  Window* window = engine->getWindow();
-
-  if (window != nullptr) {
+  if (auto& window = engine->getWindow()) {
     const Subworld& subworld = level.getSubworld(current_subworld);
     const EntityRegistry& entities = subworld.getEntities();
     const auto& pos = entities.get<CPosition>(subworld.camera).value;
@@ -452,16 +447,16 @@ void Gameplay::drawHUD() {
            << int(std::ceil(level.timer));
 
   TextStyle align_left("smb3_sbfont");
-  drawText(hud, world.str(), Vec2f(16, 16), align_left);
-  drawText(hud, mario.str(), Vec2f(16, 24), align_left);
+  drawText(*hud, world.str(), Vec2f(16, 16), align_left);
+  drawText(*hud, mario.str(), Vec2f(16, 24), align_left);
 
   TextStyle align_right("smb3_sbfont", TextStyle::Flags::ALIGN_RIGHT);
-  drawText(hud, timer.str(), Vec2f(48, 16), align_right);
-  drawText(hud, coins.str(), Vec2f(16, 16), align_right);
-  drawText(hud, score.str(), Vec2f(16, 24), align_right);
+  drawText(*hud, timer.str(), Vec2f(48, 16), align_right);
+  drawText(*hud, coins.str(), Vec2f(16, 16), align_right);
+  drawText(*hud, score.str(), Vec2f(16, 24), align_right);
 
   TextStyle align_bottom("smb3_sbfont", TextStyle::Flags::ALIGN_BOTTOM);
-  drawText(hud, p_meter.str(), Vec2f(64, 6), align_bottom);
+  drawText(*hud, p_meter.str(), Vec2f(64, 6), align_bottom);
 }
 
 Vec2f Gameplay::fromScreen(Vec2f pos) {

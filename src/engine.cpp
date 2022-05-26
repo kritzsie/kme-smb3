@@ -9,6 +9,7 @@
 
 #include <algorithm>
 #include <iostream>
+#include <optional>
 #include <string>
 #include <thread>
 #include <utility>
@@ -25,11 +26,9 @@ TimeInfo::TimeInfo(float rate) : rate(rate), delta(1.f / rate) {}
 // Window functions
 Window::Window() : Window(1440, 810) {}
 
-Window::Window(UInt width, UInt height) : Window(width, height, "Klaymore Engine") {}
-
-Window::Window(UInt width, UInt height, std::string title)
+Window::Window(std::size_t width, std::size_t height, std::string title)
 : sf::RenderWindow(sf::VideoMode(width, height), title) {
-  framebuffer = new sf::RenderTexture();
+  framebuffer.emplace();
   framebuffer->create(480, 270);
 
   setKeyRepeatEnabled(false);
@@ -38,40 +37,31 @@ Window::Window(UInt width, UInt height, std::string title)
   setPosition((Vec2i(screen.width, screen.height) - Vec2i(width, height)) / 2);
 }
 
-Window::~Window() {
-  if (framebuffer != nullptr) delete framebuffer;
-}
-
-sf::RenderTexture* Window::getFramebuffer() {
+std::optional<sf::RenderTexture>& Window::getFramebuffer() {
   return framebuffer;
 }
 
 void Window::drawWindow() {
   clear();
-
   framebuffer->display();
-
-  sf::Sprite sprite(framebuffer->getTexture());
-  draw(sprite);
-
+  draw(sf::Sprite(framebuffer->getTexture()));
   display();
 }
 
-void Window::resize(UInt width, UInt height) {
-  Vec2u size = framebuffer->getSize();
-  UInt scale = std::max(1u, std::min(width / size.x, height / size.y));
-
+void Window::resize(std::size_t width, std::size_t height) {
+  Vec2z size = static_cast<sf::Vector2<std::size_t>>(framebuffer->getSize());
+  std::size_t scale = std::clamp<std::size_t>(width / size.x, 1, height / size.y);
   sf::View view(Rect<float>(0, 0, width, height));
   view.setCenter(size.x / 2, size.y / 2);
-  view.zoom(1.0f / scale);
+  view.zoom(1.f / scale);
   setView(view);
 }
 
 // Engine functions
-Engine::Engine(std::vector<std::string>&& args) : args(args), tickinfo(64.f), renderinfo(60.f) {
-  window = new Window(1440, 810, "Super Mario Bros. 3");
-  music = new Music();
-  sound = new Sound();
+Engine::Engine(StringList args) : args(args), tickinfo(64.f), renderinfo(60.f) {
+  window.emplace(1440, 810, "Super Mario Bros. 3");
+  music.emplace();
+  sound.emplace();
 
   if (instance_count == 0) {
     PHYSFS_init(args.at(0).c_str());
@@ -83,12 +73,9 @@ Engine::Engine(std::vector<std::string>&& args) : args(args), tickinfo(64.f), re
   pushState(Intro::create());
 }
 
-Engine::Engine(int argc, char** argv): Engine(std::vector<std::string>(argv, argc + argv)) {}
+Engine::Engine(int argc, char** argv) : Engine(StringList(argv, argv + argc)) {}
 
 Engine::~Engine() {
-  if (window != nullptr) delete window;
-  if (music != nullptr) delete music;
-
   if (instance_count > 0) {
     if (instance_count == 1) {
       PHYSFS_deinit();
@@ -97,7 +84,7 @@ Engine::~Engine() {
   }
 }
 
-Window* Engine::getWindow() {
+std::optional<Window>& Engine::getWindow() {
   return window;
 }
 
@@ -172,7 +159,7 @@ bool Engine::main() {
 
 // TODO: move event processing to update function
 void Engine::update(float delta) {
-  if (window != nullptr) {
+  if (window) {
     sf::Event event;
     while (window->pollEvent(event)) {
       switch (event.type) {
@@ -232,19 +219,20 @@ void Engine::update(float delta) {
 }
 
 void Engine::draw(float delta) {
-  for (BaseState* state : states) {
-    state->draw(delta);
-  }
+  if (window) {
+    for (BaseState* state : states) {
+      state->draw(delta);
+    }
 
-  if (window != nullptr) {
     window->drawWindow();
   }
 }
 
 void Engine::quit() {
-  if (window != nullptr) {
+  if (window) {
     window->close();
   }
+
   running = false;
 }
 

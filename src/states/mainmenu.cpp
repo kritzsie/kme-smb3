@@ -11,6 +11,7 @@
 #include <SFML/Window.hpp>
 
 #include <string>
+#include <tuple>
 
 #include <cstddef>
 
@@ -22,22 +23,20 @@ MainMenu::Factory MainMenu::create() {
 }
 
 MainMenu::MainMenu(Engine* engine) : BaseState(nullptr, engine) {
-  framebuffer = new sf::RenderTexture;
-  framebuffer->create(480, 270);
+  if (engine->getWindow()) {
+    framebuffer.emplace();
+    framebuffer->create(480, 270);
+  }
 
   engine->music->open("title.spc");
 }
 
-MainMenu::~MainMenu() {
-  delete framebuffer;
-}
-
 bool MainMenu::handleInput(sf::Event::EventType type, const sf::Event& event) {
-  if (not paused) {
+  bool active = not paused;
+  if (active) {
     inputs.update(type, event);
   }
-
-  return not paused;
+  return active;
 }
 
 void MainMenu::enter() {
@@ -124,9 +123,7 @@ void MainMenu::update(float delta) {
 
 void MainMenu::draw(float delta) {
   if (not paused) {
-    Window* window = engine->getWindow();
-
-    if (window != nullptr) {
+    if (auto& window = engine->getWindow()) {
       const auto& background = gfx.getTexture("bonusquestion");
       Vec2f bgsize = static_cast<sf::Vector2f>(background.getSize());
       Vec2f fbsize = static_cast<sf::Vector2f>(framebuffer->getSize());
@@ -138,10 +135,10 @@ void MainMenu::draw(float delta) {
         framebuffer->draw(sprite);
       }
 
-      drawText(framebuffer, "START GAME", Vec2f(200, 180), TextStyle("smb3_sbfont"));
-      drawText(framebuffer, "QUIT", Vec2f(200, 188), TextStyle("smb3_sbfont"));
+      drawText(*framebuffer, "START GAME", Vec2f(200, 180), TextStyle("smb3_sbfont"));
+      drawText(*framebuffer, "QUIT", Vec2f(200, 188), TextStyle("smb3_sbfont"));
 
-      drawText(framebuffer, util::highASCII(">"), Vec2f(192, 180 + entry * 8), TextStyle("smb3_sbfont"));
+      drawText(*framebuffer, util::highASCII(">"), Vec2f(192, 180 + entry * 8), TextStyle("smb3_sbfont"));
 
       framebuffer->display();
 

@@ -20,11 +20,11 @@ TextStyle::TextStyle(std::string font_new, UInt32 flags_new) {
 
 TextStyle::TextStyle(std::string font_new) : TextStyle(font_new, Flags::NONE) {}
 
-void drawText(sf::RenderTarget* canvas, std::string text,
+void drawText(sf::RenderTarget& canvas, std::string text,
               Vec2f origin, TextStyle style) {
   const auto& texture = gfx.getTexture(style.font);
   Vec2u texture_size = texture.getSize();
-  Vec2u view_size = canvas->getSize();
+  Vec2u view_size = canvas.getSize();
   std::size_t length = text.length();
 
   for (std::size_t i = 0; i < length; ++i) {
@@ -38,7 +38,7 @@ void drawText(sf::RenderTarget* canvas, std::string text,
       align_bottom ? view_size.y - 8 - origin.y : origin.y
     );
     sprite.setPosition(pos.x + 8 * i, pos.y);
-    canvas->draw(sprite);
+    canvas.draw(sprite);
   }
 }
 }

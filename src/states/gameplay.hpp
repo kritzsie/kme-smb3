@@ -12,6 +12,7 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
 
+#include <optional>
 #include <string>
 
 #include <cstddef>
@@ -37,8 +38,6 @@ private:
            std::size_t worldnum, std::size_t levelnum);
 
 public:
-  ~Gameplay() final;
-
   bool handleInput(sf::Event::EventType type, const sf::Event& event) final;
 
   void enter() final;
@@ -93,9 +92,9 @@ private:
   float ticktime = 0.f;
   float rendertime = 0.f;
 
-  sf::RenderTexture* framebuffer = nullptr;
-  sf::RenderTexture* scene = nullptr;
-  sf::RenderTexture* hud = nullptr;
+  std::optional<sf::RenderTexture> framebuffer;
+  std::optional<sf::RenderTexture> scene;
+  std::optional<sf::RenderTexture> hud;
 
   std::size_t worldnum, levelnum;
   std::size_t current_subworld = 0;

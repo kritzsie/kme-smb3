@@ -9,6 +9,7 @@
 #include <SFML/Window.hpp>
 
 #include <map>
+#include <optional>
 #include <tuple>
 
 #include <cstddef>
@@ -33,8 +34,6 @@ private:
   MainMenu(Engine* engine);
 
 public:
-  ~MainMenu() final;
-
   bool handleInput(sf::Event::EventType type, const sf::Event& event) final;
 
   void enter() final;
@@ -52,7 +51,7 @@ private:
 private:
   bool paused = false;
 
-  sf::RenderTexture* framebuffer = nullptr;
+  std::optional<sf::RenderTexture> framebuffer;
 
   std::size_t entry = 0;
 

@@ -10,6 +10,7 @@
 
 #include <chrono>
 #include <map>
+#include <optional>
 #include <string>
 #include <utility>
 #include <vector>
@@ -36,17 +37,15 @@ public:
 class Window : public sf::RenderWindow {
 public:
   Window();
-  Window(UInt width, UInt height);
-  Window(UInt width, UInt height, std::string title);
-  ~Window();
+  Window(std::size_t width, std::size_t height, std::string title = "Klaymore Engine");
 
   void drawWindow();
-  void resize(UInt width, UInt height);
+  void resize(std::size_t width, std::size_t height);
 
-  sf::RenderTexture* getFramebuffer();
+  std::optional<sf::RenderTexture>& getFramebuffer();
 
 private:
-  sf::RenderTexture* framebuffer;
+  std::optional<sf::RenderTexture> framebuffer;
 };
 
 class Engine {
@@ -56,13 +55,13 @@ public:
   using StateEvent = std::pair<StateEventType, BaseState::Factory>;
 
   Engine(int argc, char** argv);
-  Engine(std::vector<std::string>&& args);
+  Engine(StringList args);
   ~Engine();
 
 public:
   int exec();
 
-  Window* getWindow();
+  std::optional<Window>& getWindow();
 
   bool isRunning() const;
   TimeInfo getTickTime() const;
@@ -92,11 +91,11 @@ private:
   TimeInfo renderinfo;
   PhysFSInfo physfsinfo;
 
-  Window* window;
+  std::optional<Window> window;
 
 public:
-  Music* music;
-  Sound* sound;
+  std::optional<Music> music;
+  std::optional<Sound> sound;
 
 private:
   std::vector<StateEvent> events;

@@ -27,6 +27,6 @@ public:
   std::string font;
 };
 
-void drawText(sf::RenderTarget* canvas, std::string text,
+void drawText(sf::RenderTarget& canvas, std::string text,
               Vec2f origin, TextStyle style);
 }
