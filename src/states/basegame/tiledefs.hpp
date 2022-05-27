@@ -20,7 +20,7 @@ public:
 class TileDef {
 public:
   enum class CollisionType {
-    NONE, SOLID, PLATFORM, SLOPE, WATER, WATERFALL, LAVA
+    NONE, NONSOLID, SOLID, PLATFORM, SLOPE, WATER, WATERFALL, LAVA
   };
 
   enum class SlopeType {

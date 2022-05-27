@@ -30,7 +30,7 @@ public:
 
   using Event = std::variant<CollisionEvent>;
 
-  Subworld(const BaseGame* basegame, Gameplay* gameplay);
+  Subworld(BaseGame* basegame, Gameplay* gameplay);
 
   const EntityRegistry& getEntities() const;
   EntityRegistry& getEntities();
@@ -71,7 +71,7 @@ public:
   Entity camera;
 
 private:
-  const BaseGame* basegame;
+  BaseGame* basegame;
   Gameplay* gameplay;
 
   EntityRegistry entities;
@@ -92,7 +92,7 @@ class Level {
 public:
   using Subworlds = std::unordered_map<std::size_t, Subworld>;
 
-  Level(const BaseGame* basegame, Gameplay* gameplay);
+  Level(BaseGame* basegame, Gameplay* gameplay);
 
   std::size_t createSubworld();
   std::size_t createSubworld(std::size_t index_hint);
@@ -113,7 +113,7 @@ public:
   iterator end();
 
 private:
-  const BaseGame* basegame;
+  BaseGame* basegame;
   Gameplay* gameplay;
 
   std::size_t count = 0;

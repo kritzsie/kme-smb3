@@ -13,7 +13,8 @@
 
 #include <algorithm>
 #include <exception>
-#include <type_traits>
+#include <unordered_set>
+#include <vector>
 
 #include <cmath>
 
@@ -21,7 +22,7 @@ namespace kme {
 using namespace vec2_aliases;
 
 // begin Subworld
-Subworld::Subworld(const BaseGame* basegame_new, Gameplay* gameplay_new) {
+Subworld::Subworld(BaseGame* basegame_new, Gameplay* gameplay_new) {
   basegame = basegame_new;
   gameplay = gameplay_new;
 }
@@ -651,6 +652,9 @@ void Subworld::handleWorldCollisions(Entity entity) {
   Vec2f best_move;
   Vec2f best_push;
 
+  std::vector<Tile> coins_collected;
+  std::vector<Tile> tiles_hit;
+
   for (const auto& tile : coll.tiles) {
     Vec2f pos_new = Vec2f(pos.x, pos_old.y);
     auto tileid = tilemap.getTile(tile);
@@ -698,6 +702,12 @@ void Subworld::handleWorldCollisions(Entity entity) {
         else if (ent_midpoint.y < tile_midpoint.y) {
           if (collision.width > 4.f / 16.f) {
             best_move.y = -collision.height;
+            if (vel.y > 0.f) {
+              if (tileid == "BrickGold"
+              or  tileid == "QuestionBlock") {
+                tiles_hit.push_back(tile);
+              }
+            }
           }
         }
         break;
@@ -714,19 +724,22 @@ void Subworld::handleWorldCollisions(Entity entity) {
     }
   }
 
-  pos += best_move;
-
   enum class WaterType {
     NONE, WATER, WATERFALL
   } watertype = WaterType::NONE;
 
   for (const auto& tile : coll.tiles) {
+    Vec2f pos_new = pos + best_move;
     auto tileid = tilemap.getTile(tile);
     TileDef tile_data = basegame->level_tile_data.getTileDef(tileid);
-    Rect<float> ent_aabb = coll.hitbox.toAABB(pos);
+    Rect<float> ent_aabb = coll.hitbox.toAABB(pos_new);
     Rect<float> tile_aabb = Rect<float>(tile.pos.x, tile.pos.y, 1.f, 1.f);
     if (geo::contains(tile_aabb, geo::midpoint(ent_aabb))) {
       switch (tile_data.getCollisionType()) {
+      case TileDef::CollisionType::NONSOLID:
+        if (tileid == "CoinGold")
+          coins_collected.push_back(tile);
+        break;
       case TileDef::CollisionType::WATER:
         watertype = WaterType::WATER;
         break;
@@ -740,7 +753,39 @@ void Subworld::handleWorldCollisions(Entity entity) {
     }
   }
 
+  pos += best_move;
   vel += best_push;
+
+  if (entity == player) {
+    for (auto& tile : coins_collected) {
+      basegame->addCoins(1);
+      tilemap.setTile(tile, "");
+      gameplay->playSound("coin");
+    }
+
+    if (tiles_hit.size()) {
+      std::sort(tiles_hit.begin(), tiles_hit.end(),
+        [pos](Tile a, Tile b) -> bool {
+          float a_dist = pos.x - a.pos.x + 0.5f;
+          float b_dist = pos.x - b.pos.x + 0.5f;
+          return a.pos.y < b.pos.y or a_dist < b_dist;
+        }
+      );
+      Tile& tile = tiles_hit[0];
+      TileID tileid = tilemap.getTile(tile);
+      if (tileid == "BrickGold") {
+        auto& powerup = entities.get<CPowerup>(entity).value;
+        if (getPowerupTier(powerup) > 0) {
+          tilemap.setTile(tile, "");
+        }
+      }
+      else if (tileid == "QuestionBlock") {
+        basegame->addCoins(1);
+        tilemap.setTile(tile, "EmptyBlock");
+        gameplay->playSound("coin");
+      }
+    }
+  }
 
   if (flags & EFlags::ENEMY
   or  flags & EFlags::POWERUP) {
@@ -1016,7 +1061,7 @@ void Subworld::handleEntityCollisions(Entity entity) {
 }
 
 // begin Level
-Level::Level(const BaseGame* basegame_new, Gameplay* gameplay_new) {
+Level::Level(BaseGame* basegame_new, Gameplay* gameplay_new) {
   basegame = basegame_new;
   gameplay = gameplay_new;
 }

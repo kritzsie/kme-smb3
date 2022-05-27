@@ -224,11 +224,13 @@ void Gameplay::draw(float delta) {
     const Subworld& subworld = level.getSubworld(current_subworld);
     const EntityRegistry& entities = subworld.getEntities();
     const auto& pos = entities.get<CPosition>(subworld.camera).value;
-    const auto& coll = entities.get<CCollision>(subworld.camera);
-    Rect<float> aabb = coll.hitbox.toAABB(pos);
-
-    // snap camera to integer coordinates on screen
-    aabb.pos = fromScreen(fp::map(util::round, toScreen(aabb.pos)));
+    const auto& hitbox = entities.get<CCollision>(subworld.camera).hitbox;
+    const Rect<float> aabb = [pos, hitbox]() {
+      auto result = hitbox.toAABB(pos);
+      // snap camera to integer coordinates
+      result.pos = fromScreen(fp::map(util::round, toScreen(result.pos)));
+      return result;
+    }();
 
     // set view to camera
     sf::View view = scene->getView();
@@ -278,8 +280,13 @@ void Gameplay::drawBackground(std::string name, Vec2f offset, Vec2f parallax,
   const Subworld& subworld = level.getSubworld(current_subworld);
   const EntityRegistry& entities = subworld.getEntities();
   const auto& pos = entities.get<CPosition>(subworld.camera).value;
-  const auto& coll = entities.get<CCollision>(subworld.camera);
-  const auto aabb = coll.hitbox.toAABB(pos);
+  const auto& hitbox = entities.get<CCollision>(subworld.camera).hitbox;
+  const auto aabb = [pos, hitbox]() {
+    auto result = hitbox.toAABB(pos);
+    // snap camera to integer coordinates
+    result.pos = fromScreen(fp::map(util::round, toScreen(result.pos)));
+    return result;
+  }();
 
   Vec2f origin = aabb.pos;
   Vec2f bg_begin = origin;

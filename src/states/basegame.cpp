@@ -83,8 +83,8 @@ void BaseGame::enter() {
   mario_rs.pushFrame("UNDERWATER.BIG", "player1swim_big_1", Rect<int>(0, 0, 16, 16), Vec2f(8, -1), 16.f / 60.f);
 
   mario_rs.pushFrame("SWIM.BIG", "player1swim_big_0", Rect<int>(0, 0, 16, 16), Vec2f(8, -1), 8.f / 60.f);
-  mario_rs.pushFrame("SWIM.BIG", "player1paddle_big_0", Rect<int>(0, 0, 16, 16), Vec2f(8, -1), 6.f / 60.f);
-  mario_rs.pushFrame("SWIM.BIG", "player1paddle_big_1", Rect<int>(0, 0, 16, 16), Vec2f(8, -1), 6.f / 60.f);
+  mario_rs.pushFrame("SWIM.BIG", "player1paddle_big_0", Rect<int>(0, 0, 16, 16), Vec2f(8, -1), 8.f / 60.f);
+  mario_rs.pushFrame("SWIM.BIG", "player1paddle_big_1", Rect<int>(0, 0, 16, 16), Vec2f(8, -1), 8.f / 60.f);
 
   entity_data.registerRenderStates("Player", std::move(mario_rs));
 

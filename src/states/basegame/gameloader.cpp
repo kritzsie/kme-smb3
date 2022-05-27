@@ -17,6 +17,7 @@
 namespace kme {
 const StringTable<TileDef::CollisionType> TileDefLoader::collision_table = {
   {"none", TileDef::CollisionType::NONE},
+  {"nonsolid", TileDef::CollisionType::NONSOLID},
   {"solid", TileDef::CollisionType::SOLID},
   {"platform", TileDef::CollisionType::PLATFORM},
   {"slope", TileDef::CollisionType::SLOPE},

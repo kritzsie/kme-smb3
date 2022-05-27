@@ -74,6 +74,12 @@ private:
   void drawEntities();
   void drawHUD();
 
+  static Vec2f fromScreen(Vec2f pos);
+  static Vec2f toScreen(Vec2f pos);
+
+  static Vec2f fromTile(Vec2i pos);
+  static Vec2i toTile(Vec2f pos);
+
 public:
   InputHandler<Action> inputs;
 
@@ -82,12 +88,6 @@ private:
 
   bool suspended = false;
   bool suspended_previous = false;
-
-  Vec2f fromScreen(Vec2f pos);
-  Vec2f toScreen(Vec2f pos);
-
-  Vec2f fromTile(Vec2i pos);
-  Vec2i toTile(Vec2f pos);
 
   float ticktime = 0.f;
   float rendertime = 0.f;
