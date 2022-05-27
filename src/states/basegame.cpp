@@ -50,6 +50,13 @@ void BaseGame::enter() {
 
   mario_rs.pushFrame("SLIP", "smallmarioslip", Rect<int>(0, 0, 14, 16), Vec2f(7, -1), 0.f);
 
+  mario_rs.pushFrame("UNDERWATER", "player1swim_0", Rect<int>(0, 0, 16, 16), Vec2f(8, -1), 16.f / 60.f);
+  mario_rs.pushFrame("UNDERWATER", "player1swim_1", Rect<int>(0, 0, 16, 16), Vec2f(8, -1), 16.f / 60.f);
+
+  mario_rs.pushFrame("SWIM", "player1swim_0", Rect<int>(0, 0, 16, 16), Vec2f(8, -1), 8.f / 60.f);
+  mario_rs.pushFrame("SWIM", "player1paddle_0", Rect<int>(0, 0, 16, 16), Vec2f(8, -1), 8.f / 60.f);
+  mario_rs.pushFrame("SWIM", "player1paddle_1", Rect<int>(0, 0, 16, 16), Vec2f(8, -1), 8.f / 60.f);
+
   mario_rs.pushFrame("DEATH", "mariodeath", Rect<int>(0, 0, 16, 16), Vec2f(8, -1), 0.f);
 
   mario_rs.pushFrame("IDLE.BIG", "bigmariowalk_0", Rect<int>(0, 0, 14, 27), Vec2f(6, -1), 0.f);
@@ -71,6 +78,14 @@ void BaseGame::enter() {
   mario_rs.pushFrame("SLIP.BIG", "bigmarioslip", Rect<int>(0, 0, 16, 28), Vec2f(7, -1), 0.f);
 
   mario_rs.pushFrame("DUCK.BIG", "bigmarioduck", Rect<int>(0, 0, 14, 18), Vec2f(6, -1), 0.f);
+
+  mario_rs.pushFrame("UNDERWATER.BIG", "player1swim_big_0", Rect<int>(0, 0, 16, 16), Vec2f(8, -1), 16.f / 60.f);
+  mario_rs.pushFrame("UNDERWATER.BIG", "player1swim_big_1", Rect<int>(0, 0, 16, 16), Vec2f(8, -1), 16.f / 60.f);
+
+  mario_rs.pushFrame("SWIM.BIG", "player1swim_big_0", Rect<int>(0, 0, 16, 16), Vec2f(8, -1), 8.f / 60.f);
+  mario_rs.pushFrame("SWIM.BIG", "player1paddle_big_0", Rect<int>(0, 0, 16, 16), Vec2f(8, -1), 6.f / 60.f);
+  mario_rs.pushFrame("SWIM.BIG", "player1paddle_big_1", Rect<int>(0, 0, 16, 16), Vec2f(8, -1), 6.f / 60.f);
+
   entity_data.registerRenderStates("Player", std::move(mario_rs));
 
   RenderStates goalcard_rs;

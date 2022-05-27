@@ -104,6 +104,10 @@ void Subworld::update(float delta) {
     if (timers.i_frames > 0.f) {
       timers.i_frames = std::max(timers.i_frames - delta, 0.f);
     }
+
+    if (timers.swim > 0.f) {
+      timers.swim = std::max(timers.swim - delta, 0.f);
+    }
   }
 
   auto info_view = entities.view<CInfo>();
@@ -135,9 +139,7 @@ void Subworld::update(float delta) {
     auto vel_view = entities.view<CVelocity, CState>();
     if (vel_view.contains(entity)) {
       auto& state = vel_view.get<CState>(entity).value;
-      if (state == EState::WALK) {
-        animate_faster = true;
-      }
+      animate_faster = state == EState::WALK or state == EState::UNDERWATER;
     }
 
     if (animate_faster) {
@@ -176,39 +178,51 @@ void Subworld::update(float delta) {
     bool run  = gameplay->inputs.actions.at(Gameplay::Action::RUN) > 0.25f;
     bool duck = gameplay->inputs.actions.at(Gameplay::Action::DOWN) > 0.25f;
 
-    const float max_x = run ? (flags & EFlags::RUNNING ? 12.f : 10.f) : 5.f;
+    const float max_x = [run](bool p_speed, bool underwater, bool airborne) {
+      if (underwater)
+        return airborne ? 6.f : 2.f;
+      else if (run)
+        return p_speed ? 12.f : 10.f;
+      return 5.f;
+    }(
+      flags & EFlags::RUNNING,
+      flags & EFlags::UNDERWATER,
+      flags & EFlags::AIRBORNE
+    );
 
     if (x != 0) {
       direction = toSign(x);
     }
 
     if (flags & EFlags::AIRBORNE) {
+      const bool underwater = flags & EFlags::UNDERWATER;
       flags |= EFlags::NOFRICTION;
       if (x > 0) {
         if (vel.x <= max_x) {
-          vel.x += (vel.x < 0 ? 30.f : 15.f) * delta;
+          vel.x += (underwater ? 0.25f : 1.f) * (vel.x < 0 ? 30.f : 15.f) * delta;
           vel.x = std::min(vel.x, max_x);
         }
       }
       else if (x < 0) {
         if (vel.x >= -max_x) {
-          vel.x -= (vel.x > 0 ? 30.f : 15.f) * delta;
+          vel.x -= (underwater ? 0.25f : 1.f) * (vel.x > 0 ? 30.f : 15.f) * delta;
           vel.x = std::max(vel.x, -max_x);
         }
       }
     }
     else if (x != 0) {
+      const bool underwater = flags & EFlags::UNDERWATER;
       if (x > 0) {
         if (vel.x <= max_x) {
           flags |= EFlags::NOFRICTION;
-          vel.x += (vel.x < 0 ? 30.f : 15.f) * delta;
+          vel.x += (underwater ? 0.25f : 1.f) * (vel.x < 0 ? 30.f : 15.f) * delta;
           vel.x = std::min(vel.x, max_x);
         }
       }
       else if (x < 0) {
         if (vel.x >= -max_x) {
           flags |= EFlags::NOFRICTION;
-          vel.x -= (vel.x > 0 ? 30.f : 15.f) * delta;
+          vel.x -= (underwater ? 0.25f : 1.f) * (vel.x > 0 ? 30.f : 15.f) * delta;
           vel.x = std::max(vel.x, -max_x);
         }
       }
@@ -280,21 +294,32 @@ void Subworld::update(float delta) {
     }
 
     if (jump) {
-      if (~jump_input > 0 and ~flags & EFlags::AIRBORNE) {
-        timers.jump = 0.275f + std::min(std::abs(vel.x) / 10.f / 10.f, 0.125f);
-        if (counters.p_meter > 6.f and timers.p_speed == 0.f) {
-          if (std::abs(vel.x) >= 10.f) {
-            counters.p_meter = 7.f;
-          }
-          timers.p_speed = 4.f;
+      const bool underwater = flags & EFlags::UNDERWATER;
+      if (~jump_input > 0) {
+        if (underwater) {
+          timers.jump = 0.275f + std::min(std::abs(vel.x) / 10.f / 10.f, 0.125f);
+          vel.y = std::min(vel.y + 5.f, 7.5f);
+          timers.swim = 48.f / 60.f;
+          gameplay->playSound("swim");
         }
-        gameplay->playSound("jump");
+        else if (~flags & EFlags::AIRBORNE) {
+          timers.jump = 0.275f + std::min(std::abs(vel.x) / 10.f / 10.f, 0.125f);
+          if (counters.p_meter > 6.f and timers.p_speed == 0.f) {
+            if (std::abs(vel.x) >= 10.f) {
+              counters.p_meter = 7.f;
+            }
+            timers.p_speed = 4.f;
+          }
+          gameplay->playSound("jump");
+        }
       }
 
       if (timers.jump > 0.f) {
-        flags |= EFlags::NOGRAVITY;
-        if (vel.y < 12.f) {
-          vel.y = 12.f;
+        if (not underwater) {
+          flags |= EFlags::NOGRAVITY;
+          if (vel.y < 12.f) {
+            vel.y = 12.f;
+          }
         }
         timers.jump = std::max(timers.jump - 1.f * delta, 0.f);
       }
@@ -315,7 +340,15 @@ void Subworld::update(float delta) {
       state = EState::DUCK;
     }
     else if (flags & EFlags::AIRBORNE) {
-      if (~flags & EFlags::RUNNING) {
+      if (flags & EFlags::UNDERWATER) {
+        if (timers.swim > 0.f) {
+          state = EState::SWIM;
+        }
+        else {
+          state = EState::UNDERWATER;
+        }
+      }
+      else if (~flags & EFlags::RUNNING) {
         state = EState::AIRBORNE;
       }
       else {
@@ -323,7 +356,7 @@ void Subworld::update(float delta) {
       }
     }
     else if (~flags & EFlags::AIRBORNE) {
-      if (x != 0 and direction * vel.x < 0) {
+      if (~flags & EFlags::UNDERWATER and x != 0 and direction * vel.x < 0) {
         state = EState::SLIP;
         if (audio.channels.slip == Sound::MAX_VOICES) {
           audio.channels.slip = gameplay->playSoundLoop("slip");
@@ -374,9 +407,9 @@ void Subworld::update(float delta) {
     // apply gravity
     float gravity = getGravity();
     if (~flags & EFlags::NOGRAVITY) {
-      const float min_y = -15.f;
+      const float min_y = flags & EFlags::UNDERWATER ? -7.5f : -15.f;
 
-      vel.y += gravity * delta;
+      vel.y += (flags & EFlags::UNDERWATER ? 0.125f : 1.f) * gravity * delta;
       vel.y = std::max(vel.y, min_y);
     }
 
@@ -589,19 +622,12 @@ void Subworld::checkWorldCollisions(Entity entity) {
       TileID tileid = tilemap.getTile(tile);
       Rect<float> tile_aabb = Rect<float>(x, y, 1.f, 1.f);
       switch (basegame->level_tile_data.getTileDef(tileid).getCollisionType()) {
-      case TileDef::CollisionType::SOLID: {
+      default:
         if (geo::intersects(ent_aabb, tile_aabb)) {
           genCollisionEvent(entity, tile);
         }
         break;
-      }
-      case TileDef::CollisionType::PLATFORM: {
-        if (coll.pos_old.y >= y + 0.5f) {
-          genCollisionEvent(entity, tile);
-        }
-        break;
-      }
-      default:
+      case TileDef::CollisionType::NONE:
         break;
       }
     }
@@ -614,24 +640,31 @@ void Subworld::handleWorldCollisions(Entity entity) {
   auto& vel = entities.get<CVelocity>(entity).value;
   auto& coll = entities.get<CCollision>(entity);
 
+  Vec2f pos_old = coll.pos_old;
+
   Vec2f best_move;
+  Vec2f best_push;
 
   for (const auto& tile : coll.tiles) {
-    Vec2f pos_new = Vec2f(pos.x, coll.pos_old.y);
+    Vec2f pos_new = Vec2f(pos.x, pos_old.y);
     auto tileid = tilemap.getTile(tile);
     TileDef tile_data = basegame->level_tile_data.getTileDef(tileid);
     Rect<float> ent_aabb = coll.hitbox.toAABB(pos_new);
     Rect<float> tile_aabb = Rect<float>(tile.pos.x, tile.pos.y, 1.f, 1.f);
+    Vec2f ent_midpoint = geo::midpoint(ent_aabb);
+    Vec2f tile_midpoint = geo::midpoint(tile_aabb);
     if (geo::intersects(ent_aabb, tile_aabb)) {
       auto collision = ent_aabb & tile_aabb;
       switch (tile_data.getCollisionType()) {
       case TileDef::CollisionType::SOLID:
-        if (coll.pos_old.x >= pos_new.x)
-          best_move.x = collision.width;
-        else
-          best_move.x = -collision.width;
-        break;
-      case TileDef::CollisionType::SLOPE:
+        if (collision.height > 2.f / 16.f) {
+          if (ent_midpoint.x > tile_midpoint.x) {
+            best_move.x = collision.width;
+          }
+          else if (ent_midpoint.x < tile_midpoint.x) {
+            best_move.x = -collision.width;
+          }
+        }
         break;
       default:
         break;
@@ -645,20 +678,29 @@ void Subworld::handleWorldCollisions(Entity entity) {
     TileDef tiledef = basegame->level_tile_data.getTileDef(tileid);
     Rect<float> ent_aabb = coll.hitbox.toAABB(pos_new);
     Rect<float> tile_aabb = Rect<float>(tile.pos.x, tile.pos.y, 1.f, 1.f);
+    Vec2f ent_midpoint = geo::midpoint(ent_aabb);
+    Vec2f tile_midpoint = geo::midpoint(tile_aabb);
     if (geo::intersects(ent_aabb, tile_aabb)) {
       auto collision = ent_aabb & tile_aabb;
       switch (tiledef.getCollisionType()) {
       case TileDef::CollisionType::SOLID:
-        if (coll.pos_old.y >= pos_new.y)
-          best_move.y = collision.height;
-        else
-          best_move.y = -collision.height;
+        if (ent_midpoint.y > tile_midpoint.y) {
+          if (collision.width > 2.f / 16.f) {
+            best_move.y = collision.height;
+          }
+        }
+        else if (ent_midpoint.y < tile_midpoint.y) {
+          if (collision.width > 4.f / 16.f) {
+            best_move.y = -collision.height;
+          }
+        }
         break;
       case TileDef::CollisionType::PLATFORM:
-        if (coll.pos_old.y >= pos_new.y)
-          best_move.y = collision.height;
-        break;
-      case TileDef::CollisionType::SLOPE:
+        if (vel.y < 0.f and pos_old.y >= tile_midpoint.y - 2.f / 16.f) {
+          if (collision.width > 2.f / 16.f) {
+            best_move.y = collision.height;
+          }
+        }
         break;
       default:
         break;
@@ -667,6 +709,30 @@ void Subworld::handleWorldCollisions(Entity entity) {
   }
 
   pos += best_move;
+
+  bool underwater = false;
+
+  for (const auto& tile : coll.tiles) {
+    auto tileid = tilemap.getTile(tile);
+    TileDef tile_data = basegame->level_tile_data.getTileDef(tileid);
+    Rect<float> ent_aabb = coll.hitbox.toAABB(pos);
+    Rect<float> tile_aabb = Rect<float>(tile.pos.x, tile.pos.y, 1.f, 1.f);
+    if (geo::contains(tile_aabb, geo::midpoint(ent_aabb))) {
+      switch (tile_data.getCollisionType()) {
+      case TileDef::CollisionType::WATER:
+        underwater = true;
+        break;
+      case TileDef::CollisionType::WATERFALL:
+        underwater = true;
+        best_push.y = -0.25f;
+        break;
+      default:
+        break;
+      }
+    }
+  }
+
+  vel += best_push;
 
   if (flags & EFlags::ENEMY
   or  flags & EFlags::POWERUP) {
@@ -680,10 +746,10 @@ void Subworld::handleWorldCollisions(Entity entity) {
     }
   }
   else {
-    if (best_move.x > 0.f) {
+    if (best_move.x > 0.f and vel.x < 0.f) {
       vel.x = 0.f;
     }
-    else if (best_move.x < 0.f) {
+    else if (best_move.x < 0.f and vel.x > 0.f) {
       vel.x = 0.f;
     }
   }
@@ -696,23 +762,32 @@ void Subworld::handleWorldCollisions(Entity entity) {
       flags &= ~EFlags::LANDED;
     }
     flags &= ~EFlags::AIRBORNE;
-    vel.y = 0.f;
+
+    if (vel.y < 0.f) {
+      vel.y = 0.f;
+    }
   }
   else {
     flags |= EFlags::AIRBORNE;
     flags &= ~EFlags::LANDED;
 
-    if (best_move.y < 0.f) {
+    if (best_move.y < 0.f and vel.y > 0.f) {
       auto timers_view = entities.view<CTimers>();
       if (timers_view.contains(entity)) {
         auto& timers = timers_view.get<CTimers>(entity);
         timers.jump = 0.f;
       }
-      if (vel.y > 0.f) {
-        gameplay->playSound("bump");
-      }
+
+      gameplay->playSound("bump");
       vel.y = 0.f;
     }
+  }
+
+  if (underwater) {
+    flags |= EFlags::UNDERWATER;
+  }
+  else {
+    flags &= ~EFlags::UNDERWATER;
   }
 }
 
@@ -726,15 +801,16 @@ void Subworld::checkEntityCollisions(Entity entity1) {
     return; // Intangible entities don't collide with other entities
 
   for (auto entity2 : collision_view) {
-    auto& flags2 = collision_view.get<CFlags>(entity2).value;
-    auto& pos2 = collision_view.get<CPosition>(entity2).value;
-    auto& coll2 = collision_view.get<CCollision>(entity2);
-
     if (entity1 == entity2)
       continue; // Don't collide with self!
 
+    auto& flags2 = collision_view.get<CFlags>(entity2).value;
+
     if (flags2 & EFlags::INTANGIBLE)
       continue;
+
+    auto& pos2 = collision_view.get<CPosition>(entity2).value;
+    auto& coll2 = collision_view.get<CCollision>(entity2);
 
     Rect<float> entity1_aabb = coll1.hitbox.toAABB(pos1);
     Rect<float> entity2_aabb = coll2.hitbox.toAABB(pos2);

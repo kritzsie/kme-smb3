@@ -34,7 +34,8 @@ struct EFlags {
     NOCLIP     = 1 << 7,
 
     AIRBORNE   = 1 << 8,
-    LANDED     = 1 << 9,
+    UNDERWATER = 1 << 9,
+    LANDED     = 1 << 12,
 
     SOLID      = 1 << 16,
     INTANGIBLE = 1 << 17,
@@ -89,12 +90,13 @@ struct CTimers {
   float i_frames = 0.f;
   float jump = 0.f;
   float p_speed = 0.f;
+  float swim = 0.f;
 };
 
 struct CRender {
-  Vec2f scale = Vec2f(1.f, 1.f);
   RenderState state;
   float time = 0.f;
+  Vec2f scale = Vec2f(1.f, 1.f);
 };
 
 struct CAudio {
