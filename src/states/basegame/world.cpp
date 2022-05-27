@@ -294,11 +294,12 @@ void Subworld::update(float delta) {
     }
 
     if (jump) {
-      const bool underwater = flags & EFlags::UNDERWATER;
       if (~jump_input > 0) {
-        if (underwater) {
-          timers.jump = 0.275f + std::min(std::abs(vel.x) / 10.f / 10.f, 0.125f);
-          vel.y = std::min(vel.y + 5.f, 7.5f);
+        if (flags & EFlags::UNDERWATER) {
+          vel.y += 5.f;
+          if (vel.y > 0.f) {
+            timers.jump = 0.275f + std::min(std::abs(vel.x) / 10.f / 10.f, 0.125f);
+          }
           timers.swim = 48.f / 60.f;
           gameplay->playSound("swim");
         }
@@ -315,7 +316,7 @@ void Subworld::update(float delta) {
       }
 
       if (timers.jump > 0.f) {
-        if (not underwater) {
+        if (~flags & EFlags::UNDERWATER) {
           flags |= EFlags::NOGRAVITY;
           if (vel.y < 12.f) {
             vel.y = 12.f;
@@ -405,12 +406,17 @@ void Subworld::update(float delta) {
     auto& vel = move_view.get<CVelocity>(entity).value;
 
     // apply gravity
-    float gravity = getGravity();
     if (~flags & EFlags::NOGRAVITY) {
+      const float gravity = getGravity();
       const float min_y = flags & EFlags::UNDERWATER ? -7.5f : -15.f;
-
       vel.y += (flags & EFlags::UNDERWATER ? 0.125f : 1.f) * gravity * delta;
       vel.y = std::max(vel.y, min_y);
+    }
+
+    // limit underwater upward speed
+    if (flags & EFlags::UNDERWATER) {
+      const float max_y = 7.5f;
+      vel.y = std::min(vel.y, max_y);
     }
 
     // apply friction
@@ -710,7 +716,9 @@ void Subworld::handleWorldCollisions(Entity entity) {
 
   pos += best_move;
 
-  bool underwater = false;
+  enum class WaterType {
+    NONE, WATER, WATERFALL
+  } watertype = WaterType::NONE;
 
   for (const auto& tile : coll.tiles) {
     auto tileid = tilemap.getTile(tile);
@@ -720,10 +728,10 @@ void Subworld::handleWorldCollisions(Entity entity) {
     if (geo::contains(tile_aabb, geo::midpoint(ent_aabb))) {
       switch (tile_data.getCollisionType()) {
       case TileDef::CollisionType::WATER:
-        underwater = true;
+        watertype = WaterType::WATER;
         break;
       case TileDef::CollisionType::WATERFALL:
-        underwater = true;
+        watertype = WaterType::WATERFALL;
         best_push.y = -0.25f;
         break;
       default:
@@ -783,7 +791,11 @@ void Subworld::handleWorldCollisions(Entity entity) {
     }
   }
 
-  if (underwater) {
+  if (watertype != WaterType::NONE) {
+    if (watertype == WaterType::WATER
+    and ~flags & EFlags::UNDERWATER) {
+      vel = Vec2f(0.f, 0.f);
+    }
     flags |= EFlags::UNDERWATER;
   }
   else {
@@ -793,19 +805,18 @@ void Subworld::handleWorldCollisions(Entity entity) {
 
 void Subworld::checkEntityCollisions(Entity entity1) {
   auto& flags1 = entities.get<CFlags>(entity1).value;
+  if (flags1 & EFlags::INTANGIBLE)
+    return; // Intangible entities don't collide with other entities
+
   auto& pos1 = entities.get<CPosition>(entity1).value;
   auto& coll1 = entities.get<CCollision>(entity1);
 
   auto collision_view = entities.view<CFlags, CPosition, CCollision>();
-  if (flags1 & EFlags::INTANGIBLE)
-    return; // Intangible entities don't collide with other entities
-
   for (auto entity2 : collision_view) {
     if (entity1 == entity2)
       continue; // Don't collide with self!
 
     auto& flags2 = collision_view.get<CFlags>(entity2).value;
-
     if (flags2 & EFlags::INTANGIBLE)
       continue;
 
