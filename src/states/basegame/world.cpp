@@ -482,7 +482,7 @@ void Subworld::update(float delta) {
       pos.y = std::clamp(
         pos.y,
         0.f + bounds.y,
-        bounds.height - coll.hitbox.height / 2 + bounds.y
+        bounds.height - coll.hitbox.height + bounds.y
       );
     }
 
