@@ -166,37 +166,33 @@ void Subworld::update(float delta) {
     auto& render = entities.get<CRender>(player);
     auto& audio = entities.get<CAudio>(player);
 
-    const auto& hitbox_table = basegame->entity_data.getHitboxes(info.type);
-    const auto& hitbox_states = hitbox_table.at(powerup);
+    auto& hitbox_table = basegame->entity_data.getHitboxes(info.type);
+    auto& hitbox_states = hitbox_table.at(powerup);
 
     float x = 0.f;
     x += gameplay->inputs.actions.at(Gameplay::Action::RIGHT) > 0.25f;
     x -= gameplay->inputs.actions.at(Gameplay::Action::LEFT)  > 0.25f;
     x = std::clamp(x, -1.f, 1.f);
 
-    const auto& jump_input = gameplay->inputs.actions.at(Gameplay::Action::JUMP);
+    auto& jump_input = gameplay->inputs.actions.at(Gameplay::Action::JUMP);
     bool jump = jump_input > 0.25f;
     bool run  = gameplay->inputs.actions.at(Gameplay::Action::RUN) > 0.25f;
     bool duck = gameplay->inputs.actions.at(Gameplay::Action::DOWN) > 0.25f;
 
-    const float max_x = [run](bool p_speed, bool underwater, bool airborne) {
+    float max_x = [run](bool p_speed, bool underwater, bool airborne) {
       if (underwater)
         return airborne ? 6.f : 2.f;
       else if (run)
         return p_speed ? 12.f : 10.f;
       return 5.f;
-    }(
-      flags & EFlags::RUNNING,
-      flags & EFlags::UNDERWATER,
-      flags & EFlags::AIRBORNE
-    );
+    }(flags & EFlags::RUNNING, flags & EFlags::UNDERWATER, flags & EFlags::AIRBORNE);
 
     if (x != 0) {
       direction = toSign(x);
     }
 
     if (flags & EFlags::AIRBORNE) {
-      const bool underwater = flags & EFlags::UNDERWATER;
+      bool underwater = flags & EFlags::UNDERWATER;
       flags |= EFlags::NOFRICTION;
       if (x > 0) {
         if (vel.x <= max_x) {
@@ -212,7 +208,7 @@ void Subworld::update(float delta) {
       }
     }
     else if (x != 0) {
-      const bool underwater = flags & EFlags::UNDERWATER;
+      bool underwater = flags & EFlags::UNDERWATER;
       if (x > 0) {
         if (vel.x <= max_x) {
           flags |= EFlags::NOFRICTION;
@@ -334,7 +330,7 @@ void Subworld::update(float delta) {
       timers.jump = 0.f;
     }
 
-    EState state_prev = state;
+    auto state_old = state;
     if (flags & EFlags::DEAD) {
       state = EState::DEAD;
     }
@@ -375,10 +371,10 @@ void Subworld::update(float delta) {
       }
     }
 
-    if (state != state_prev) {
+    if (state != state_old) {
       render.time = 0.f;
 
-      if (state_prev == EState::SLIP) {
+      if (state_old == EState::SLIP) {
         gameplay->stopSoundLoop(audio.channels.slip);
         audio.channels.slip = Sound::MAX_VOICES;
       }
@@ -408,15 +404,15 @@ void Subworld::update(float delta) {
 
     // apply gravity
     if (~flags & EFlags::NOGRAVITY) {
-      const float gravity = getGravity();
-      const float min_y = flags & EFlags::UNDERWATER ? -7.5f : -15.f;
+      float gravity = getGravity();
+      float min_y = flags & EFlags::UNDERWATER ? -7.5f : -15.f;
       vel.y += (flags & EFlags::UNDERWATER ? 0.125f : 1.f) * gravity * delta;
       vel.y = std::max(vel.y, min_y);
     }
 
     // limit underwater upward speed
     if (flags & EFlags::UNDERWATER) {
-      const float max_y = 7.5f;
+      float max_y = 7.5f;
       vel.y = std::min(vel.y, max_y);
     }
 
@@ -542,7 +538,7 @@ void Subworld::update(float delta) {
     auto& state = renderstate_view.get<CState>(entity).value;
     auto& render = renderstate_view.get<CRender>(entity);
 
-    const auto& states = basegame->entity_data.getRenderStates(info.type);
+    auto& states = basegame->entity_data.getRenderStates(info.type);
 
     std::string label = getStateName(state).data();
     if (powerup_view.contains(entity)) {
@@ -603,11 +599,8 @@ void Subworld::genCollisionEvent(Entity entity1, Entity entity2) {
 }
 
 void Subworld::consumeEvents() {
-  for (const auto& event : world_collisions) {
-  }
-
-  for (const auto& event : entity_collisions) {
-  }
+  for (auto event : world_collisions) {}
+  for (auto event : entity_collisions) {}
 
   world_collisions.clear();
   entity_collisions.clear();
@@ -653,7 +646,7 @@ void Subworld::handleWorldCollisions(Entity entity) {
   Vec2f best_push;
 
   std::vector<Tile> coins_collected;
-  std::vector<Tile> tiles_hit;
+  std::vector<Tile> itemblocks_hit;
 
   for (const auto& tile : coll.tiles) {
     Vec2f pos_new = Vec2f(pos.x, pos_old.y);
@@ -702,10 +695,11 @@ void Subworld::handleWorldCollisions(Entity entity) {
         else if (ent_midpoint.y < tile_midpoint.y) {
           if (collision.width > 4.f / 16.f) {
             best_move.y = -collision.height;
+
             if (vel.y > 0.f) {
               if (tileid == "BrickGold"
               or  tileid == "QuestionBlock") {
-                tiles_hit.push_back(tile);
+                itemblocks_hit.push_back(tile);
               }
             }
           }
@@ -734,58 +728,32 @@ void Subworld::handleWorldCollisions(Entity entity) {
     TileDef tile_data = basegame->level_tile_data.getTileDef(tileid);
     Rect<float> ent_aabb = coll.hitbox.toAABB(pos_new);
     Rect<float> tile_aabb = Rect<float>(tile.pos.x, tile.pos.y, 1.f, 1.f);
-    if (geo::contains(tile_aabb, geo::midpoint(ent_aabb))) {
-      switch (tile_data.getCollisionType()) {
-      case TileDef::CollisionType::NONSOLID:
-        if (tileid == "CoinGold")
+    switch (tile_data.getCollisionType()) {
+    case TileDef::CollisionType::NONSOLID:
+      if (geo::intersects(ent_aabb, tile_aabb)) {
+        if (tileid == "CoinGold") {
           coins_collected.push_back(tile);
-        break;
-      case TileDef::CollisionType::WATER:
+        }
+      }
+      break;
+    case TileDef::CollisionType::WATER:
+      if (geo::contains(tile_aabb, geo::midpoint(ent_aabb))) {
         watertype = WaterType::WATER;
-        break;
-      case TileDef::CollisionType::WATERFALL:
+      }
+      break;
+    case TileDef::CollisionType::WATERFALL:
+      if (geo::contains(tile_aabb, geo::midpoint(ent_aabb))) {
         watertype = WaterType::WATERFALL;
         best_push.y = -0.25f;
-        break;
-      default:
-        break;
       }
+      break;
+    default:
+      break;
     }
   }
 
   pos += best_move;
   vel += best_push;
-
-  if (entity == player) {
-    for (auto& tile : coins_collected) {
-      basegame->addCoins(1);
-      tilemap.setTile(tile, "");
-      gameplay->playSound("coin");
-    }
-
-    if (tiles_hit.size()) {
-      std::sort(tiles_hit.begin(), tiles_hit.end(),
-        [pos](Tile a, Tile b) -> bool {
-          float a_dist = pos.x - a.pos.x + 0.5f;
-          float b_dist = pos.x - b.pos.x + 0.5f;
-          return a.pos.y < b.pos.y or a_dist < b_dist;
-        }
-      );
-      Tile& tile = tiles_hit[0];
-      TileID tileid = tilemap.getTile(tile);
-      if (tileid == "BrickGold") {
-        auto& powerup = entities.get<CPowerup>(entity).value;
-        if (getPowerupTier(powerup) > 0) {
-          tilemap.setTile(tile, "");
-        }
-      }
-      else if (tileid == "QuestionBlock") {
-        basegame->addCoins(1);
-        tilemap.setTile(tile, "EmptyBlock");
-        gameplay->playSound("coin");
-      }
-    }
-  }
 
   if (flags & EFlags::ENEMY
   or  flags & EFlags::POWERUP) {
@@ -833,6 +801,40 @@ void Subworld::handleWorldCollisions(Entity entity) {
 
       gameplay->playSound("bump");
       vel.y = 0.f;
+    }
+  }
+
+  if (entity == player) {
+    for (auto& tile : coins_collected) {
+      basegame->addCoins(1);
+      tilemap.setTile(tile, "");
+      gameplay->playSound("coin");
+    }
+
+    if (itemblocks_hit.size()) {
+      std::sort(itemblocks_hit.begin(), itemblocks_hit.end(),
+        [pos](Tile a, Tile b) -> bool {
+          float a_dist = pos.x - a.pos.x + 0.5f;
+          float b_dist = pos.x - b.pos.x + 0.5f;
+          return a.pos.y < b.pos.y or a_dist < b_dist;
+        }
+      );
+      Tile& tile = itemblocks_hit[0];
+      TileID tileid = tilemap.getTile(tile);
+      if (tileid == "BrickGold") {
+        vel.y += -7.5f;
+        auto& powerup = entities.get<CPowerup>(entity).value;
+        if (getPowerupTier(powerup) > 0) {
+          tilemap.setTile(tile, "");
+          gameplay->playSound("smash");
+        }
+      }
+      else if (tileid == "QuestionBlock") {
+        vel.y += -7.5f;
+        basegame->addCoins(1);
+        tilemap.setTile(tile, "EmptyBlock");
+        gameplay->playSound("coin");
+      }
     }
   }
 

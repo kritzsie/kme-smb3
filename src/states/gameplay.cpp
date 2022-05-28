@@ -97,7 +97,7 @@ void Gameplay::enter() {
   auto& entities = subworld.getEntities();
 
   auto player = entities.create();
-  auto player_powerup = Powerup::NONE;
+  auto player_powerup = Powerup::MUSHROOM;
   auto player_state = EState::IDLE;
   const auto& player_hitbox = getBaseGame() \
     ->entity_data.getHitboxes("Player").at(player_powerup).at(player_state);
@@ -120,6 +120,11 @@ void Gameplay::enter() {
   entities.emplace<CPosition>(camera, Vec2f(15.f, 0.f));
   entities.emplace<CCollision>(camera, Hitbox(15.f, 16.875f));
   subworld.camera = camera;
+
+  auto sign = entities.create();
+  entities.emplace<CInfo>(sign, "StartSign");
+  entities.emplace<CPosition>(sign, Vec2f(5.f, 1.f));
+  entities.emplace<CRender>(sign);
 
   auto goalcard = entities.create();
   entities.emplace<CInfo>(goalcard, "GoalCard");
