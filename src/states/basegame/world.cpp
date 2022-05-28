@@ -237,6 +237,11 @@ void Subworld::update(float delta) {
         flags &= ~EFlags::DUCKING;
       }
     }
+    else {
+      if (flags & EFlags::UNDERWATER and flags & EFlags::DUCKING) {
+        flags &= ~EFlags::DUCKING;
+      }
+    }
 
     if (timers.p_speed > 0.f) {
       bool reset_p_meter = false;
@@ -474,16 +479,10 @@ void Subworld::update(float delta) {
       }
 
       // restrict camera to world boundaries
-      pos.x = std::clamp(
-        pos.x,
-        coll.hitbox.radius + bounds.x,
-        bounds.width - coll.hitbox.radius + bounds.x
-      );
-      pos.y = std::clamp(
-        pos.y,
-        0.f + bounds.y,
-        bounds.height - coll.hitbox.height + bounds.y
-      );
+      pos.x = std::clamp(pos.x, coll.hitbox.radius + bounds.x,
+                         bounds.width - coll.hitbox.radius + bounds.x);
+      pos.y = std::clamp(pos.y,0.f + bounds.y,
+                         bounds.height - coll.hitbox.height + bounds.y);
     }
 
     if (entities.valid(player)) {
