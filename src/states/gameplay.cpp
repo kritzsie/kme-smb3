@@ -92,39 +92,25 @@ void Gameplay::enter() {
   loader.load(level);
 
   Subworld& subworld = level.getSubworld(current_subworld);
+  EntityRegistry& entities = subworld.getEntities();
 
-  // entities
-  auto& entities = subworld.getEntities();
-
-  auto player = entities.create();
-  auto player_powerup = Powerup::NONE;
-  auto player_state = EState::IDLE;
-  const auto& player_hitbox = getBaseGame() \
-    ->entity_data.getHitboxes("Player").at(player_powerup).at(player_state);
-  entities.emplace<CInfo>(player, "Player");
-  entities.emplace<CPosition>(player, Vec2f(2.f, 1.f));
-  entities.emplace<CPowerup>(player, player_powerup);
-  entities.emplace<CState>(player, player_state);
-  entities.emplace<CCollision>(player, player_hitbox);
-  entities.emplace<CVelocity>(player);
-  entities.emplace<CDirection>(player);
-  entities.emplace<CFlags>(player);
-  entities.emplace<CCounters>(player);
-  entities.emplace<CTimers>(player);
-  entities.emplace<CRender>(player);
-  entities.emplace<CAudio>(player);
-  subworld.player = player;
-
-  auto camera = entities.create();
-  entities.emplace<CInfo>(camera, "Camera", player);
-  entities.emplace<CPosition>(camera, Vec2f(15.f, 0.f));
-  entities.emplace<CCollision>(camera, Hitbox(15.f, 16.875f));
-  subworld.camera = camera;
+  Entity player = subworld.player = getBaseGame()->getSpawner(entities, "Player")(Vec2f(2.f, 1.f));
+  Entity camera = subworld.camera = getBaseGame()->getSpawner(entities, "Camera")(Vec2f());
+  entities.get<CInfo>(camera).parent = player;
 
   subworld.loadEntities();
 
-  const auto& theme = getBaseGame()->themes.at(subworld.getTheme());
-  playMusic(theme.music);
+  auto playerstart_view = entities.view<CInfo, CPosition>();
+  for (auto entity : playerstart_view) {
+    auto& info = playerstart_view.get<CInfo>(entity);
+    if (info.type == "PlayerStart") {
+      auto& pos = playerstart_view.get<CPosition>(entity).value;
+      auto& player_pos = entities.get<CPosition>(player).value;
+      player_pos = pos + Vec2f(-3.f, 0.f);
+    }
+  }
+
+  playMusic(getBaseGame()->themes.at(subworld.getTheme()).music);
 }
 
 void Gameplay::exit() {}

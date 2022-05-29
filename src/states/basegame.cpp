@@ -39,14 +39,34 @@ void BaseGame::enter() {
   TileDefLoader loader;
   loader.load(level_tile_data);
 
+  entity_spawn_data["Player"] = [this](EntityRegistry& entities, Entity entity) {
+    EntityType type = "Player";
+    auto powerup = Powerup::NONE;
+    auto state = EState::IDLE;
+    auto& hitbox = entity_data.getHitboxes(type).at(powerup).at(state);
+    entities.emplace<CPowerup>(entity, powerup);
+    entities.emplace<CState>(entity, state);
+    entities.emplace<CCollision>(entity, hitbox);
+    entities.emplace<CVelocity>(entity);
+    entities.emplace<CDirection>(entity);
+    entities.emplace<CFlags>(entity);
+    entities.emplace<CCounters>(entity);
+    entities.emplace<CTimers>(entity);
+    entities.emplace<CRender>(entity);
+    entities.emplace<CAudio>(entity);
+  };
+
+  entity_spawn_data["Camera"] = [](EntityRegistry& entities, Entity entity) {
+    entities.emplace<CCollision>(entity, Hitbox(15.f, 16.875f));
+  };
+
   entity_spawn_data["PlayerStart"] = [this](EntityRegistry& entities, Entity entity) {
     auto& pos = entities.get<CPosition>(entity).value;
-    auto spawner = getSpawner(entities, "StartSign");
-    spawner(pos);
+    auto sign_spawner = getSpawner(entities, "StartSign");
+    sign_spawner(pos);
   };
 
   entity_spawn_data["StartSign"] = [](EntityRegistry& entities, Entity entity) {
-    auto& pos = entities.get<CPosition>(entity).value;
     entities.emplace<CRender>(entity);
   };
 
