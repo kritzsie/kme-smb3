@@ -1,4 +1,4 @@
-#include "entitydata.hpp"
+#include "entitydefs.hpp"
 
 #include "../entity.hpp"
 #include "components.hpp"
@@ -6,7 +6,7 @@
 #include <sstream>
 
 namespace kme {
-void EntityData::registerHitboxes(EntityType type, Hitboxes states) {
+void EntityDefs::registerHitboxes(EntityType type, Hitboxes states) {
   if (hitboxes.find(type) != hitboxes.end()) {
     std::stringstream ss;
     ss << "attempted to redefine hitboxes of entity \"" << type << "\"";
@@ -15,11 +15,11 @@ void EntityData::registerHitboxes(EntityType type, Hitboxes states) {
   hitboxes[type] = states;
 }
 
-const EntityData::Hitboxes& EntityData::getHitboxes(EntityType type) const {
+const EntityDefs::Hitboxes& EntityDefs::getHitboxes(EntityType type) const {
   return hitboxes.at(type);
 }
 
-void EntityData::registerRenderStates(EntityType type, RenderStates rs) {
+void EntityDefs::registerRenderStates(EntityType type, RenderStates rs) {
   if (render_states.find(type) != render_states.end()) {
     std::stringstream ss;
     ss << "attempted to redefine render states of entity \"" << type << "\"";
@@ -28,7 +28,7 @@ void EntityData::registerRenderStates(EntityType type, RenderStates rs) {
   render_states[type] = rs;
 }
 
-const RenderStates& EntityData::getRenderStates(EntityType type) const {
+const RenderStates& EntityDefs::getRenderStates(EntityType type) const {
   return render_states.at(type);
 }
 }

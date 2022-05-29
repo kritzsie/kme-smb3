@@ -377,7 +377,7 @@ void Gameplay::drawTiles() {
 
 void Gameplay::drawEntities() {
   const Subworld& subworld = level.getSubworld(current_subworld);
-  const EntityData& entity_data = getBaseGame()->entity_data;
+  const EntityDefs& entity_data = getBaseGame()->entity_data;
   const EntityRegistry& entities = subworld.getEntities();
 
   auto view = entities.view<CInfo, CPosition, CRender>();

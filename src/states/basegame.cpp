@@ -29,7 +29,7 @@ void BaseGame::enter() {
   TileDefLoader loader;
   loader.load(level_tile_data);
 
-  EntityData::Hitboxes mario_hb;
+  EntityDefs::Hitboxes mario_hb;
   mario_hb[Powerup::NONE][EState::IDLE] = Hitbox(6.f / 16.f, 15.f / 16.f);
   mario_hb[Powerup::MUSHROOM][EState::IDLE] = Hitbox(6.f / 16.f, 25.f / 16.f);
   mario_hb[Powerup::MUSHROOM][EState::DUCK] = Hitbox(6.f / 16.f, 15.f / 16.f);

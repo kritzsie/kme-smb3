@@ -11,11 +11,6 @@
 namespace kme {
 class LevelLoader {
 public:
-  struct EntityData {
-    std::vector<EntityType> types;
-    std::vector<Vec2f> pos;
-  };
-
   struct SubworldData {
     EntityData entities;
     Tilemap tilemap;

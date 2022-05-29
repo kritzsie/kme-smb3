@@ -16,7 +16,7 @@ public:
   using runtime_error::runtime_error;
 };
 
-class EntityData {
+class EntityDefs {
 public:
   using Hitboxes = std::map<Powerup, std::map<EState, Hitbox>>;
 

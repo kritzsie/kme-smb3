@@ -6,7 +6,7 @@
 #include "../renderstates.hpp"
 #include "../sound.hpp"
 #include "../types.hpp"
-#include "basegame/ecs/entitydata.hpp"
+#include "basegame/ecs/entitydefs.hpp"
 #include "basegame/theme.hpp"
 #include "basegame/tiledefs.hpp"
 #include "basestate.hpp"
@@ -44,7 +44,7 @@ private:
   bool paused = false;
 
 public:
-  EntityData entity_data;
+  EntityDefs entity_data;
   TileDefs level_tile_data;
 
   StringTable<RenderFrames> backgrounds;

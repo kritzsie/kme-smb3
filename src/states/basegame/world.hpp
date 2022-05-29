@@ -3,6 +3,7 @@
 #include "../../math.hpp"
 #include "ecs/ecs.hpp"
 #include "collision.hpp"
+#include "entity.hpp"
 #include "theme.hpp"
 #include "tilemap.hpp"
 
@@ -34,6 +35,7 @@ public:
 
   const EntityRegistry& getEntities() const;
   EntityRegistry& getEntities();
+  void setEntities(const EntityData& entities);
 
   const Tilemap& getTilemap() const;
   Tilemap& getTilemap();
