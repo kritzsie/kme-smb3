@@ -72,17 +72,17 @@ TileDefs::TileDefs(TileDef default_tile) {
   registerTileDef("", std::move(default_tile));
 }
 
-void TileDefs::registerTileDef(TileID tileid, TileDef tiledef) {
-  if (tiledefs.find(tileid) != tiledefs.end()) {
+void TileDefs::registerTileDef(TileType tile_type, TileDef tiledef) {
+  if (tiledefs.find(tile_type) != tiledefs.end()) {
     std::stringstream ss;
-    ss << "attempted to redefine tile with id \"" << tileid << "\"";
+    ss << "attempted to redefine tile with id \"" << tile_type << "\"";
     throw TileRedefinitionError(ss.str());
   }
-  tiledefs[tileid] = std::move(tiledef);
+  tiledefs[tile_type] = std::move(tiledef);
 }
 
-const TileDef& TileDefs::getTileDef(TileID tileid) const {
-  return tiledefs.at(tileid);
+const TileDef& TileDefs::getTileDef(TileType tile_type) const {
+  return tiledefs.at(tile_type);
 }
 
 const TileDefs::const_iterator TileDefs::begin() const { return tiledefs.begin(); }

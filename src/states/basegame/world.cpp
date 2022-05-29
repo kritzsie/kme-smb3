@@ -618,9 +618,9 @@ void Subworld::checkWorldCollisions(Entity entity) {
     for (int y = range.y; y < range.y + range.height; ++y)
     for (int x = range.x; x < range.x + range.width;  ++x) {
       Tile tile(iter->first, x, y);
-      TileID tileid = tilemap.getTile(tile);
+      TileType tile_type = tilemap.getTile(tile);
       Rect<float> tile_aabb = Rect<float>(x, y, 1.f, 1.f);
-      switch (basegame->level_tile_data.getTileDef(tileid).getCollisionType()) {
+      switch (basegame->level_tile_data.getTileDef(tile_type).getCollisionType()) {
       default:
         if (geo::intersects(ent_aabb, tile_aabb)) {
           genCollisionEvent(entity, tile);
@@ -649,8 +649,8 @@ void Subworld::handleWorldCollisions(Entity entity) {
 
   for (const auto& tile : coll.tiles) {
     Vec2f pos_new = Vec2f(pos.x, pos_old.y);
-    auto tileid = tilemap.getTile(tile);
-    TileDef tile_data = basegame->level_tile_data.getTileDef(tileid);
+    auto tile_type = tilemap.getTile(tile);
+    TileDef tile_data = basegame->level_tile_data.getTileDef(tile_type);
     Rect<float> ent_aabb = coll.hitbox.toAABB(pos_new);
     Rect<float> tile_aabb = Rect<float>(tile.pos.x, tile.pos.y, 1.f, 1.f);
     Vec2f ent_midpoint = geo::midpoint(ent_aabb);
@@ -676,8 +676,8 @@ void Subworld::handleWorldCollisions(Entity entity) {
 
   for (const auto& tile : coll.tiles) {
     Vec2f pos_new = Vec2f(pos.x + best_move.x, pos.y);
-    TileID tileid = tilemap.getTile(tile);
-    TileDef tiledef = basegame->level_tile_data.getTileDef(tileid);
+    TileType tile_type = tilemap.getTile(tile);
+    TileDef tiledef = basegame->level_tile_data.getTileDef(tile_type);
     Rect<float> ent_aabb = coll.hitbox.toAABB(pos_new);
     Rect<float> tile_aabb = Rect<float>(tile.pos.x, tile.pos.y, 1.f, 1.f);
     Vec2f ent_midpoint = geo::midpoint(ent_aabb);
@@ -696,8 +696,8 @@ void Subworld::handleWorldCollisions(Entity entity) {
             best_move.y = -collision.height;
 
             if (vel.y > 0.f) {
-              if (tileid == "BrickGold"
-              or  tileid == "QuestionBlock") {
+              if (tile_type == "BrickGold"
+              or  tile_type == "QuestionBlock") {
                 itemblocks_hit.push_back(tile);
               }
             }
@@ -723,14 +723,14 @@ void Subworld::handleWorldCollisions(Entity entity) {
 
   for (const auto& tile : coll.tiles) {
     Vec2f pos_new = pos + best_move;
-    auto tileid = tilemap.getTile(tile);
-    TileDef tile_data = basegame->level_tile_data.getTileDef(tileid);
+    auto tile_type = tilemap.getTile(tile);
+    TileDef tile_data = basegame->level_tile_data.getTileDef(tile_type);
     Rect<float> ent_aabb = coll.hitbox.toAABB(pos_new);
     Rect<float> tile_aabb = Rect<float>(tile.pos.x, tile.pos.y, 1.f, 1.f);
     switch (tile_data.getCollisionType()) {
     case TileDef::CollisionType::NONSOLID:
       if (geo::intersects(ent_aabb, tile_aabb)) {
-        if (tileid == "CoinGold") {
+        if (tile_type == "CoinGold") {
           coins_collected.push_back(tile);
         }
       }
@@ -819,8 +819,8 @@ void Subworld::handleWorldCollisions(Entity entity) {
         }
       );
       Tile& tile = itemblocks_hit[0];
-      TileID tileid = tilemap.getTile(tile);
-      if (tileid == "BrickGold") {
+      TileType tile_type = tilemap.getTile(tile);
+      if (tile_type == "BrickGold") {
         vel.y += -7.5f;
         auto& powerup = entities.get<CPowerup>(entity).value;
         if (getPowerupTier(powerup) > 0) {
@@ -828,7 +828,7 @@ void Subworld::handleWorldCollisions(Entity entity) {
           gameplay->playSound("smash");
         }
       }
-      else if (tileid == "QuestionBlock") {
+      else if (tile_type == "QuestionBlock") {
         vel.y += -7.5f;
         basegame->addCoins(1);
         tilemap.setTile(tile, "EmptyBlock");

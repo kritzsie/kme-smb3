@@ -10,7 +10,7 @@
 namespace kme {
 using namespace vec2_aliases;
 
-using TileID = std::string;
+using TileType = std::string;
 
 class TileRedefinitionError : public std::runtime_error {
 public:
@@ -52,7 +52,7 @@ private:
 
 class TileDefs {
 public:
-  using Map = std::map<TileID, TileDef>;
+  using Map = std::map<TileType, TileDef>;
 
   using const_iterator = Map::const_iterator;
   using const_reverse_iterator = Map::const_reverse_iterator;
@@ -62,8 +62,8 @@ public:
   TileDefs();
   TileDefs(TileDef default_tile);
 
-  void registerTileDef(TileID tileid, TileDef tiledef);
-  const TileDef& getTileDef(TileID tileid) const;
+  void registerTileDef(TileType tile_type, TileDef tiledef);
+  const TileDef& getTileDef(TileType tile_type) const;
 
   const const_iterator cbegin() const;
   const const_iterator cend() const;

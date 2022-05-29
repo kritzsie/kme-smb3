@@ -39,7 +39,7 @@ const Tilemap::Chunk& Tilemap::getChunkAt(Tile tile) const {
   return getChunkAt(tile.layer, tile.pos.x, tile.pos.y);
 }
 
-TileID Tilemap::getTile(int layer, int x, int y) const {
+TileType Tilemap::getTile(int layer, int x, int y) const {
   Vec2s chunk_pos = getChunkPos(x, y);
   Vec2z local_pos = getLocalPos(x, y);
   const auto& chunks = getChunks(layer);
@@ -49,17 +49,17 @@ TileID Tilemap::getTile(int layer, int x, int y) const {
   return notile;
 }
 
-TileID Tilemap::getTile(Tile tile) const {
+TileType Tilemap::getTile(Tile tile) const {
   return getTile(tile.layer, tile.pos.x, tile.pos.y);
 }
 
-void Tilemap::setTile(int layer, int x, int y, TileID tileid) {
+void Tilemap::setTile(int layer, int x, int y, TileType tile_type) {
   Vec2z local_pos = getLocalPos(x, y);
-  layers[layer][getChunkPos(x, y)][local_pos.y][local_pos.x] = tileid;
+  layers[layer][getChunkPos(x, y)][local_pos.y][local_pos.x] = tile_type;
 }
 
-void Tilemap::setTile(Tile tile, TileID tileid) {
-  setTile(tile.layer, tile.pos.x, tile.pos.y, tileid);
+void Tilemap::setTile(Tile tile, TileType tile_type) {
+  setTile(tile.layer, tile.pos.x, tile.pos.y, tile_type);
 }
 
 // mutable accessors

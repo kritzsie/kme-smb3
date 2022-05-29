@@ -26,7 +26,7 @@ LevelLoader::LevelLoader(std::size_t world, std::size_t level) {
     std::size_t subworld_id = std::stoi(filename);
     SubworldData& subworld_data = subworlds[subworld_id];
 
-    std::unordered_map<std::size_t, TileID> tileset_types;
+    std::unordered_map<std::size_t, TileType> tileset_types;
 
     Json::Value root;
     if (reader.parse(util::readFile(util::join({path.str(), filename}, "/")).data(), root)) {

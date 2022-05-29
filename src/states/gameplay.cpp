@@ -361,9 +361,9 @@ void Gameplay::drawTiles() {
   for (int y = region.y; y < region.y + region.height; ++y)
   for (int x = region.x; x < region.x + region.width;  ++x) {
     Tile tile(iter->first, x, y);
-    TileID tileid = tilemap.getTile(tile);
-    if (tileid != Tilemap::notile) {
-      TileDef tiledef = getBaseGame()->level_tile_data.getTileDef(tileid);
+    TileType tile_type = tilemap.getTile(tile);
+    if (tile_type != Tilemap::notile) {
+      TileDef tiledef = getBaseGame()->level_tile_data.getTileDef(tile_type);
       std::size_t frame = tiledef.getFrameOffset(rendertime);
       std::string texture = tiledef.getFrame(frame).texture;
       if (texture != "") {

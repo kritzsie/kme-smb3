@@ -24,11 +24,11 @@ struct Tile {
 
 class Tilemap {
 public:
-  using Chunk = std::array<std::array<TileID, 16>, 16>;
+  using Chunk = std::array<std::array<TileType, 16>, 16>;
   using Chunks = std::unordered_map<Vec2s, Chunk>;
   using Layers = std::map<int, Chunks>;
 
-  inline static const TileID notile;
+  inline static const TileType notile;
 
   static constexpr Vec2s getChunkPos(int x, int y);
   static constexpr Vec2z getLocalPos(int x, int y);
@@ -45,10 +45,10 @@ public:
   Chunk& getChunkAt(Tile tile);
   Chunk& getChunkAt(int layer, int x, int y);
 
-  TileID getTile(Tile tile) const;
-  TileID getTile(int layer, int x, int y) const;
-  void setTile(int layer, int x, int y, TileID tileid);
-  void setTile(Tile tile, TileID tileid);
+  TileType getTile(Tile tile) const;
+  TileType getTile(int layer, int x, int y) const;
+  void setTile(int layer, int x, int y, TileType tile_type);
+  void setTile(Tile tile, TileType tile_type);
 
 private:
   Layers layers;
