@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../../../renderstates.hpp"
+#include "../entity.hpp"
 #include "../powerup.hpp"
 #include "components.hpp"
 
@@ -10,8 +11,6 @@
 #include <unordered_map>
 
 namespace kme {
-using EntityType = std::string;
-
 class EntityRedefinitionError : public std::runtime_error {
 public:
   using runtime_error::runtime_error;

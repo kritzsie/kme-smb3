@@ -23,15 +23,15 @@ LevelLoader::LevelLoader(std::size_t world, std::size_t level) {
   StringList files = util::getFiles(path.str());
 
   for (const auto& filename : files) {
-    std::size_t subworld = std::stoi(filename);
-    SubworldData& data = subworld_data[subworld];
+    std::size_t subworld_id = std::stoi(filename);
+    SubworldData& subworld_data = subworlds[subworld_id];
 
-    std::unordered_map<std::size_t, TileID> tileids;
+    std::unordered_map<std::size_t, TileID> tileset_types;
 
     Json::Value root;
     if (reader.parse(util::readFile(util::join({path.str(), filename}, "/")).data(), root)) {
-      data.bounds.width = root["width"].asInt();
-      data.bounds.height = root["height"].asInt();
+      subworld_data.bounds.width = root["width"].asInt();
+      subworld_data.bounds.height = root["height"].asInt();
     }
     else {
       throw std::runtime_error(filename + " " + reader.getFormattedErrorMessages());
@@ -46,21 +46,27 @@ LevelLoader::LevelLoader(std::size_t world, std::size_t level) {
       if (reader.parse(util::readFile(tileset_path).data(), tileset_root)) {
         for (const auto& tiles : tileset_root["tiles"]) {
           std::size_t id = tiles["id"].asInt() + firstgid;
-          tileids[id] = tiles["type"].asString();
+          tileset_types[id] = tiles["type"].asString();
         }
       }
     }
 
-    std::size_t layer_count = 0;
+    std::size_t tilelayer_count = 0;
     for (const auto& layer : root["layers"]) {
       if (layer["type"] == "tilelayer") {
-        layer_count += 1;
+        tilelayer_count += 1;
+      }
+    }
+
+    for (const auto& properties : root["properties"]) {
+      if (properties["name"] == "theme") {
+        subworld_data.theme = properties["value"].asString();
       }
     }
 
     for (const auto& layer : root["layers"]) {
       if (layer["type"] == "tilelayer") {
-        layer_count -= 1;
+        tilelayer_count -= 1;
         auto layer_data = util::base64_decode(layer["data"].asString());
         for (std::size_t i = 0; i < layer_data.size(); i += 4) {
           std::size_t id = 0;
@@ -68,28 +74,36 @@ LevelLoader::LevelLoader(std::size_t world, std::size_t level) {
           for (std::size_t j = 0; j < 4; ++j) {
             id += static_cast<UInt8>(layer_data[i + j]) << (j * 8);
           }
-          auto it = tileids.find(id);
-          int x = (i / 4) % data.bounds.width;
-          int y = data.bounds.height - (i / 4) / data.bounds.width - 1;
-          if (it != tileids.end()) {
-            data.tilemap.setTile(layer_count, x, y, it->second);
+          int x = (i / 4) % subworld_data.bounds.width;
+          int y = subworld_data.bounds.height - (i / 4) / subworld_data.bounds.width - 1;
+          auto it = tileset_types.find(id);
+          if (it != tileset_types.end()) {
+            subworld_data.tilemap.setTile(tilelayer_count, x, y, it->second);
           }
         }
       }
-    }
-
-    for (const auto& properties : root["properties"]) {
-      if (properties["name"] == "theme") {
-        data.theme = properties["value"].asString();
+      else if (layer["type"] == "objectgroup") {
+        for (auto object : layer["objects"]) {
+          auto aabb = Rect<float>(
+            object["x"].asFloat() / 16.f, object["y"].asFloat() / 16.f,
+            object["width"].asFloat() / 16.f, object["height"].asFloat() / 16.f
+          );
+          auto pos = Vec2f(aabb.x + aabb.width / 2, aabb.y);
+          auto it = tileset_types.find(object["gid"].asInt());
+          if (it != tileset_types.end()) {
+            subworld_data.entities.types.push_back(it->second);
+            subworld_data.entities.pos.push_back(pos);
+          }
+        }
       }
     }
   }
 }
 
 void LevelLoader::load(Level& level) {
-  for (std::pair<std::size_t, const SubworldData&> iter : subworld_data) {
+  for (auto iter : subworlds) {
     std::size_t index = iter.first;
-    const auto& data = iter.second;
+    auto& data = iter.second;
 
     if (not level.subworldExists(index)) {
       level.createSubworld(index);

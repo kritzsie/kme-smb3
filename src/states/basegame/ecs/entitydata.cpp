@@ -1,5 +1,8 @@
 #include "entitydata.hpp"
 
+#include "../entity.hpp"
+#include "components.hpp"
+
 #include <sstream>
 
 namespace kme {

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../../math.hpp"
+#include "entity.hpp"
 #include "tilemap.hpp"
 #include "world.hpp"
 
@@ -10,7 +11,13 @@
 namespace kme {
 class LevelLoader {
 public:
+  struct EntityData {
+    std::vector<EntityType> types;
+    std::vector<Vec2f> pos;
+  };
+
   struct SubworldData {
+    EntityData entities;
     Tilemap tilemap;
     Rect<int> bounds;
     std::string theme;
@@ -21,6 +28,6 @@ public:
   void load(Level& level);
 
 private:
-  std::unordered_map<std::size_t, SubworldData> subworld_data;
+  std::unordered_map<std::size_t, SubworldData> subworlds;
 };
 }
