@@ -10,6 +10,7 @@ namespace kme {
 using namespace vec2_aliases;
 
 using Entity = entt::entity;
+using EntityRegistry = entt::registry;
 using EntityType = std::string;
 
 struct EntityData {

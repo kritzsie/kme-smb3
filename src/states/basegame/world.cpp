@@ -84,6 +84,12 @@ void Subworld::setTheme(std::string theme_new) {
 }
 
 void Subworld::loadEntities() {
+  for (std::size_t i = 0; i < entity_data.types.size(); ++i) {
+    auto entity_type = entity_data.types[i];
+    auto entity_pos = entity_data.pos[i];
+    auto spawner = basegame->getSpawner(entities, entity_type);
+    spawner(entity_pos);
+  }
 }
 
 // begin ugly

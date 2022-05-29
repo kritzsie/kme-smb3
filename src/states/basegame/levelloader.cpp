@@ -85,7 +85,7 @@ LevelLoader::LevelLoader(std::size_t world, std::size_t level) {
       else if (layer["type"] == "objectgroup") {
         for (auto object : layer["objects"]) {
           auto aabb = Rect<float>(
-            object["x"].asFloat() / 16.f, object["y"].asFloat() / 16.f,
+            object["x"].asFloat() / 16.f, subworld_data.bounds.height - object["y"].asFloat() / 16.f,
             object["width"].asFloat() / 16.f, object["height"].asFloat() / 16.f
           );
           auto pos = Vec2f(aabb.x + aabb.width / 2, aabb.y);

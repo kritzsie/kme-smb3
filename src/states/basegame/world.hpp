@@ -1,7 +1,6 @@
 #pragma once
 
 #include "../../math.hpp"
-#include "ecs/ecs.hpp"
 #include "collision.hpp"
 #include "entity.hpp"
 #include "theme.hpp"

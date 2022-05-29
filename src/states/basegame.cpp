@@ -25,9 +25,76 @@ BaseGame::Factory BaseGame::create() {
 
 BaseGame::BaseGame(BaseState* parent, Engine* engine) : BaseState(parent, engine) {}
 
+BaseGame::Spawner BaseGame::getSpawner(EntityRegistry& entities, EntityType entity_type) {
+  return [this, &entities, entity_type](Vec2f pos) -> Entity {
+    auto entity = entities.create();
+    entities.emplace<CInfo>(entity, entity_type);
+    entities.emplace<CPosition>(entity, pos);
+    entity_spawn_data.at(entity_type)(entities, entity);
+    return entity;
+  };
+}
+
 void BaseGame::enter() {
   TileDefLoader loader;
   loader.load(level_tile_data);
+
+  entity_spawn_data["PlayerStart"] = [this](EntityRegistry& entities, Entity entity) {
+    auto& pos = entities.get<CPosition>(entity).value;
+    auto spawner = getSpawner(entities, "StartSign");
+    spawner(pos);
+  };
+
+  entity_spawn_data["StartSign"] = [](EntityRegistry& entities, Entity entity) {
+    auto& pos = entities.get<CPosition>(entity).value;
+    entities.emplace<CRender>(entity);
+  };
+
+  entity_spawn_data["Checkpoint"] = [](EntityRegistry& entities, Entity entity) {
+  };
+
+  entity_spawn_data["GoalCard"] = [](EntityRegistry& entities, Entity entity) {
+    entities.emplace<CCollision>(entity, Hitbox(0.5f, 1.f));
+    entities.emplace<CFlags>(entity);
+    entities.emplace<CState>(entity);
+    entities.emplace<CRender>(entity);
+  };
+
+  entity_spawn_data["Mushroom"] = [](EntityRegistry& entities, Entity entity) {
+    entities.emplace<CFlags>(entity, EFlags::POWERUP | EFlags::NOFRICTION);
+    entities.emplace<CVelocity>(entity, Vec2f(4.f, 0.f));
+    entities.emplace<CCollision>(entity, Hitbox(0.5f, 1.f));
+    entities.emplace<CPowerup>(entity, Powerup::MUSHROOM);
+    entities.emplace<CDirection>(entity);
+    entities.emplace<CState>(entity);
+    entities.emplace<CRender>(entity);
+  };
+
+  entity_spawn_data["Checkpoint"] = [](EntityRegistry& entities, Entity entity) {
+  };
+
+  entity_spawn_data["Goomba"] = [](EntityRegistry& entities, Entity entity) {
+    entities.emplace<CFlags>(entity, EFlags::ENEMY | EFlags::NOFRICTION);
+    entities.emplace<CState>(entity, EState::WALK);
+    entities.emplace<CVelocity>(entity, Vec2f(-2.f, 0.f));
+    entities.emplace<CCollision>(entity, Hitbox(0.5f, 0.75f));
+    entities.emplace<CDirection>(entity);
+    entities.emplace<CTimers>(entity);
+    entities.emplace<CRender>(entity);
+  };
+
+  entity_spawn_data["RaccoonLeaf"] = [](EntityRegistry& entities, Entity entity) {
+  };
+
+  entity_spawn_data["PSwitch"] = [](EntityRegistry& entities, Entity entity) {
+    entities.emplace<CInfo>(entity, "PSwitch");
+    entities.emplace<CPosition>(entity, Vec2f(16.5f, 4.f));
+    entities.emplace<CCollision>(entity, Hitbox(0.5f, 1.f));
+    entities.emplace<CFlags>(entity, EFlags::SOLID);
+    entities.emplace<CVelocity>(entity);
+    entities.emplace<CState>(entity);
+    entities.emplace<CRender>(entity);
+  };
 
   EntityDefs::Hitboxes mario_hb;
   mario_hb[Powerup::NONE][EState::IDLE] = Hitbox(6.f / 16.f, 15.f / 16.f);
