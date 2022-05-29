@@ -659,7 +659,7 @@ void Subworld::handleWorldCollisions(Entity entity) {
       auto collision = ent_aabb & tile_aabb;
       switch (tile_data.getCollisionType()) {
       case TileDef::CollisionType::SOLID:
-        if (collision.height > 2.f / 16.f) {
+        if (collision.height > 3.f / 16.f) {
           if (ent_midpoint.x > tile_midpoint.x) {
             best_move.x = collision.width;
           }
@@ -687,12 +687,12 @@ void Subworld::handleWorldCollisions(Entity entity) {
       switch (tiledef.getCollisionType()) {
       case TileDef::CollisionType::SOLID:
         if (ent_midpoint.y > tile_midpoint.y) {
-          if (collision.width > 2.f / 16.f) {
+          if (collision.width > 3.f / 16.f) {
             best_move.y = collision.height;
           }
         }
         else if (ent_midpoint.y < tile_midpoint.y) {
-          if (collision.width > 4.f / 16.f) {
+          if (collision.width > 3.f / 16.f) {
             best_move.y = -collision.height;
 
             if (vel.y > 0.f) {
@@ -705,8 +705,8 @@ void Subworld::handleWorldCollisions(Entity entity) {
         }
         break;
       case TileDef::CollisionType::PLATFORM:
-        if (vel.y < 0.f and pos_old.y >= tile_midpoint.y - 2.f / 16.f) {
-          if (collision.width > 2.f / 16.f) {
+        if (vel.y < 0.f and pos_old.y >= tile_aabb.y + tile_aabb.height - 4.f / 16.f) {
+          if (collision.width > 3.f / 16.f) {
             best_move.y = collision.height;
           }
         }

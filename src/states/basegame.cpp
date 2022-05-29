@@ -30,9 +30,9 @@ void BaseGame::enter() {
   loader.load(level_tile_data);
 
   EntityData::Hitboxes mario_hb;
-  mario_hb[Powerup::NONE][EState::IDLE] = Hitbox(5.f / 16.f, 15.f / 16.f);
-  mario_hb[Powerup::MUSHROOM][EState::IDLE] = Hitbox(5.f / 16.f, 25.f / 16.f);
-  mario_hb[Powerup::MUSHROOM][EState::DUCK] = Hitbox(5.f / 16.f, 15.f / 16.f);
+  mario_hb[Powerup::NONE][EState::IDLE] = Hitbox(6.f / 16.f, 15.f / 16.f);
+  mario_hb[Powerup::MUSHROOM][EState::IDLE] = Hitbox(6.f / 16.f, 25.f / 16.f);
+  mario_hb[Powerup::MUSHROOM][EState::DUCK] = Hitbox(6.f / 16.f, 15.f / 16.f);
   entity_data.registerHitboxes("Player", std::move(mario_hb));
 
   RenderStates mario_rs;
