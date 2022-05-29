@@ -103,16 +103,17 @@ LevelLoader::LevelLoader(std::size_t world, std::size_t level) {
 void LevelLoader::load(Level& level) {
   for (auto iter : subworlds) {
     std::size_t index = iter.first;
-    auto& data = iter.second;
+    auto& subworld_data = iter.second;
 
     if (not level.subworldExists(index)) {
       level.createSubworld(index);
     }
 
     Subworld& subworld = level.getSubworld(index);
-    subworld.setBounds(data.bounds);
-    subworld.setTheme(data.theme);
-    subworld.setTilemap(data.tilemap);
+    subworld.setBounds(subworld_data.bounds);
+    subworld.setTheme(subworld_data.theme);
+    subworld.setEntities(subworld_data.entities);
+    subworld.setTilemap(subworld_data.tilemap);
   }
 }
 }

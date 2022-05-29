@@ -35,11 +35,11 @@ public:
 
   const EntityRegistry& getEntities() const;
   EntityRegistry& getEntities();
-  void setEntities(const EntityData& entities);
+  void setEntities(EntityData entity_data);
 
   const Tilemap& getTilemap() const;
   Tilemap& getTilemap();
-  void setTilemap(const Tilemap& tilemap);
+  void setTilemap(Tilemap tilemap);
 
   Rect<int> getBounds() const;
   void setBounds(int width, int height);
@@ -51,6 +51,8 @@ public:
 
   std::string getTheme() const;
   void setTheme(std::string theme);
+
+  void loadEntities();
 
   void update(float delta);
 
@@ -75,6 +77,9 @@ public:
 private:
   BaseGame* basegame;
   Gameplay* gameplay;
+
+  EntityData entity_data;
+  //Tilemap tilemap_data;
 
   EntityRegistry entities;
   Tilemap tilemap;

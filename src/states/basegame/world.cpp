@@ -35,11 +35,15 @@ EntityRegistry& Subworld::getEntities() {
   return const_cast<EntityRegistry&>(static_cast<const Subworld*>(this)->getEntities());
 }
 
+void Subworld::setEntities(EntityData entity_data_new) {
+  entity_data = entity_data_new;
+}
+
 const Tilemap& Subworld::getTilemap() const {
   return tilemap;
 }
 
-void Subworld::setTilemap(const Tilemap& tilemap_new) {
+void Subworld::setTilemap(Tilemap tilemap_new) {
   tilemap = tilemap_new;
 }
 
@@ -77,6 +81,9 @@ std::string Subworld::getTheme() const {
 
 void Subworld::setTheme(std::string theme_new) {
   theme = theme_new;
+}
+
+void Subworld::loadEntities() {
 }
 
 // begin ugly

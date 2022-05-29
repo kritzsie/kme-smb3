@@ -121,6 +121,7 @@ void Gameplay::enter() {
   entities.emplace<CCollision>(camera, Hitbox(15.f, 16.875f));
   subworld.camera = camera;
 
+  /*
   auto sign = entities.create();
   entities.emplace<CInfo>(sign, "StartSign");
   entities.emplace<CPosition>(sign, Vec2f(5.f, 1.f));
@@ -134,7 +135,6 @@ void Gameplay::enter() {
   entities.emplace<CState>(goalcard);
   entities.emplace<CRender>(goalcard);
 
-  /*
   auto mushroom = entities.create();
   entities.emplace<CInfo>(mushroom, "Mushroom");
   entities.emplace<CFlags>(mushroom, EFlags::POWERUP | EFlags::NOFRICTION);
