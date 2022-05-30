@@ -96,6 +96,11 @@ LevelLoader::LevelLoader(std::size_t world, std::size_t level) {
           }
         }
       }
+      else if (layer["type"] == "imagelayer") {
+        if (layer["name"] == "Water Layer") {
+          subworld_data.water_height = std::round(subworld_data.bounds.height - layer["offsety"].asFloat());
+        }
+      }
     }
   }
 }
@@ -114,6 +119,7 @@ void LevelLoader::load(Level& level) {
     subworld.setTheme(subworld_data.theme);
     subworld.setEntities(subworld_data.entities);
     subworld.setTilemap(subworld_data.tilemap);
+    subworld.setWaterHeight(subworld_data.water_height);
   }
 }
 }

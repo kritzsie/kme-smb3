@@ -5,6 +5,7 @@
 #include "tilemap.hpp"
 #include "world.hpp"
 
+#include <optional>
 #include <string>
 #include <unordered_map>
 
@@ -16,6 +17,7 @@ public:
     Tilemap tilemap;
     Rect<int> bounds;
     std::string theme;
+    std::optional<int> water_height;
   };
 
   LevelLoader(std::size_t world, std::size_t level);

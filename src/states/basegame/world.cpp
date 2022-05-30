@@ -13,6 +13,7 @@
 
 #include <algorithm>
 #include <exception>
+#include <optional>
 #include <unordered_set>
 #include <vector>
 
@@ -27,61 +28,35 @@ Subworld::Subworld(BaseGame* basegame_new, Gameplay* gameplay_new) {
   gameplay = gameplay_new;
 }
 
-const EntityRegistry& Subworld::getEntities() const {
-  return entities;
-}
+const EntityRegistry& Subworld::getEntities() const { return entities; }
 
 EntityRegistry& Subworld::getEntities() {
   return const_cast<EntityRegistry&>(static_cast<const Subworld*>(this)->getEntities());
 }
 
-void Subworld::setEntities(EntityData entity_data_new) {
-  entity_data = entity_data_new;
-}
-
-const Tilemap& Subworld::getTilemap() const {
-  return tilemap;
-}
-
-void Subworld::setTilemap(Tilemap tilemap_new) {
-  tilemap = tilemap_new;
-}
+void Subworld::setEntities(EntityData entity_data_new) { entity_data = entity_data_new; }
+const Tilemap& Subworld::getTilemap() const { return tilemap; }
+void Subworld::setTilemap(Tilemap tilemap_new) { tilemap = tilemap_new; }
 
 Tilemap& Subworld::getTilemap() {
   return const_cast<Tilemap&>(static_cast<const Subworld*>(this)->getTilemap());
 }
 
-Rect<int> Subworld::getBounds() const {
-  return bounds;
-}
+Rect<int> Subworld::getBounds() const { return bounds; }
+void Subworld::setBounds(Rect<int> bounds_new) { bounds = bounds_new; }
+void Subworld::setBounds(int x, int y, int width, int height) { setBounds(Rect<int>(x, y, width, height)); }
+void Subworld::setBounds(int width, int height) { setBounds(0, 0, width, height); }
 
-void Subworld::setBounds(Rect<int> bounds_new) {
-  bounds = bounds_new;
-}
+float Subworld::getGravity() const { return gravity; }
+void Subworld::setGravity(float value) { gravity = value; }
 
-void Subworld::setBounds(int x, int y, int width, int height) {
-  setBounds(Rect<int>(x, y, width, height));
-}
+std::optional<int> Subworld::getWaterHeight() const { return water_height; }
+void Subworld::setWaterHeight(std::optional<int> height) { water_height = height; }
+void Subworld::setWaterHeight(int height) { water_height = height; }
+void Subworld::unsetWaterHeight() { water_height = std::nullopt; }
 
-void Subworld::setBounds(int width, int height) {
-  setBounds(0, 0, width, height);
-}
-
-float Subworld::getGravity() const {
-  return gravity;
-}
-
-void Subworld::setGravity(float value) {
-  gravity = value;
-}
-
-std::string Subworld::getTheme() const {
-  return theme;
-}
-
-void Subworld::setTheme(std::string theme_new) {
-  theme = theme_new;
-}
+std::string Subworld::getTheme() const { return theme; }
+void Subworld::setTheme(std::string theme_new) { theme = theme_new; }
 
 void Subworld::loadEntities() {
   for (std::size_t i = 0; i < entity_data.types.size(); ++i) {
@@ -705,7 +680,7 @@ void Subworld::handleWorldCollisions(Entity entity) {
           }
         }
         else if (ent_midpoint.y < tile_midpoint.y) {
-          if (collision.width > 3.f / 16.f) {
+          if (collision.width > 6.f / 16.f) {
             best_move.y = -collision.height;
 
             if (vel.y > 0.f) {
@@ -718,7 +693,7 @@ void Subworld::handleWorldCollisions(Entity entity) {
         }
         break;
       case TileDef::CollisionType::PLATFORM:
-        if (vel.y < 0.f and pos_old.y >= tile_aabb.y + tile_aabb.height - 4.f / 16.f) {
+        if (vel.y < 0.f and pos_old.y >= tile_aabb.y + tile_aabb.height - 3.f / 16.f) {
           if (collision.width > 3.f / 16.f) {
             best_move.y = collision.height;
           }

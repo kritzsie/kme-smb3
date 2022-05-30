@@ -7,6 +7,7 @@
 #include "tilemap.hpp"
 
 #include <map>
+#include <optional>
 #include <unordered_map>
 #include <unordered_set>
 #include <utility>
@@ -48,6 +49,11 @@ public:
   float getGravity() const;
   void setGravity(float value);
 
+  std::optional<int> getWaterHeight() const;
+  void setWaterHeight(std::optional<int> height);
+  void setWaterHeight(int height);
+  void unsetWaterHeight();
+
   std::string getTheme() const;
   void setTheme(std::string theme);
 
@@ -88,6 +94,7 @@ private:
 
   Rect<int> bounds;
   float gravity = -60.f;
+  std::optional<int> water_height;
 
   std::string theme;
 };
