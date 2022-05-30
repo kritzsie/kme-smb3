@@ -194,26 +194,24 @@ void Engine::update(float delta) {
 
   // WARNING: Don't create/delete states from within a BaseState::enter() call!
   // Possible fix: use a stable iterator over the event queue.
-  if (events.size() > 0) {
-    for (StateEvent event : events) {
-      BaseState* state;
-      switch (event.first) {
-      case StateEventType::PUSH:
-        state = event.second(states.size() ? states.back() : nullptr, this);
-        states.push_back(state);
-        state->enter();
-        break;
-      case StateEventType::POP:
-        state = states.back();
-        state->exit();
-        states.pop_back();
-        delete state;
-        break;
-      }
+  for (StateEvent event : events) {
+    BaseState* state;
+    switch (event.first) {
+    case StateEventType::PUSH:
+      state = event.second(states.size() ? states.back() : nullptr, this);
+      states.push_back(state);
+      state->enter();
+      break;
+    case StateEventType::POP:
+      state = states.back();
+      state->exit();
+      states.pop_back();
+      delete state;
+      break;
     }
-
-    events.clear();
   }
+
+  events.clear();
 
   for (BaseState* state : states) {
     state->update(delta);
@@ -231,6 +229,18 @@ void Engine::draw(float delta) {
 }
 
 void Engine::quit() {
+  for (auto iter = states.rbegin(); iter != states.rend(); ++iter) {
+    BaseState* state = *iter;
+    state->exit();
+  }
+
+  for (auto iter = states.rbegin(); iter != states.rend(); ++iter) {
+    delete *iter;
+    *iter = nullptr;
+  }
+
+  states.clear();
+
   if (window) {
     window->close();
   }
