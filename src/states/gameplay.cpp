@@ -390,7 +390,6 @@ void Gameplay::drawWater(float height) {
     for (int x = aabb.x; x < aabb.x + aabb.width; ++x) {
       const int offset = rendertime / (8.f / 60.f);
       sf::Sprite sprite(water_top, Rect<int>((offset % 4) * 16, 0, 16, water_top_height));
-      sprite.setColor(Color(1, 1, 1, 0.5f));
       sprite.setPosition(toScreen(Vec2f(x, height)));
       scene->draw(sprite);
     }
@@ -399,7 +398,6 @@ void Gameplay::drawWater(float height) {
   for (int y = aabb.y; y < std::min(aabb.y + aabb.height, height - water_top_height / 16); ++y)
   for (int x = aabb.x; x < aabb.x + aabb.width; ++x) {
     sf::Sprite sprite(water);
-    sprite.setColor(Color(1, 1, 1, 0.5f));
     sprite.setPosition(toScreen(Vec2f(x, y + 1)));
     scene->draw(sprite);
   }
