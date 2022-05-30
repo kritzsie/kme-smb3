@@ -126,28 +126,30 @@ int Engine::exec() {
 }
 
 bool Engine::main() {
-  Duration tickdelta = static_cast<Duration>(tickinfo.delta);
-  Duration renderdelta = static_cast<Duration>(renderinfo.delta);
-  TimePoint curtime = Clock::now();
-  TimePoint prevtime = curtime - tickdelta;
-  TimePoint nexttick = prevtime + tickdelta;
-  TimePoint nextrender = prevtime + renderdelta;
+  Duration update_delta = static_cast<Duration>(tickinfo.delta);
+  Duration draw_delta = static_cast<Duration>(renderinfo.delta);
+  TimePoint time = Clock::now();
+  TimePoint time_old = time - update_delta;
+  TimePoint update_next = time_old + update_delta;
+  TimePoint draw_next = time_old + draw_delta;
 
   while (running) {
-    if (nexttick < curtime) {
+    if (update_next < time) {
       update(tickinfo.delta);
-      nexttick += tickdelta;
+      TimePoint time_new = Clock::now();
+      update_next = std::max(update_next, time_new) + update_delta;
     }
 
-    if (nextrender < curtime) {
+    if (draw_next < time) {
       draw(renderinfo.delta);
-      nextrender += renderdelta;
+      TimePoint time_new = Clock::now();
+      draw_next = std::max(draw_next, time_new) + draw_delta;
     }
 
     if (events.size() + states.size() > 0) {
-      std::this_thread::sleep_until(std::min(nexttick, nextrender));
-      prevtime = curtime;
-      curtime = Clock::now();
+      std::this_thread::sleep_until(std::min(update_next, draw_next));
+      time_old = time;
+      time = Clock::now();
     }
     else {
       quit();
@@ -190,10 +192,10 @@ void Engine::update(float delta) {
     }
   }
 
-  // WARNING: immediate changes to event queue means it's impossible to create
-  // and delete states from within a BaseState::enter() call
+  // WARNING: Don't create/delete states from within a BaseState::enter() call!
+  // Possible fix: use a stable iterator over the event queue.
   if (events.size() > 0) {
-    for (const StateEvent& event : events) {
+    for (StateEvent event : events) {
       BaseState* state;
       switch (event.first) {
       case StateEventType::PUSH:
