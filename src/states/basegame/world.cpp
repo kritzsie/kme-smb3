@@ -52,6 +52,7 @@ void Subworld::setGravity(float value) { gravity = value; }
 
 std::optional<int> Subworld::getWaterHeight() const { return water_height; }
 void Subworld::setWaterHeight(std::optional<int> height) { water_height = height; }
+bool Subworld::hasWater() const { return water_height.has_value(); }
 void Subworld::setWaterHeight(int height) { water_height = height; }
 void Subworld::unsetWaterHeight() { water_height = std::nullopt; }
 
@@ -707,7 +708,7 @@ void Subworld::handleWorldCollisions(Entity entity) {
 
   enum class WaterType {
     NONE, WATER, WATERFALL
-  } watertype = WaterType::NONE;
+  } water_type = WaterType::NONE;
 
   for (const auto& tile : coll.tiles) {
     Vec2f pos_new = pos + best_move;
@@ -725,12 +726,12 @@ void Subworld::handleWorldCollisions(Entity entity) {
       break;
     case TileDef::CollisionType::WATER:
       if (geo::contains(tile_aabb, geo::midpoint(ent_aabb))) {
-        watertype = WaterType::WATER;
+        water_type = WaterType::WATER;
       }
       break;
     case TileDef::CollisionType::WATERFALL:
       if (geo::contains(tile_aabb, geo::midpoint(ent_aabb))) {
-        watertype = WaterType::WATERFALL;
+        water_type = WaterType::WATERFALL;
         best_push.y = -0.25f;
       }
       break;
@@ -825,8 +826,15 @@ void Subworld::handleWorldCollisions(Entity entity) {
     }
   }
 
-  if (watertype != WaterType::NONE) {
-    if (watertype == WaterType::WATER
+  if (water_height) {
+    Rect<float> ent_aabb = coll.hitbox.toAABB(pos);
+    if (geo::midpoint(ent_aabb).y < water_height) {
+      water_type = WaterType::WATER;
+    }
+  }
+
+  if (water_type != WaterType::NONE) {
+    if (water_type == WaterType::WATER
     and ~flags & EFlags::UNDERWATER) {
       vel = Vec2f(0.f, 0.f);
     }

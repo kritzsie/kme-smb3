@@ -192,6 +192,9 @@ void Gameplay::draw(float delta) {
 
     drawTiles();
     drawEntities();
+    if (auto water = subworld.getWaterHeight()) {
+      drawWater(*water);
+    }
     drawHUD();
 
     scene->display();
@@ -301,7 +304,7 @@ void Gameplay::drawTiles() {
 
   for (auto iter = layers.rbegin(); iter != layers.rend(); ++iter)
   for (int y = region.y; y < region.y + region.height; ++y)
-  for (int x = region.x; x < region.x + region.width;  ++x) {
+  for (int x = region.x; x < region.x + region.width; ++x) {
     Tile tile(iter->first, x, y);
     TileType tile_type = tilemap.getTile(tile);
     if (tile_type != Tilemap::notile) {
@@ -363,8 +366,47 @@ void Gameplay::drawEntities() {
   }
 }
 
+// NOTE: this function needs improvement
+void Gameplay::drawWater(float height) {
+  const Subworld& subworld = level.getSubworld(current_subworld);
+  const EntityRegistry& entities = subworld.getEntities();
+  const auto& pos = entities.get<CPosition>(subworld.camera).value;
+  const auto& hitbox = entities.get<CCollision>(subworld.camera).hitbox;
+
+  const auto aabb = [pos, hitbox]() {
+    auto result = hitbox.toAABB(pos);
+    // snap camera to integer coordinates
+    result.pos = fromScreen(fp::map(util::round, toScreen(result.pos)));
+    return result;
+  }();
+
+  const auto& water_top = gfx.getTexture("water_overlay_top");
+  const auto& water = gfx.getTexture("water_overlay");
+
+  const int water_top_height = water_top.getSize().y;
+
+  if (height >= aabb.y
+  and height - water_top_height / 16 < aabb.y + aabb.height) {
+    for (int x = aabb.x; x < aabb.x + aabb.width; ++x) {
+      const int offset = rendertime / (8.f / 60.f);
+      sf::Sprite sprite(water_top, Rect<int>((offset % 4) * 16, 0, 16, water_top_height));
+      sprite.setColor(Color(1, 1, 1, 0.5f));
+      sprite.setPosition(toScreen(Vec2f(x, height)));
+      scene->draw(sprite);
+    }
+  }
+
+  for (int y = aabb.y; y < std::min(aabb.y + aabb.height, height - water_top_height / 16); ++y)
+  for (int x = aabb.x; x < aabb.x + aabb.width; ++x) {
+    sf::Sprite sprite(water);
+    sprite.setColor(Color(1, 1, 1, 0.5f));
+    sprite.setPosition(toScreen(Vec2f(x, y + 1)));
+    scene->draw(sprite);
+  }
+}
+
 void Gameplay::drawHUD() {
-  hud->clear(Color(0));
+  hud->clear(Color(0, 0, 0, 0));
 
   const auto& subworld = level.getSubworld(current_subworld);
   const auto& entities = subworld.getEntities();

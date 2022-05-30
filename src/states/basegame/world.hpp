@@ -51,6 +51,7 @@ public:
 
   std::optional<int> getWaterHeight() const;
   void setWaterHeight(std::optional<int> height);
+  bool hasWater() const;
   void setWaterHeight(int height);
   void unsetWaterHeight();
 

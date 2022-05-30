@@ -98,7 +98,7 @@ LevelLoader::LevelLoader(std::size_t world, std::size_t level) {
       }
       else if (layer["type"] == "imagelayer") {
         if (layer["name"] == "Water Layer") {
-          subworld_data.water_height = std::round(subworld_data.bounds.height - layer["offsety"].asFloat());
+          subworld_data.water_height = std::round(subworld_data.bounds.height - layer["offsety"].asFloat() / 16);
         }
       }
     }

@@ -67,11 +67,12 @@ private:
 
   void drawBackground(Color color);
   void drawBackground(Layer layer);
-  // parallax here is a factor from 0.0 to 1.0, not distance
-  void drawBackground(std::string name, Vec2f offset, Vec2f parallax,
+  // parallax is a factor from 0.0 to 1.0, NOT distance!
+  void drawBackground(std::string name, Vec2f offset, Vec2f parallax_factor,
                       bool tile_vertically = false);
   void drawTiles();
   void drawEntities();
+  void drawWater(float height);
   void drawHUD();
 
   static Vec2f fromScreen(Vec2f pos);
