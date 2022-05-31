@@ -8,6 +8,7 @@
 #include "../util.hpp"
 #include "basegame/ecs/components.hpp"
 #include "basegame/levelloader.hpp"
+#include "basegame/tilemap.hpp"
 #include "basegame.hpp"
 
 #include <iomanip>
@@ -172,7 +173,7 @@ void Gameplay::draw(float delta) {
     const EntityRegistry& entities = subworld.getEntities();
     const auto& pos = entities.get<CPosition>(subworld.camera).value;
     const auto& hitbox = entities.get<CCollision>(subworld.camera).hitbox;
-    const Rect<float> aabb = [pos, hitbox]() {
+    const Rect<float> aabb = [pos, hitbox] {
       auto result = hitbox.toAABB(pos);
       // snap camera to integer coordinates
       result.pos = fromScreen(fp::map(util::round, toScreen(result.pos)));
@@ -292,29 +293,42 @@ static Rect<int> viewportFromRegion(Rect<float> region) {
 }
 // end ugly
 
-void Gameplay::drawTiles() {
-  const Subworld& subworld = level.getSubworld(current_subworld);
-  const EntityRegistry& entities = subworld.getEntities();
-  const auto& pos = entities.get<CPosition>(subworld.camera).value;
-  const auto& coll = entities.get<CCollision>(subworld.camera);
+void Gameplay::drawTile(Vec2f pos, TileType tile_type) {
+  TileDef tiledef = getBaseGame()->level_tile_data.getTileDef(tile_type);
+  std::size_t frame = tiledef.getFrameOffset(rendertime);
+  std::string texture = tiledef.getFrame(frame).texture;
+  if (texture != "") {
+    sf::Sprite sprite(gfx.getTile(texture), tiledef.getFrame(frame).cliprect);
+    sprite.setPosition(toScreen(Vec2f(pos.x, pos.y + 1)));
+    scene->draw(sprite);
+  }
+}
 
-  Rect<int> region = viewportFromRegion(regionFromRect(coll.hitbox.toAABB(pos)));
+void Gameplay::drawChunk(Vec2s pos, const Tilemap::Chunk& chunk) {
+  for (std::size_t y = 0; y < 16; ++y)
+  for (std::size_t x = 0; x < 16; ++x) {
+    TileType tile_type = chunk.at(y).at(x);
+    drawTile(Vec2f(16 * pos.x + x, 16 * pos.y + y), tile_type);
+  }
+}
+
+void Gameplay::drawTiles() {
   const auto& tilemap = level.getSubworld(current_subworld).getTilemap();
   const auto& layers = tilemap.getLayers();
-
-  for (auto iter = layers.rbegin(); iter != layers.rend(); ++iter)
-  for (int y = region.y; y < region.y + region.height; ++y)
-  for (int x = region.x; x < region.x + region.width; ++x) {
-    Tile tile(iter->first, x, y);
-    TileType tile_type = tilemap.getTile(tile);
-    if (tile_type != Tilemap::notile) {
-      TileDef tiledef = getBaseGame()->level_tile_data.getTileDef(tile_type);
-      std::size_t frame = tiledef.getFrameOffset(rendertime);
-      std::string texture = tiledef.getFrame(frame).texture;
-      if (texture != "") {
-        sf::Sprite sprite(gfx.getTile(texture), tiledef.getFrame(frame).cliprect);
-        sprite.setPosition(toScreen(Vec2f(tile.pos.x, tile.pos.y + 1)));
-        scene->draw(sprite);
+  const auto& view = scene->getView();
+  const auto range = [view] {
+    const Vec2f size = static_cast<Vec2f>(view.getSize()) / 16.f;
+    const Vec2f pos = fromScreen(view.getCenter()) - size / 2.f;
+    return Rect<float>(pos / 16.f, size / 16.f);
+  }();
+  for (auto iter = layers.rbegin(); iter != layers.rend(); ++iter) {
+    const auto& chunks = iter->second;
+    for (short y = std::floor(range.y); y < std::ceil(range.y + range.height); ++y)
+    for (short x = std::floor(range.x); x < std::ceil(range.x + range.width); ++x) {
+      Vec2s pos(x, y);
+      const auto& chunks_iter = chunks.find(pos);
+      if (chunks_iter != chunks.end()) {
+        drawChunk(pos, chunks_iter->second);
       }
     }
   }

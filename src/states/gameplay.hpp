@@ -6,6 +6,7 @@
 #include "../math.hpp"
 #include "../types.hpp"
 #include "basegame/theme.hpp"
+#include "basegame/tilemap.hpp"
 #include "basegame/world.hpp"
 #include "basestate.hpp"
 
@@ -70,6 +71,8 @@ private:
   // parallax is a factor from 0.0 to 1.0, NOT distance!
   void drawBackground(std::string name, Vec2f offset, Vec2f parallax_factor,
                       bool tile_vertically = false);
+  void drawTile(Vec2f pos, TileType tile_type);
+  void drawChunk(Vec2s pos, const Tilemap::Chunk& chunk);
   void drawTiles();
   void drawEntities();
   void drawWater(float height);
