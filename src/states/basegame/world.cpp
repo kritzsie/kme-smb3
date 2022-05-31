@@ -126,7 +126,7 @@ void Subworld::update(float delta) {
 
     bool animate_faster = false;
 
-    auto vel_view = entities.view<CVelocity, CState>();
+    auto vel_view = entities.view<CVelocity, CState, CFlags>();
     if (vel_view.contains(entity)) {
       auto& state = vel_view.get<CState>(entity).value;
       animate_faster = state == EState::WALK or state == EState::UNDERWATER;
@@ -134,7 +134,12 @@ void Subworld::update(float delta) {
 
     if (animate_faster) {
       auto& vel = vel_view.get<CVelocity>(entity).value;
-      render.time += std::clamp(std::abs(vel.x) / 3.f, 1.f, 4.f) * delta;
+      auto& flags = vel_view.get<CFlags>(entity).value;
+      bool on_ice = flags & EFlags::ON_ICE;
+      render.time += std::clamp(
+        on_ice * 0.5f + std::abs((on_ice ? 1.5f : 1.f) * vel.x) / 3.f,
+        1.f, 4.f
+      ) * delta;
     }
     else {
       render.time += delta;
@@ -198,17 +203,24 @@ void Subworld::update(float delta) {
     }
     else if (x != 0) {
       bool underwater = flags & EFlags::UNDERWATER;
+      bool on_ice = flags & EFlags::ON_ICE;
       if (x > 0) {
         if (vel.x <= max_x) {
           flags |= EFlags::NOFRICTION;
-          vel.x += (underwater ? 0.25f : 1.f) * (vel.x < 0 ? 30.f : 15.f) * delta;
+          if (not on_ice)
+            vel.x += (underwater ? 0.25f : 1.f) * (vel.x < 0 ? 30.f : 15.f) * delta;
+          else
+            vel.x += (underwater ? 0.25f : 1.f) * (vel.x < 0 ? 15.f : 10.f) * delta;
           vel.x = std::min(vel.x, max_x);
         }
       }
       else if (x < 0) {
         if (vel.x >= -max_x) {
           flags |= EFlags::NOFRICTION;
-          vel.x -= (underwater ? 0.25f : 1.f) * (vel.x > 0 ? 30.f : 15.f) * delta;
+          if (not on_ice)
+            vel.x -= (underwater ? 0.25f : 1.f) * (vel.x > 0 ? 30.f : 15.f) * delta;
+          else
+            vel.x -= (underwater ? 0.25f : 1.f) * (vel.x > 0 ? 15.f : 10.f) * delta;
           vel.x = std::max(vel.x, -max_x);
         }
       }
@@ -413,11 +425,12 @@ void Subworld::update(float delta) {
     // apply friction
     if (~flags & EFlags::NOFRICTION
     and ~flags & EFlags::AIRBORNE) {
+      bool on_ice = flags & EFlags::ON_ICE;
       if (vel.x > 0.f) {
-        vel.x = std::max(vel.x - 10.f * delta, 0.f);
+        vel.x = std::max(vel.x - (on_ice ? 5.f : 10.f) * delta, 0.f);
       }
       else if (vel.x < 0.f) {
-        vel.x = std::min(vel.x + 10.f * delta, 0.f);
+        vel.x = std::min(vel.x + (on_ice ? 5.f : 10.f) * delta, 0.f);
       }
     }
 
@@ -636,6 +649,10 @@ void Subworld::handleWorldCollisions(Entity entity) {
   std::vector<Tile> coins_collected;
   std::vector<Tile> itemblocks_hit;
 
+  enum class GroundType {
+    NONE, SOLID, ICE
+  } ground_type = GroundType::NONE;
+
   for (const auto& tile : coll.tiles) {
     Vec2f pos_new = Vec2f(pos.x, pos_old.y);
     auto tile_type = tilemap.getTile(tile);
@@ -678,6 +695,29 @@ void Subworld::handleWorldCollisions(Entity entity) {
         if (ent_midpoint.y > tile_midpoint.y) {
           if (collision.width > 3.f / 16.f) {
             best_move.y = collision.height;
+
+            if (ground_type != GroundType::SOLID) {
+              // FIXME please
+              if (tile_type == "WoodFloorSnow_0"
+              or  tile_type == "WoodFloorSnow_1"
+              or  tile_type == "WoodFloorSnow_2"
+              or  tile_type == "WoodFloorSnow_9"
+              or  tile_type == "WoodFloorSnow_12"
+              or  tile_type == "WoodFloorSnow_13"
+              or  tile_type == "WoodFloorSnow_14"
+              or  tile_type == "IceBlock"
+              or  tile_type == "IceBlockCoin"
+              or  tile_type == "IceBlockMuncher"
+              or  tile_type == "IceBlockBig_0"
+              or  tile_type == "IceBlockBig_1"
+              or  tile_type == "IceBlockBig_2"
+              or  tile_type == "IceBlockBig_3") {
+                ground_type = GroundType::ICE;
+              }
+            }
+            else {
+              ground_type = GroundType::SOLID;
+            }
           }
         }
         else if (ent_midpoint.y < tile_midpoint.y) {
@@ -712,7 +752,7 @@ void Subworld::handleWorldCollisions(Entity entity) {
 
   for (const auto& tile : coll.tiles) {
     Vec2f pos_new = pos + best_move;
-    auto tile_type = tilemap.getTile(tile);
+    TileType tile_type = tilemap.getTile(tile);
     TileDef tile_data = basegame->level_tile_data.getTileDef(tile_type);
     Rect<float> ent_aabb = coll.hitbox.toAABB(pos_new);
     Rect<float> tile_aabb = Rect<float>(tile.pos.x, tile.pos.y, 1.f, 1.f);
@@ -842,6 +882,13 @@ void Subworld::handleWorldCollisions(Entity entity) {
   }
   else {
     flags &= ~EFlags::UNDERWATER;
+  }
+
+  if (ground_type == GroundType::ICE) {
+    flags |= EFlags::ON_ICE;
+  }
+  else {
+    flags &= ~EFlags::ON_ICE;
   }
 }
 

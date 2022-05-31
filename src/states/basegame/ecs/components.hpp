@@ -35,6 +35,7 @@ struct EFlags {
 
     AIRBORNE   = 1 << 8,
     UNDERWATER = 1 << 9,
+    ON_ICE     = 1 << 10,
     LANDED     = 1 << 12,
 
     SOLID      = 1 << 16,
