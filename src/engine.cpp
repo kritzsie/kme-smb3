@@ -136,14 +136,20 @@ bool Engine::main() {
   while (running) {
     if (update_next < time) {
       update(tickinfo.delta);
-      TimePoint time_new = Clock::now();
-      update_next = std::max(update_next, time_new) + update_delta;
+      TimePoint time = Clock::now();
+      update_next += update_delta;
+      if (time > update_next) {
+        update_next = time + update_delta;
+      }
     }
 
     if (draw_next < time) {
       draw(renderinfo.delta);
-      TimePoint time_new = Clock::now();
-      draw_next = std::max(draw_next, time_new) + draw_delta;
+      TimePoint time = Clock::now();
+      draw_next += draw_delta;
+      if (time > draw_next) {
+        draw_next = time + draw_delta;
+      }
     }
 
     if (events.size() + states.size() > 0) {
